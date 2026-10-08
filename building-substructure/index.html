@@ -1,0 +1,873 @@
+<title>Building Substructure Sequence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&display=swap">
+<style>
+/* Layout: one 5:4 plate holding the whole beam, sized to fit the viewport, with a rail of the twelve
+   stages under it. Black and white only: white on black in dark, black on white in light. */
+:root{
+  color-scheme:light;
+  --ground:#ffffff; --ink:#000000; --muted:#6c6c6c; --line:#e4e4e4;
+  --hairline-plate:#ffffff; --hairline-hi:#000000; --hairline-edge:#6a6a6a; --hairline-mid:#adadad; --hairline-lo:#dedede; --hairline-stroke:0.9;
+  --f-sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#000000; --ink:#ffffff; --muted:#8c8c8c; --line:#1e1e1e;
+    --hairline-plate:#000000; --hairline-hi:#ffffff; --hairline-edge:#8e8e8e; --hairline-mid:#4c4c4c; --hairline-lo:#262626;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#000000; --ink:#ffffff; --muted:#8c8c8c; --line:#1e1e1e;
+  --hairline-plate:#000000; --hairline-hi:#ffffff; --hairline-edge:#8e8e8e; --hairline-mid:#4c4c4c; --hairline-lo:#262626;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:13px/1.5 var(--f-sans);-webkit-font-smoothing:antialiased}
+.wrap{--w:min(100%, max(320px, calc((100svh - 230px)*1.25)), 980px);max-width:1100px;margin:0 auto;padding-inline:clamp(16px,3vw,40px);padding-block:36px 56px;display:grid;gap:22px;justify-items:center}
+.wrap > *{min-width:0;width:var(--w)}
+header{display:grid;gap:8px}
+h1{margin:0;font:300 clamp(28px,3.6vw,42px)/1.05 var(--f-sans);letter-spacing:-.025em;text-wrap:balance}
+header p{margin:0;max-width:60ch;color:var(--muted);font-size:14px;text-wrap:pretty}
+.plate{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--ground)}
+.tag{position:absolute;top:14px;z-index:1;font:11px/1 var(--f-mono);letter-spacing:.02em;color:var(--muted);pointer-events:none}
+#stageName{left:16px}
+#read{right:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.rail{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--cols,6),minmax(0,1fr));gap:14px 8px}
+@media (max-width:560px){.rail{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.rail button{width:100%;display:grid;gap:7px;padding:0;border:0;background:none;color:var(--muted);cursor:pointer;text-align:left;font:11px/1.2 var(--f-mono);letter-spacing:.01em}
+.rail button::before{content:"";display:block;height:1px;background:var(--line);transition:background-color .3s}
+.rail button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rail button:hover{color:var(--ink)}
+.rail button.done::before{background:var(--muted)}
+.rail button[aria-current="step"]{color:var(--ink)}
+.rail button[aria-current="step"]::before{background:var(--ink)}
+.rail button:focus-visible{outline:1.5px solid var(--ink);outline-offset:3px}
+footer{font:11px/1.7 var(--f-mono);color:var(--muted)}
+footer a{color:inherit}
+@media (prefers-reduced-motion: reduce){.rail button::before{transition:none}}
+</style>
+<div class="wrap">
+  <header>
+    <h1>Industrial substructure, built in lines</h1>
+    <p>The substructure of an industrial building: four rooms at different floor levels, with the main slab on grade a foot above the ground outside. Heights are exaggerated so the level changes read. Move across the drawing to scrub it, or pick a stage below.</p>
+  </header>
+  <div class="plate">
+    <span class="tag" id="stageName"></span>
+    <span class="tag" id="read"></span>
+    <div id="stage" data-hairline="building-substructure" role="img" aria-label="An industrial building substructure is drawn in lines: the grade datum, a column grid, four rooms at different floor levels, strip and spread footings, stem walls and piers, slabs on grade with the main slab one foot above grade, a depressed pit, materials, a mesh, subgrade springs, column and equipment loads, and differential settlement."></div>
+  </div>
+  <ol class="rail" id="rail" aria-label="Stages" style="--cols:6"></ol>
+  <footer>Drawn on the <a href="https://github.com/lucasmarkes/hairline">hairline</a> kernel by Lucas Marques, MIT licence.</footer>
+</div>
+<script>
+/* hairline kernel sha256:8e2abcbdf63c7755195ee942c39e9c8ea6a539d1147e986dd1c153559121f075 */
+/*
+ * HL: everything a figure may call. Read this index; the code under it is the
+ * package's src/core, unchanged, and a figure should not need to read it.
+ *
+ * Every figure is drawn in a 400 × 320 viewBox. World space is x/y on the
+ * ground and z up. Plates are filled with the ground colour and painted back
+ * to front, so a nearer one covers a farther one: append in that order. At
+ * the default camera, Cam(45, 0.5, S), +x runs down to the right and +y down
+ * to the left, so the corner with the largest x and y is nearest the viewer:
+ * append by ascending x + y, from the far corner (smallest x and y) to it.
+ *
+ * Camera
+ *   Cam(azDeg, k, S)                       a camera: azimuth in degrees, k = sin(elevation) (0.5 is the 2:1 view), S = scale
+ *   fit(C, points, cx, cy)                 centres the box of [x, y, z] points on (cx, cy); call it once, before proj
+ *                                          it only centres, it never scales: choose S by trying values, with the most extreme pose in points.
+ *                                          The six figures use S 1.42 to 2.12; the boxes they fit come out 230 to 310 wide and 180 to 245 tall
+ *   proj(C)                                returns P(x, y, z), which gives [sx, sy]
+ *   unproj(C, sx, sy, z)                   the world [x, y] under a screen point, on the plane at height z
+ *   facing(C)                              returns front(sample): whether a ring sample faces the camera
+ * Rounded solids
+ *   rrect(u0, v0, u1, v1, r, n)            a rounded rectangle, as a ring of samples {u, v, nu, nv}
+ *   circ(R, n)                             a circle, as a ring
+ *   rings(x0, y0, x1, y1, r, b)            [ring, inner]: a rounded footprint and its crease ring, inset by b
+ *                                          r, the corner radius, is cut to half the shorter side. b, the crease's inset in world units
+ *                                          (0.6 to 2.2 in the figures), must stay under half the shorter side or the crease turns inside out
+ *   prism(P, front, ring, inner, z0, z1)   {sil, crease}: a solid standing from z0 to z1, as two path strings
+ *   ringAt(P, ring, z)                     the ring's points, projected at height z
+ *   run(ring, keep)                        the one cyclic run of samples that pass keep
+ *   hull(points)                           the convex hull of screen points
+ *   extremes(P, ring)                      [left, right, nearest] samples: where dashed drops fall from
+ *   fillet(points, radii, n)               rounds every vertex of a closed polygon; returns the new points
+ *                                          radii is an array, one radius per vertex, each cut to half its shorter edge; a single number gives NaN.
+ *                                          n is the steps round each corner, default 4: each vertex becomes n + 1 points
+ *   ghost(P, front, ring, z0, depth)       a reflection's path {d, y0, y1}; reflect() draws it for you
+ * Paths and numbers
+ *   poly(points)                           a closed path string
+ *   open(points)                           an open polyline string
+ *   seg(a, b)                              one segment between two screen points [sx, sy], as its own subpath; project world points with P first
+ *   clamp(v, a, b)
+ *   lerp(a, b, t)
+ *   rad(deg)
+ *   r2(n)                                  two decimals
+ * The continuous clock: one spring per moving number
+ *   spring(x, opts)                        at rest on x; write .t to retarget; opts {k, c, m, eps}, default k 100, c 18, m 1
+ *   stepS(sp, dt)                          advances by dt seconds; returns whether it is still moving
+ * The discrete clock: a 700ms tween on (.32, .72, 0, 1)
+ *   tween(v, dur)                          at rest on v; dur defaults to 700 (ms)
+ *   tset(tw, to, now, delay)               retargets from where it is, after delay ms: the stagger
+ *                                          the same target again does nothing, so calling it on every pointer move is safe
+ *   tval(tw, now)                          its value at now
+ *   tdone(tw, now)                         whether it has landed
+ *   bezier(x1, y1, x2, y2)                 a CSS cubic-bezier, as a function of progress
+ *   EASE_LIFT                              the lift curve itself
+ *   reducedMotion()                        true when the reader asked for less motion; springs and tweens already land at once
+ *   setReducedMotion(on)                   the loop's business, not a figure's
+ * Drawing
+ *   mk(tag, attrs, parent)                 one svg element: the only way a figure makes a node
+ *   solid(parent)                          {g, sil, cr}: a group holding a silhouette path and a crease path
+ *   put(solid, paths)                      writes prism()'s {sil, crease} into solid()'s {sil, cr}: sil into sil, crease into cr
+ *   flatDot(parent, C, r, cls)             a dot lying on the ground plane; cls is "dot", "dot m" or "dot off"
+ *   place(el, point)                       moves a dot or a circle to [sx, sy]
+ *   reflect(svg, parent, P, front, ring, z0, depth)   a fading mirror under a solid
+ *   fade(svg, y0, y1, a0)                  a vertical fade, as a mask; returns the value for a mask attribute
+ * Life
+ *   register(stage, tick)                  joins the one frame loop; tick(dt in seconds, now in ms) returns true to ask for another frame; gives {wake, unregister}
+ *   pointer(stage, handlers)               {move(point), down(point), leave()}, points in viewBox units; returns its disposer
+ *   disposer()                             {add, on, dispose}: collects tear-down, so destroy is bag.dispose
+ * The bench's business, not a figure's
+ *   css(lightDark)
+ *   inject(root)
+ *
+ * Classes, on path, polygon, ellipse and line. They are the whole palette; a
+ * figure sets no colour, width or fill of its own.
+ *     (none)   filled with the ground colour, medium stroke
+ *     sil      the silhouette's stroke        hi    the bright stroke: the only highlight
+ *     lo       the dim stroke                 nf    no fill        fo   fill only, no stroke
+ *     dash     a dashed guide
+ *     dot      a bright dot                   dot m   a medium dot     dot off   a dim dot
+ */
+var HL = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // packages/hairline/src/core/kernel.ts
+  var kernel_exports = {};
+  __export(kernel_exports, {
+    Cam: () => Cam,
+    EASE_LIFT: () => EASE_LIFT,
+    bezier: () => bezier,
+    circ: () => circ,
+    clamp: () => clamp,
+    css: () => css,
+    disposer: () => disposer,
+    extremes: () => extremes,
+    facing: () => facing,
+    fade: () => fade,
+    fillet: () => fillet,
+    fit: () => fit,
+    flatDot: () => flatDot,
+    ghost: () => ghost,
+    hull: () => hull,
+    inject: () => inject,
+    lerp: () => lerp,
+    mk: () => mk,
+    open: () => open,
+    place: () => place,
+    pointer: () => pointer,
+    poly: () => poly,
+    prism: () => prism,
+    proj: () => proj,
+    put: () => put,
+    r2: () => r2,
+    rad: () => rad,
+    reducedMotion: () => reducedMotion,
+    reflect: () => reflect,
+    register: () => register,
+    ringAt: () => ringAt,
+    rings: () => rings,
+    rrect: () => rrect,
+    run: () => run,
+    seg: () => seg,
+    setReducedMotion: () => setReducedMotion,
+    solid: () => solid,
+    spring: () => spring,
+    stepS: () => stepS,
+    tdone: () => tdone,
+    tset: () => tset,
+    tval: () => tval,
+    tween: () => tween,
+    unproj: () => unproj
+  });
+
+  // packages/hairline/src/core/iso.ts
+  var clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  var lerp = (a, b, t) => a + (b - a) * t;
+  var rad = (d) => d * Math.PI / 180;
+  var r2 = (n) => Math.round(n * 100) / 100;
+  var poly = (pts) => "M" + pts.map((p) => r2(p[0]) + " " + r2(p[1])).join("L") + "Z";
+  var seg = (a, b) => `M${r2(a[0])} ${r2(a[1])}L${r2(b[0])} ${r2(b[1])}`;
+  var open = (pts) => pts.length < 2 ? "" : "M" + pts.map((p) => r2(p[0]) + " " + r2(p[1])).join("L");
+  var Cam = (azDeg, k, S) => ({ az: rad(azDeg), k, S, ox: 0, oy: 0 });
+  function proj(C) {
+    const c = Math.cos(C.az), s = Math.sin(C.az), zf = Math.sqrt(1 - C.k * C.k);
+    return (x, y, z) => {
+      const X = x * c - y * s, Y = x * s + y * c;
+      return [C.ox + C.S * X, C.oy + C.S * (Y * C.k - z * zf)];
+    };
+  }
+  function unproj(C, sx, sy, z) {
+    const c = Math.cos(C.az), s = Math.sin(C.az), zf = Math.sqrt(1 - C.k * C.k);
+    const X = (sx - C.ox) / C.S, Y = ((sy - C.oy) / C.S + z * zf) / C.k;
+    return [X * c + Y * s, -X * s + Y * c];
+  }
+  function fit(C, pts, cx, cy) {
+    C.ox = 0;
+    C.oy = 0;
+    const P = proj(C);
+    let a = 1e9, b = -1e9, c = 1e9, d = -1e9;
+    for (const p of pts) {
+      const q = P(p[0], p[1], p[2]);
+      a = Math.min(a, q[0]);
+      b = Math.max(b, q[0]);
+      c = Math.min(c, q[1]);
+      d = Math.max(d, q[1]);
+    }
+    C.ox = cx - (a + b) / 2;
+    C.oy = cy - (c + d) / 2;
+  }
+  function rrect(u0, v0, u1, v1, r, n = 4) {
+    r = Math.max(0, Math.min(r, (u1 - u0) / 2, (v1 - v0) / 2));
+    const out = [];
+    for (const [cu, cv, a0] of [[u1 - r, v1 - r, 0], [u0 + r, v1 - r, 90], [u0 + r, v0 + r, 180], [u1 - r, v0 + r, 270]])
+      for (let k = 0; k <= n; k++) {
+        const a = rad(a0 + 90 * k / n), ca = Math.cos(a), sa = Math.sin(a);
+        out.push({ u: cu + r * ca, v: cv + r * sa, nu: ca, nv: sa });
+      }
+    return out;
+  }
+  function circ(R, n = 96) {
+    const out = [];
+    for (let k = 0; k < n; k++) {
+      const a = k / n * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a);
+      out.push({ u: R * ca, v: R * sa, nu: ca, nv: sa });
+    }
+    return out;
+  }
+  function hull(input) {
+    const pts = input.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const x = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], up = [];
+    for (const p of pts) {
+      while (lo.length > 1 && x(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop();
+      lo.push(p);
+    }
+    for (let i = pts.length - 1; i >= 0; i--) {
+      const p = pts[i];
+      while (up.length > 1 && x(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop();
+      up.push(p);
+    }
+    lo.pop();
+    up.pop();
+    return lo.concat(up);
+  }
+  var ringAt = (P, ring, z) => ring.map((q) => P(q.u, q.v, z));
+  var facing = (C) => {
+    const s = Math.sin(C.az), c = Math.cos(C.az);
+    return (q) => q.nu * s + q.nv * c >= -1e-6;
+  };
+  function run(ring, keep) {
+    const n = ring.length;
+    let s = -1;
+    for (let i = 0; i < n; i++) if (keep(ring[i]) && !keep(ring[(i + n - 1) % n])) {
+      s = i;
+      break;
+    }
+    if (s < 0) return keep(ring[0]) ? ring.slice() : [];
+    const out = [];
+    for (let k = 0; k < n && keep(ring[(s + k) % n]); k++) out.push(ring[(s + k) % n]);
+    return out;
+  }
+  function prism(P, front, ring, inner, z0, z1) {
+    return {
+      sil: poly(hull(ringAt(P, ring, z1).concat(ringAt(P, ring, z0)))),
+      crease: inner ? open(ringAt(P, run(inner, front), z1)) : ""
+    };
+  }
+  var rings = (x0, y0, x1, y1, r, b) => [
+    rrect(x0, y0, x1, y1, r),
+    rrect(x0 + b, y0 + b, x1 - b, y1 - b, Math.max(0.3, r - b))
+  ];
+  function extremes(P, ring) {
+    const pr = ring.map((q) => P(q.u, q.v, 0));
+    let a = 0, b = 0, c = 0;
+    pr.forEach((p, k) => {
+      if (p[0] < pr[a][0]) a = k;
+      if (p[0] > pr[b][0]) b = k;
+      if (p[1] > pr[c][1]) c = k;
+    });
+    return [ring[a], ring[b], ring[c]];
+  }
+  function fillet(pts, rs, n = 4) {
+    const m = pts.length, out = [];
+    for (let i = 0; i < m; i++) {
+      const a = pts[(i + m - 1) % m], p = pts[i], b = pts[(i + 1) % m];
+      const la = Math.hypot(a[0] - p[0], a[1] - p[1]), lb = Math.hypot(b[0] - p[0], b[1] - p[1]);
+      const t = Math.min(rs[i], la / 2, lb / 2);
+      const p1 = [p[0] + (a[0] - p[0]) / la * t, p[1] + (a[1] - p[1]) / la * t];
+      const p2 = [p[0] + (b[0] - p[0]) / lb * t, p[1] + (b[1] - p[1]) / lb * t];
+      for (let k = 0; k <= n; k++) {
+        const s = k / n, w = 1 - s;
+        out.push([w * w * p1[0] + 2 * w * s * p[0] + s * s * p2[0], w * w * p1[1] + 2 * w * s * p[1] + s * s * p2[1]]);
+      }
+    }
+    return out;
+  }
+  function ghost(P, front, ring, z0, depth) {
+    const f = run(ring, front), lowP = ringAt(P, f, z0 - depth);
+    return {
+      d: open(lowP) + [f[0], f[f.length - 1]].map((q) => seg(P(q.u, q.v, z0), P(q.u, q.v, z0 - depth))).join(""),
+      y0: Math.min(...ringAt(P, f, z0).map((p) => p[1])),
+      y1: Math.max(...lowP.map((p) => p[1])) + 2
+    };
+  }
+
+  // packages/hairline/src/core/motion.ts
+  var reduced = false;
+  var setReducedMotion = (on) => {
+    reduced = on;
+  };
+  var reducedMotion = () => reduced;
+  function spring(x, o = {}) {
+    return { x, v: 0, t: x, k: o.k ?? 100, c: o.c ?? 18, m: o.m ?? 1, eps: o.eps ?? 0.01 };
+  }
+  function stepS(sp, dt) {
+    if (reduced) {
+      sp.x = sp.t;
+      sp.v = 0;
+      return false;
+    }
+    const n = Math.max(1, Math.ceil(dt * 240)), h = dt / n;
+    for (let i = 0; i < n; i++) {
+      const a = (-sp.k * (sp.x - sp.t) - sp.c * sp.v) / sp.m;
+      sp.v += a * h;
+      sp.x += sp.v * h;
+    }
+    if (Math.abs(sp.x - sp.t) < sp.eps && Math.abs(sp.v) < sp.eps * 10) {
+      sp.x = sp.t;
+      sp.v = 0;
+      return false;
+    }
+    return true;
+  }
+  function bezier(x1, y1, x2, y2) {
+    const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+    const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+    const X = (u) => ((ax * u + bx) * u + cx) * u;
+    const Y = (u) => ((ay * u + by) * u + cy) * u;
+    const dX = (u) => (3 * ax * u + 2 * bx) * u + cx;
+    return (t) => {
+      if (t <= 0) return 0;
+      if (t >= 1) return 1;
+      let u = t;
+      for (let i = 0; i < 8; i++) {
+        const e = X(u) - t;
+        if (Math.abs(e) < 1e-5) break;
+        const d = dX(u);
+        if (Math.abs(d) < 1e-6) break;
+        u -= e / d;
+      }
+      if (!(u >= 0 && u <= 1) || Math.abs(X(u) - t) > 1e-4) {
+        let lo = 0, hi = 1;
+        u = t;
+        for (let i = 0; i < 24; i++) {
+          if (X(u) < t) lo = u;
+          else hi = u;
+          u = (lo + hi) / 2;
+        }
+      }
+      return Y(u);
+    };
+  }
+  var EASE_LIFT = bezier(0.32, 0.72, 0, 1);
+  var tween = (v, dur = 700) => ({ from: v, to: v, t0: -1e9, dur });
+  var tval = (tw, now) => {
+    const p = clamp((now - tw.t0) / tw.dur, 0, 1);
+    return tw.from + (tw.to - tw.from) * (reduced ? 1 : EASE_LIFT(p));
+  };
+  var tset = (tw, to, now, delay) => {
+    if (tw.to === to) return;
+    tw.from = tval(tw, now);
+    tw.to = to;
+    tw.t0 = now + delay;
+  };
+  var tdone = (tw, now) => reduced || now >= tw.t0 + tw.dur;
+
+  // packages/hairline/src/core/stage.ts
+  var NS = "http://www.w3.org/2000/svg";
+  function mk(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    if (attrs) for (const k in attrs) e.setAttribute(k, String(attrs[k]));
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function solid(parent) {
+    const g = mk("g", {}, parent);
+    return { g, sil: mk("path", { class: "sil" }, g), cr: mk("path", { class: "nf lo" }, g) };
+  }
+  var put = (el, s) => {
+    el.sil.setAttribute("d", s.sil);
+    el.cr.setAttribute("d", s.crease);
+  };
+  var flatDot = (parent, C, r, cls) => mk("ellipse", { rx: r2(r * C.S), ry: r2(r * C.S * C.k), class: cls }, parent);
+  var place = (el, q) => {
+    el.setAttribute("cx", String(r2(q[0])));
+    el.setAttribute("cy", String(r2(q[1])));
+  };
+  var fid = 0;
+  function fade(svg, y0, y1, a0 = 0.7) {
+    const id = "hl-fd" + ++fid, defs = mk("defs", {}, svg);
+    const lg = mk("linearGradient", { id: id + "g", gradientUnits: "userSpaceOnUse", x1: 0, y1: r2(y0), x2: 0, y2: r2(y1) }, defs);
+    mk("stop", { offset: 0, "stop-color": "#fff", "stop-opacity": a0 }, lg);
+    mk("stop", { offset: 1, "stop-color": "#fff", "stop-opacity": 0 }, lg);
+    const m = mk("mask", { id, maskUnits: "userSpaceOnUse", x: 0, y: 0, width: 400, height: 320 }, defs);
+    mk("rect", { x: 0, y: 0, width: 400, height: 320, fill: `url(#${id}g)` }, m);
+    return `url(#${id})`;
+  }
+  function reflect(svg, parent, P, front, ring, z0, depth) {
+    const r = ghost(P, front, ring, z0, depth);
+    const gh = mk("g", { class: "ghost", mask: fade(svg, r.y0, r.y1) }, parent);
+    mk("path", { d: r.d }, gh);
+  }
+  var boards = [];
+  var byStage = /* @__PURE__ */ new Map();
+  var raf = 0;
+  var last = 0;
+  var io = null;
+  var rm = null;
+  function frame(now) {
+    const dt = Math.min(0.05, Math.max(0, (now - last) / 1e3));
+    last = now;
+    let any = false;
+    for (const b of boards.slice()) if (b.vis && b.awake) {
+      b.awake = !!b.tick(dt, now);
+      any = any || b.awake;
+    }
+    raf = any ? requestAnimationFrame(frame) : 0;
+  }
+  function wake(b) {
+    b.awake = true;
+    if (!raf) {
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
+  }
+  var onMotion = () => {
+    setReducedMotion(!!rm?.matches);
+    boards.forEach(wake);
+  };
+  function start() {
+    if (io) return;
+    io = new IntersectionObserver((es) => {
+      for (const e of es) {
+        const b = byStage.get(e.target);
+        if (!b) continue;
+        b.vis = e.isIntersecting;
+        if (b.vis) wake(b);
+      }
+    }, { rootMargin: "80px" });
+    rm = matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(rm.matches);
+    rm.addEventListener("change", onMotion);
+  }
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    io?.disconnect();
+    io = null;
+    rm?.removeEventListener("change", onMotion);
+    rm = null;
+  }
+  function register(stage, tick) {
+    start();
+    const b = { stage, tick, vis: false, awake: true };
+    boards.push(b);
+    byStage.set(stage, b);
+    io.observe(stage);
+    tick(0, performance.now());
+    let gone = false;
+    return {
+      wake: () => {
+        if (!gone) wake(b);
+      },
+      unregister: () => {
+        if (gone) return;
+        gone = true;
+        boards = boards.filter((x) => x !== b);
+        if (byStage.get(stage) === b) {
+          byStage.delete(stage);
+          io?.unobserve(stage);
+        }
+        if (!boards.length) stop();
+      }
+    };
+  }
+  function pointer(stage, on) {
+    let tm = 0;
+    const pt = (e) => {
+      const r = stage.getBoundingClientRect();
+      return [(e.clientX - r.left) / r.width * 400, (e.clientY - r.top) / r.height * 320];
+    };
+    const move = (e) => {
+      clearTimeout(tm);
+      on.move(pt(e), e);
+    };
+    const down = (e) => {
+      clearTimeout(tm);
+      if (e.pointerType !== "mouse") stage.releasePointerCapture?.(e.pointerId);
+      if (on.down) on.down(pt(e), e);
+      else on.move(pt(e), e);
+    };
+    const leave = (e) => {
+      clearTimeout(tm);
+      tm = window.setTimeout(() => on.leave(e), e.pointerType === "mouse" ? 0 : 1400);
+    };
+    stage.addEventListener("pointermove", move);
+    stage.addEventListener("pointerdown", down);
+    stage.addEventListener("pointerleave", leave);
+    return () => {
+      clearTimeout(tm);
+      stage.removeEventListener("pointermove", move);
+      stage.removeEventListener("pointerdown", down);
+      stage.removeEventListener("pointerleave", leave);
+    };
+  }
+  function disposer() {
+    let fns = [];
+    return {
+      add: (fn) => {
+        fns.push(fn);
+      },
+      on: (target, type, fn, opts) => {
+        const h = fn;
+        target.addEventListener(type, h, opts);
+        fns.push(() => target.removeEventListener(type, h, opts));
+      },
+      dispose: () => {
+        const run2 = fns;
+        fns = [];
+        for (let i = run2.length - 1; i >= 0; i--) run2[i]();
+      }
+    };
+  }
+
+  // packages/hairline/src/core/styles.ts
+  var LIGHT = { plate: "#ffffff", hi: "#232327", edge: "#a4a4ac", mid: "#c3c3c9", lo: "#e0e0e4" };
+  var DARK = { plate: "#08090a", hi: "#d0d6e0", edge: "#5b5d64", mid: "#3e3e44", lo: "#29292d" };
+  var KEYS = ["plate", "hi", "edge", "mid", "lo"];
+  var vars = (p) => KEYS.map((k) => `--hl-${k}:var(--hairline-${k},${p[k]});`).join("");
+  var EASE = "cubic-bezier(0.5,0,0.1,1)";
+  var SVG = ":where([data-hairline]>svg)";
+  function css(lightDark) {
+    const both = Object.fromEntries(KEYS.map((k) => [k, `light-dark(${LIGHT[k]},${DARK[k]})`]));
+    return [
+      // the box, and the palette: light unless something below says otherwise
+      `:where([data-hairline]){display:block;position:relative;aspect-ratio:5/4;touch-action:pan-y;user-select:none;-webkit-user-select:none;--hl-sw:var(--hairline-stroke,0.9);${vars(LIGHT)}}`,
+      // the page's color-scheme
+      lightDark ? `:where([data-hairline]){${vars(both)}}` : "",
+      // an ancestor that says dark
+      `:where(.dark,[data-theme="dark"]) :where([data-hairline]){${vars(DARK)}}`,
+      // the figure's own theme option
+      `:where([data-hairline][data-hairline-theme="light"]){${vars(LIGHT)}}`,
+      `:where([data-hairline][data-hairline-theme="dark"]){${vars(DARK)}}`,
+      `:where([data-hairline]:focus-visible){outline:1.5px solid var(--hl-hi);outline-offset:2px}`,
+      `${SVG}{position:absolute;inset:0;width:100%;height:100%;display:block}`,
+      // Riffle's live region: read, not seen
+      `:where([data-hairline]>[data-hairline-live]){position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}`,
+      // the drawing: plates are filled with the plate colour and painted back to front
+      `${SVG} :where(path,polygon,ellipse,line){fill:var(--hl-plate);stroke:var(--hl-mid);stroke-width:var(--hl-sw);vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round;transition:stroke 260ms ${EASE}}`,
+      `${SVG} :where(.nf){fill:none}`,
+      `${SVG} :where(.fo){stroke:none}`,
+      `${SVG} :where(.sil){stroke:var(--hl-edge)}`,
+      `${SVG} :where(.hi){stroke:var(--hl-hi)}`,
+      `${SVG} :where(.lo){stroke:var(--hl-lo)}`,
+      `${SVG} :where(.dash){stroke-dasharray:1 3}`,
+      `${SVG} :where(.dot){stroke:none;fill:var(--hl-hi);transition:fill 260ms ${EASE}}`,
+      `${SVG} :where(.dot.m){fill:var(--hl-edge)}`,
+      `${SVG} :where(.dot.off){fill:var(--hl-lo)}`,
+      `${SVG} :where(.ghost path){fill:none;stroke:var(--hl-mid)}`
+    ].join("");
+  }
+  var done = /* @__PURE__ */ new WeakSet();
+  function inject(root) {
+    if (done.has(root)) return;
+    done.add(root);
+    const doc = root.nodeType === 9 ? root : root.ownerDocument;
+    const win = doc.defaultView;
+    const text = css(!!win?.CSS?.supports?.("color", "light-dark(#000,#fff)"));
+    if (win && "adoptedStyleSheets" in root) {
+      try {
+        const sheet = new win.CSSStyleSheet();
+        sheet.replaceSync(text);
+        root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet];
+        return;
+      } catch {
+      }
+    }
+    const style = doc.createElement("style");
+    style.setAttribute("data-hairline-style", "");
+    style.textContent = text;
+    (root.nodeType === 9 ? doc.head ?? doc.documentElement : root).appendChild(style);
+  }
+  return __toCommonJS(kernel_exports);
+})();
+/* /hairline kernel */
+
+</script>
+<script>
+/* An industrial building substructure. Rooms: production hall at +1'-0" (slab on grade one foot above
+   grade), loading dock at +4'-0", office at +1'-6", and a process pit at -3'-0" inside the hall. Heights
+   are drawn at 5 units per foot against a 160 x 100 plan, so the level changes read. Eleven stages,
+   21 phases. Everything structural is drawn through Pw, which adds the settlement field in the last stage. */
+const BS = (() => {
+  const { Cam, fit, proj, facing, rings, lerp, clamp, tween, tset, tval, mk, solid, place, flatDot } = HL;
+  const FT = 5, ZB = -35, ZFT = -21.5, ZFB = -17.5, TS = 2.5, N = 21;
+  const FF = { hall: FT, dock: 4*FT, office: 1.5*FT, pit: -3*FT };
+  const STAGES = [['grade',1],['rooms',3],['footings',5],['walls',7],['slabs on grade',9],['pit',11],['materials',13],['mesh',14],['subgrade',16],['loads',18],['settlement',20]];
+  const DETAIL = ['ready','grade ±0′-0″','grid 4 × 3','rooms 4','FF +1′ +4′ +1.5′ −3′','strip footings','spread footings','stem walls','piers',
+    'hall +1′-0″','dock +4′ · office +1′-6″','pit −3′-0″','pit walls','concrete','slabs','walls','subgrade','k springs','columns 11','equipment','δ 0.4 in','δ 0.8 in'];
+  const setD = (el, d) => { if (el._d !== d){ el._d = d; el.setAttribute('d', d); } };
+  const cls = (el, c) => { if (el._c !== c){ el._c = c; el.setAttribute('class', c); } };
+  const show = (el, on) => { const v = on ? '' : 'none'; if (el._v !== v){ el._v = v; el.style.display = v; } };
+  const mix = (a, b, t) => a.map((v, i) => lerp(v, b[i], t));
+  function partial(pts, v){
+    if (v <= 0 || pts.length < 2) return [];
+    if (v >= 1) return pts;
+    const d = []; let tot = 0;
+    for (let i = 1; i < pts.length; i++){ const l = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); d.push(l); tot += l; }
+    let rem = v*tot; const out = [pts[0]];
+    for (let i = 0; i < d.length; i++){
+      if (rem >= d[i]){ out.push(pts[i+1]); rem -= d[i]; continue; }
+      out.push(mix(pts[i], pts[i+1], d[i] ? rem/d[i] : 0)); break;
+    }
+    return out;
+  }
+  const line = (pts, v = 1) => { const q = partial(pts, v); return q.length > 1 ? HL.open(q) : ''; };
+  const ringsOf = (b, r, k) => { const w = Math.min(b[2] - b[0], b[3] - b[1]); return rings(b[0], b[1], b[2], b[3], Math.min(r, w/2), Math.min(k, w*.38)); };
+  /* where the ground goes down under the loads: a dish under the hall and a deeper one under the dock */
+  const settle = (x, y) => -(1 + 2.2*Math.exp(-((x - 60)**2 + (y - 50)**2)/2600) + 1.6*Math.exp(-((x - 130)**2 + (y - 25)**2)/900));
+
+  const S = { k: N, now: 0, lam: 1 };
+  const G = (gate, dl = 0) => ({ gate, dl, t: tween(gate(N) ? 1 : 0) });
+  const val = e => { tset(e.t, e.gate(S.k) ? 1 : 0, S.now, e.dl); return tval(e.t, S.now); };
+  const from = (a, b = Infinity) => k => k >= a && k < b;
+  const ctr = b => (b[0] + b[2] + b[1] + b[3])/2;
+
+  function build(svg){
+    const C = Cam(45, 0.5, 1.6);
+    fit(C, [[-14,-14,ZB-3],[174,114,ZB-3],[174,-14,ZB-3],[-14,114,ZB-3],[0,0,FF.dock+26],[160,100,FF.hall]], 200, 164);
+    const P = proj(C), front = facing(C), g = mk('g', {}, svg);
+    const Pw = (x, y, z) => P(x, y, z + S.lam*settle(x, y));
+    const M = { P, Pw, front, C };
+    const item = (list, b, z0, z1, o) => list.push({ b, z0, z1, mode: o.mode || 'drop', drop: o.drop ?? 16, s: G(o.gate, o.dl || 0), ph: o.ph, r: o.r ?? 1.2, k: o.k ?? .6, key: ctr(b) + (o.ord || 0)*.01 });
+    const make = list => list.sort((a, b) => a.key - b.key).forEach(it => { [it.ring, it.inner] = ringsOf(it.b, it.r, it.k); it.el = solid(g); });
+    const lines = (arr, cls0) => arr.forEach(l => { l.el = mk('path', { class: cls0 }, g); });
+
+    for (let i = 0; i <= 8; i++) for (let j = 0; j <= 5; j++) place(flatDot(g, C, .5, 'dot off'), P(-10 + i*180/8, -10 + j*120/5, ZB));
+    M.ground = { el: solid(g), s: G(from(16)) };
+    M.springs = [];
+    [8, 30, 52, 74, 96, 118, 140, 156].forEach((x, i) => [6, 50, 98].forEach(y => {
+      const w = []; for (let n = 0; n <= 8; n++) w.push([x + (n === 0 || n === 8 ? 0 : n % 2 ? 2.2 : -2.2), y, n/8]);
+      M.springs.push({ x, y, w, s: G(from(17), i*45 + y*2) });
+    }));
+    lines(M.springs, 'nf');
+
+    M.gradeBack = [{ w: [[-12, 112, 0], [-12, -12, 0], [172, -12, 0]], s: G(from(1)) }]; lines(M.gradeBack, 'nf dash');
+
+    const WALLS = [
+      [[0, 0, 98.5, 3], FF.hall - TS], [[98.5, 0, 160, 3], FF.dock - TS], [[0, 3, 3, 97], FF.hall - TS],
+      [[0, 97, 98.5, 100], FF.hall - TS], [[98.5, 97, 160, 100], FF.office - TS], [[157, 3, 160, 61.5], FF.dock - TS],
+      [[157, 61.5, 160, 97], FF.office - TS], [[98.5, 3, 101.5, 61.5], FF.dock - TS], [[98.5, 61.5, 101.5, 97], FF.office - TS],
+      [[101.5, 58.5, 157, 61.5], FF.dock - TS],
+    ];
+    const COLS = [[35, 40, FF.hall], [70, 40, FF.hall], [130, 30, FF.dock]];
+    M.foots = [];
+    WALLS.forEach(([b]) => item(M.foots, [b[0] - 3, b[1] - 3, b[2] + 3, b[3] + 3], ZFT, ZFB, { gate: from(5), dl: ctr(b)*2.2, ph: 5 }));
+    COLS.forEach(([x, y]) => item(M.foots, [x - 6, y - 6, x + 6, y + 6], ZFT, ZFB, { gate: from(6), dl: (x + y)*2, ph: 6 }));
+    item(M.foots, [22, 59, 58, 91], ZFT, FF.pit, { gate: from(11), ph: 11, r: 2 });
+    make(M.foots);
+
+    M.walls = [];
+    WALLS.forEach(([b, top]) => item(M.walls, b, ZFB, top, { gate: from(7), dl: ctr(b)*2.2, ph: 7, mode: 'rise' }));
+    COLS.forEach(([x, y, ff]) => item(M.walls, [x - 2, y - 2, x + 2, y + 2], ZFB, ff - TS, { gate: from(8), dl: (x + y)*2, ph: 8, mode: 'rise' }));
+    [[22, 59, 58, 62], [22, 62, 25, 88], [55, 62, 58, 88], [22, 88, 58, 91]].forEach((b, i) => item(M.walls, b, FF.pit, FF.hall - TS, { gate: from(12), dl: i*110, ph: 12, mode: 'rise' }));
+    make(M.walls);
+
+    M.slabs = [];
+    [[0, 0, 98.5, 62], [0, 62, 25, 88], [55, 62, 98.5, 88], [0, 88, 98.5, 100]].forEach((b, i) => item(M.slabs, b, FF.hall - TS, FF.hall, { gate: from(9), dl: i*110, ph: 9, drop: 14, ord: -1000 + i }));
+    item(M.slabs, [98.5, 0, 160, 61.5], FF.dock - TS, FF.dock, { gate: from(10), ph: 10, drop: 14, ord: 10 });
+    item(M.slabs, [98.5, 61.5, 160, 100], FF.office - TS, FF.office, { gate: from(10), dl: 200, ph: 10, drop: 14, ord: 20 });
+    M.slabs.forEach((it, i) => { it.key = i; }); make(M.slabs);
+
+    M.mesh = [];
+    const meshRect = (b, z, ph, dl) => {
+      for (let x = b[0] + 12.5 - (b[0] % 12.5); x < b[2] - 1; x += 12.5) M.mesh.push({ w: [[x, b[1] + .8, z], [x, b[3] - .2, z]], s: G(from(ph), dl + x*2.4) });
+      for (let y = b[1] + 12.5 - (b[1] % 12.5); y < b[3] - 1; y += 12.5) M.mesh.push({ w: [[b[0] + .8, y, z], [b[2] - .2, y, z]], s: G(from(ph), dl + 200 + y*2.4) });
+    };
+    [[0, 0, 98.5, 62], [0, 62, 25, 88], [55, 62, 98.5, 88], [0, 88, 98.5, 100]].forEach(b => meshRect(b, FF.hall, 14, 0));
+    meshRect([98.5, 0, 160, 61.5], FF.dock, 14, 120); meshRect([98.5, 61.5, 160, 100], FF.office, 14, 160);
+    for (let x = 12.5; x < 160; x += 12.5) M.mesh.push({ w: [[x, 100, x < 98.5 ? FF.hall - TS : FF.office - TS], [x, 100, ZFB + .6]], s: G(from(15), x*3) });
+    for (let y = 12.5; y < 100; y += 12.5) M.mesh.push({ w: [[160, y, y < 61.5 ? FF.dock - TS : FF.office - TS], [160, y, ZFB + .6]], s: G(from(15), 480 + y*3) });
+    [-10, -2.5].forEach((z, i) => M.mesh.push({ w: [[1.2, 100, z], [160, 100, z], [160, 1.2, z]], s: G(from(15), 300 + i*120) }));
+    lines(M.mesh, 'nf');
+
+    let seed = 3; const rnd = () => (seed = (seed*16807) % 2147483647)/2147483647;
+    M.agg = [];
+    const dots = (n, at) => { for (let i = 0; i < n; i++){ const p = at(rnd(), rnd()), big = rnd() < .22;
+      const el = mk('circle', { r: big ? .85 : .5, class: big ? 'dot m' : 'dot off' }, g); place(el, P(...p));
+      M.agg.push({ el, s: G(from(13, 14), Math.hypot(p[0], 100 - p[1])*4) }); } };
+    dots(70, (a, b) => [2 + a*156, 100, ZFB + 1 + b*(FF.hall - TS - ZFB - 2)]);
+    dots(44, (a, b) => [160, 2 + a*96, ZFB + 1 + b*(FF.office - TS - ZFB - 2)]);
+    dots(16, (a, b) => [102 + a*54, 61.5, FF.office + 1 + b*(FF.dock - FF.office - 2)]);
+
+    M.gradeWall = [{ w: [[0, 100, 0], [160, 100, 0], [160, 0, 0]], s: G(from(7)) }]; lines(M.gradeWall, 'nf sil');
+    M.gradeFront = [{ w: [[-12, 112, 0], [172, 112, 0], [172, -12, 0]], s: G(from(1)) }]; lines(M.gradeFront, 'nf dash');
+
+    M.loads = [];
+    const COLUMNS = [[1.5, 1.5, FF.hall], [50, 1.5, FF.hall], [100, 1.5, FF.dock], [158.5, 1.5, FF.dock], [1.5, 98.5, FF.hall], [50, 98.5, FF.hall],
+      [100, 98.5, FF.office], [158.5, 98.5, FF.office], ...COLS];
+    COLUMNS.forEach(([x, y, z], i) => {
+      item(M.loads, [x - 2.6, y - 2.6, x + 2.6, y + 2.6], z, z + .8, { gate: from(18), dl: (x + y)*2.5, ph: 18, drop: 20, r: .8, k: .4 });
+      item(M.loads, [x - 1.2, y - 1.2, x + 1.2, y + 1.2], z + .8, z + 24, { gate: from(18), dl: (x + y)*2.5, ph: 18, drop: 20, r: .5, k: .3, ord: 1 });
+    });
+    item(M.loads, [64, 66, 90, 86], FF.hall, FF.hall + 8, { gate: from(19), ph: 19, r: 3, k: 1 });
+    item(M.loads, [70, 70, 84, 82], FF.hall + 8, FF.hall + 12, { gate: from(19), ph: 19, r: 3, k: 1, ord: 1 });
+    [[113, 12, 125, 24, 9], [131, 12, 143, 24, 7], [131, 30, 143, 42, 11]].forEach(([x0, y0, x1, y1, h], i) =>
+      item(M.loads, [x0, y0, x1, y1], FF.dock, FF.dock + h, { gate: from(19), dl: 160 + i*120, ph: 19, r: 1.4, k: .7 }));
+    make(M.loads);
+
+    M.gridL = [
+      ...[0, 50, 100, 160].map((x, i) => ({ w: [[x, -8, 0], [x, 108, 0]], s: G(from(2, 7), i*100) })),
+      ...[0, 40, 100].map((y, i) => ({ w: [[-8, y, 0], [168, y, 0]], s: G(from(2, 7), 400 + i*100) })),
+    ];
+    lines(M.gridL, 'nf dash');
+    const rect = (b, z) => [[b[0], b[1], z], [b[2], b[1], z], [b[2], b[3], z], [b[0], b[3], z], [b[0], b[1], z]];
+    M.rooms = [[[0, 0, 98.5, 100], FF.hall], [[98.5, 0, 160, 61.5], FF.dock], [[98.5, 61.5, 160, 100], FF.office], [[25, 62, 55, 88], FF.pit]]
+      .map(([b, z], i) => ({ w: rect(b, z), s: G(from(3, 9), i*140) }));
+    lines(M.rooms, 'nf sil');
+    M.marks = [[166, 0, FF.dock], [166, 100, FF.office], [58, 91, FF.pit]].map(([x, y, z], i) => ({ x, y, z, s: G(from(4, 9), 150 + i*150) }));
+    M.marks.forEach(m => { m.el = mk('path', { class: 'nf dash' }, g); m.dot = mk('circle', { r: 1.5, class: 'dot m' }, g); });
+    M.foot1 = { s: G(from(4)), el: mk('path', { class: 'nf sil' }, g), dot: mk('circle', { r: 1.5, class: 'dot' }, g) };
+    M.lam = tween(1, 900);
+    return M;
+  }
+  return { FF, TS, ZB, ZFT, ZFB, N, STAGES, DETAIL, S, setD, cls, show, line, val, settle, build };
+})();
+</script>
+<script>
+/* Drawing. Footings, walls, slabs and loads are lists of rounded boxes drawn back to front; each either
+   drops into place or rises from its base. Grade never moves; everything built on it settles with S.lam. */
+(() => {
+  const { prism, rings, open, lerp, tset, tval, place } = HL;
+  const { FF, ZB, ZFT, S, setD, cls, show, line, val, settle } = BS;
+  const putc = (el, s) => {
+    if (el._s !== s.sil){ el._s = s.sil; el.sil.setAttribute('d', s.sil); }
+    if (el._k !== s.crease){ el._k = s.crease; el.cr.setAttribute('d', s.crease); }
+  };
+
+  BS.draw = M => {
+    const { P, Pw, front } = M, k = S.k;
+    tset(M.lam, k >= 20 ? (k - 19)/2 : 0, S.now, 0); S.lam = tval(M.lam, S.now);
+    const drawItem = it => {
+      const v = val(it.s), on = v > .001; show(it.el.g, on);
+      if (on){
+        let z0 = it.z0, z1 = it.z1;
+        if (it.mode === 'rise') z1 = z0 + Math.max(.4, (z1 - z0)*v);
+        else { const dz = it.drop*(1 - v); z0 += dz; z1 += dz; }
+        const key = z0 + ':' + z1 + ':' + S.lam;
+        if (key !== it.kk){ it.kk = key; putc(it.el, prism(Pw, front, it.ring, it.inner, z0, z1)); }
+      }
+      cls(it.el.sil, k === it.ph ? 'sil hi' : 'sil');
+    };
+    const guide = (l, Pf, hiAt, base) => { setD(l.el, line(l.w.map(p => Pf(...p)), val(l.s))); cls(l.el, k === hiAt ? base + ' hi' : base); };
+
+    const vg = val(M.ground.s); show(M.ground.el.g, vg > .02);
+    if (vg > .02){
+      const hw = 94*vg, hh = 64*vg, [r1, r2] = rings(80 - hw, 50 - hh, 80 + hw, 50 + hh, 8, Math.min(2, hh*.4));
+      putc(M.ground.el, prism(P, front, r1, r2, ZB - 3, ZB));
+    }
+    cls(M.ground.el.sil, k === 16 ? 'sil hi' : 'sil');
+    M.springs.forEach(s => {
+      const top = ZFT + S.lam*settle(s.x, s.y);
+      setD(s.el, line(s.w.map(([x, y, f]) => P(x, y, lerp(ZB, top, f))), val(s.s)));
+      cls(s.el, k === 17 ? 'nf hi' : 'nf');
+    });
+    M.gradeBack.forEach(l => guide(l, P, 1, 'nf dash'));
+
+    M.foots.forEach(drawItem);
+    M.walls.forEach(drawItem);
+    M.slabs.forEach(drawItem);
+    M.mesh.forEach(l => { const v = val(l.s), key = v + ':' + S.lam; if (key !== l.kk){ l.kk = key; setD(l.el, line(l.w.map(p => Pw(...p)), v)); } });
+    M.agg.forEach(d => show(d.el, val(d.s) > .5));
+    M.gradeWall.forEach(l => guide(l, Pw, 9, 'nf sil'));
+    M.gradeFront.forEach(l => guide(l, P, 1, 'nf dash'));
+    M.loads.forEach(drawItem);
+
+    M.gridL.forEach(l => guide(l, P, 2, 'nf dash'));
+    M.rooms.forEach(l => guide(l, P, 3, 'nf sil'));
+    M.marks.forEach(m => {
+      const v = val(m.s), zt = m.z*v;
+      setD(m.el, v > .001 ? open([P(m.x, m.y, 0), P(m.x, m.y, zt)]) : '');
+      show(m.dot, v > .5); place(m.dot, P(m.x, m.y, zt)); cls(m.dot, k === 4 ? 'dot' : 'dot m');
+    });
+    /* the one-foot step from grade to the hall slab, at the front-left corner */
+    const f = M.foot1, v1 = val(f.s), z1 = FF.hall*v1;
+    setD(f.el, v1 > .001 ? open([P(-1, 100, 0), P(-5, 100, 0), Pw(-5, 100, z1), Pw(-1, 100, z1)]) : '');
+    show(f.dot, v1 > .5); place(f.dot, Pw(-5, 100, z1));
+    cls(f.el, k === 4 || k === 9 ? 'nf hi' : 'nf sil');
+  };
+})();
+
+/* Playback: the loop's clock, scrubbing by the pointer's x, and the stage rail. */
+(() => {
+  const { register, pointer, reducedMotion, mk, inject, clamp } = HL, { N, STAGES, DETAIL, S } = BS;
+  inject(document);
+  const stage = document.getElementById('stage'), svg = mk('svg', { viewBox: '0 0 400 320', 'aria-hidden': 'true' }, stage);
+  const M = BS.build(svg), DW = 1100, HOLD = 3800, CYC = (N + 1)*DW + HOLD;
+  let t0 = null, man = null, shown = -1, R = null;
+  const at = now => {
+    if (man !== null) return man;
+    if (reducedMotion()) return N;
+    if (t0 === null) t0 = now - N*DW;
+    return Math.min(N, Math.floor(((now - t0) % CYC)/DW));
+  };
+  const stageOf = k => STAGES.reduce((s, [, k0], i) => (k >= k0 ? i : s), -1);
+  const btns = STAGES.map(([name, k0], i) => {
+    const li = document.createElement('li'), b = document.createElement('button'), s = document.createElement('span');
+    b.type = 'button'; s.textContent = String(i + 1).padStart(2, '0') + ' ' + name; b.append(s);
+    b.addEventListener('click', () => { if (reducedMotion()) man = k0; else { man = null; t0 = performance.now() - k0*DW; } R && R.wake(); });
+    li.append(b); document.getElementById('rail').append(li); return b;
+  });
+  function ui(k){
+    if (k === shown) return; shown = k;
+    const s = stageOf(k);
+    document.getElementById('stageName').textContent = s < 0 ? '00  start' : String(s + 1).padStart(2, '0') + '  ' + STAGES[s][0];
+    document.getElementById('read').textContent = DETAIL[k];
+    btns.forEach((b, i) => { if (i === s) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); b.classList.toggle('done', i < s); });
+  }
+  R = register(stage, (dt, now) => { S.now = now; S.k = at(now); ui(S.k); BS.draw(M); return !reducedMotion(); });
+  const pick = p => { man = clamp(Math.round((p[0] - 24)/352*N), 0, N); R.wake(); };
+  pointer(stage, { move: pick, down: pick, leave: () => { if (man !== null && !reducedMotion()) t0 = performance.now() - man*DW; man = null; R.wake(); } });
+})();
+</script>
