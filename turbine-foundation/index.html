@@ -1,4 +1,4 @@
-<title>Concrete Beam Sequence</title>
+<title>Turbine Foundation Sequence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&display=swap">
@@ -51,15 +51,15 @@ footer a{color:inherit}
 </style>
 <div class="wrap">
   <header>
-    <h1>Concrete beam, built in lines</h1>
-    <p>One reinforced concrete beam model, from its dimensions to its first cracks, in a single loop. Move across the drawing to scrub it, or pick a stage below.</p>
+    <h1>Turbine foundation, built in lines</h1>
+    <p>A tabletop turbine-generator foundation model, from its column grid to its first two vibration modes, in a single loop. Move across the drawing to scrub it, or pick a stage below.</p>
   </header>
   <div class="plate">
     <span class="tag" id="stageName"></span>
     <span class="tag" id="read"></span>
-    <div id="stage" data-hairline="concrete-beam" role="img" aria-label="A concrete beam is drawn in lines: dimensions, keypoints, edges, an area, a volume, partitions, a reinforcing cage, materials, a mesh, supports, loads, and finally bending and cracks."></div>
+    <div id="stage" data-hairline="tg-foundation" role="img" aria-label="A tabletop turbine-generator foundation is drawn in lines: a column grid, keypoints, a frame, the raft, columns and a beam-grid table top, materials, a mesh, soil springs, the machine with its unbalance, and two vibration modes."></div>
   </div>
-  <ol class="rail" id="rail" aria-label="Stages"></ol>
+  <ol class="rail" id="rail" aria-label="Stages" style="--cols:5"></ol>
   <footer>Drawn on the <a href="https://github.com/lucasmarkes/hairline">hairline</a> kernel by Lucas Marques, MIT licence.</footer>
 </div>
 <script>
@@ -636,18 +636,17 @@ var HL = (() => {
 
 </script>
 <script>
-/* One beam, twelve stages, 28 phases. Every part has a gate, the phases in which it is present, and a
-   700ms tween that follows the gate with a stagger by distance. The loop opens on the finished beam,
-   un-builds, and builds again. World units: x along the beam, y across it, z up. */
-const BEAM = (() => {
-  const { Cam, fit, proj, facing, rings, prism, rrect, circ, ringAt, run, hull, poly, open, seg, fillet,
-    lerp, clamp, tween, tset, tval, mk, solid, put, place, flatDot } = HL;
-  const L = 160, B = 18, H = 26, CV = 4.5, Z0 = 13, LIFT = 38, DEF = 9, N = 28;
-  const STAGES = [['dimensions',1],['keypoints',4],['lines',6],['area',7],['volume',8],['partition',9],
-    ['reinforcement',12],['materials',15],['mesh',18],['supports',20],['loads',22],['cracking',25]];
-  const DETAIL = ['ready','L 2100','B 200 · H 300','envelope','kp 4','kp 8','lines 12','A1','V1','cuts 6','V 27','V 27',
-    'lift','4 bars','links','cover','concrete','steel','x 12','144 elements','base','pin · roller','pads','P 50','P 100',
-    'step 1/4','step 2/4','step 3/4','step 4/4'];
+/* A tabletop turbine-generator foundation: a raft on soil springs, eight columns in two rows, a table
+   top built as a grid of beams, sole plates, and the machine on top. Ten stages, 21 phases, on the same
+   gate-and-tween scheme as the beam. Everything above the raft is drawn through Pw, which adds the
+   vibration mode's sideways offset in proportion to height. */
+const TG = (() => {
+  const { Cam, fit, proj, facing, rings, prism, circ, ringAt, run, poly, open, lerp, clamp, tween, tset, tval, mk, solid, put, place, flatDot } = HL;
+  const LX = 180, WY = 60, ZR = 10, ZD0 = 60, ZD1 = 72, ZG = -12, ZM = 73.2, ZSH = 82.2, N = 21;
+  const XC = [15, 65, 115, 165], YC = [8, 52], CW = 6;
+  const STAGES = [['grid',1],['keypoints',3],['frame',5],['raft plan',7],['volumes',8],['materials',11],['mesh',13],['soil springs',15],['machine',17],['modes',20]];
+  const DETAIL = ['ready','axes 1–4','rows A–B','kp 8','kp 16','columns','deck lines','raft plan','raft','columns 8','table top','concrete','sole plates',
+    'raft · columns','table top','ground','k springs','T-G set','shaft','unbalance','mode 1','mode 2'];
   const setD = (el, d) => { if (el._d !== d){ el._d = d; el.setAttribute('d', d); } };
   const cls = (el, c) => { if (el._c !== c){ el._c = c; el.setAttribute('class', c); } };
   const show = (el, on) => { const v = on ? '' : 'none'; if (el._v !== v){ el._v = v; el.style.display = v; } };
@@ -665,247 +664,200 @@ const BEAM = (() => {
     return out;
   }
   const line = (pts, v = 1) => { const q = partial(pts, v); return q.length > 1 ? open(q) : ''; };
-  function box(P, front, x0, y0, z0, x1, y1, z1, r = 2.4, b = 1.1){
-    const w = Math.min(x1 - x0, y1 - y0), [ring, inner] = rings(x0, y0, x1, y1, Math.min(r, w/2), Math.min(b, w*.38));
-    return prism(P, front, ring, inner, z0, z1);
-  }
-  const disc = (cx, cy, R) => circ(R, 16).map(q => ({ ...q, u: q.u + cx, v: q.v + cy }));
-  function bend(x){
-    const a = L/3, f = u => u < a ? u*(3*L*a - 3*a*a - u*u) : a*(3*L*u - 3*u*u - a*a);
-    return f(clamp(Math.min(x, L - x), 0, L/2))/f(L/2);
-  }
-  const corners = (x0, y0, z0, x1, y1, z1) => [[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]];
-  const EDGES = [[0,1],[1,2],[2,3],[3,0],[0,4],[1,5],[2,6],[3,7],[4,5],[5,6],[6,7],[7,4]];
+  const ringsOf = (b, r, k) => { const w = Math.min(b[2] - b[0], b[3] - b[1]); return rings(b[0], b[1], b[2], b[3], Math.min(r, w/2), Math.min(k, w*.38)); };
+  const disc = (cx, cy, R) => circ(R, 20).map(q => ({ ...q, u: q.u + cx, v: q.v + cy }));
 
-  /* the phase and the time, read by every gate */
-  const S = { k: N, now: 0 };
+  const S = { k: N, now: 0, off: () => 0 };
   const G = (gate, dl = 0) => ({ gate, dl, t: tween(gate(N) ? 1 : 0) });
   const val = e => { tset(e.t, e.gate(S.k) ? 1 : 0, S.now, e.dl); return tval(e.t, S.now); };
   const from = (a, b = Infinity) => k => k >= a && k < b;
 
   function build(svg){
-    const C = Cam(45, 0.5, 2.12);
-    fit(C, [[-16,-9,-3],[L+16,B+9,-3],[L+16,-9,0],[-16,B+9,0],[0,0,Z0+H+LIFT],[L,B,Z0+H+LIFT],[L+18,B,Z0]], 200, 160);
-    const P = proj(C), front = facing(C), g = mk('g', {}, svg), M = { P, front, C };
-    const K = corners(0, 0, Z0, L, B, Z0 + H);
+    const C = Cam(45, 0.5, 1.45);
+    fit(C, [[-10,-10,ZG-3],[LX+10,WY+10,ZG-3],[LX+10,-10,ZG-3],[-10,WY+10,ZG-3],[0,0,ZD1+30],[LX,WY,ZD1+30]], 200, 162);
+    const P = proj(C), front = facing(C), g = mk('g', {}, svg);
+    const fz = z => clamp((z - ZR)/(ZD0 - ZR), 0, 1);
+    const Pw = (x, y, z) => P(x, y + S.off(x)*fz(z), z);
+    const M = { P, Pw, front, C };
+    let seed = 11; const rnd = () => (seed = (seed*16807) % 2147483647)/2147483647;
+    const dots = (parent, n, at, gate) => Array.from({ length: n }, () => { const p = at(rnd(), rnd()), big = rnd() < .22;
+      return { p, el: mk('circle', { r: big ? .85 : .5, class: big ? 'dot m' : 'dot off' }, parent), s: G(gate, Math.hypot(p[0], WY - p[1], ZD1 - p[2])/LX*800) }; });
 
-    for (let i = 0; i <= 8; i++) for (let j = 0; j <= 2; j++) place(flatDot(g, C, .5, 'dot off'), P(i*L/8, j*B/2, 0));
-    M.plinth = { el: solid(g), e: G(from(20)) };
-    M.pin = solid(g); M.pucks = [2.6, 9, 15.4].map(y => ({ y, el: solid(g) })); M.pad = solid(g); M.sup = G(from(21));
+    for (let i = 0; i <= 9; i++) for (let j = 0; j <= 3; j++) place(flatDot(g, C, .5, 'dot off'), P(i*LX/9, j*WY/3, ZG));
+    M.ground = { el: solid(g), s: G(from(15)) };
+    M.springs = [];
+    for (let i = 0; i < 7; i++) for (const y of [6, 30, 54]){
+      const x = 15 + i*25, w = [];
+      for (let n = 0; n <= 8; n++) w.push([x + (n === 0 || n === 8 ? 0 : n % 2 ? 2.4 : -2.4), y, ZG + (0 - ZG)*n/8]);
+      M.springs.push({ w, el: mk('path', { class: 'nf' }, g), s: G(from(16), i*55 + y*3) });
+    }
 
-    const O = [0, 0, Z0];
-    M.O = O;
-    M.axes = [[L,0,0,1,8],[0,B,0,2,3],[0,0,H,2,4]].map(([x, y, z, ph, n], i) => {
-      const el = mk('path', { class: 'nf sil' }, g), ticks = [];
-      for (let j = 1; j <= n; j++){
-        const c = mk('circle', { r: j === n ? 1.4 : .85, class: j === n ? 'dot m' : 'dot off' }, g);
-        place(c, P(O[0] + x*j/n, O[1] + y*j/n, O[2] + z*j/n)); ticks.push({ el: c, f: j/n });
-      }
-      return { e: [x, y, z], ph, el, ticks, s: G(from(ph, 6), i*120) };
+    M.rarea = mk('path', { class: 'sil' }, g); M.rareaS = G(from(7, 9));
+    M.raft = solid(g); M.raftS = G(from(8)); M.raftR = ringsOf([0, 0, LX, WY], 3, 1.4);
+    M.rmesh = [];
+    for (let x = 15; x < LX; x += 15) M.rmesh.push({ w: [[x, .8, ZR], [x, WY, ZR], [x, WY, .8]], s: G(from(13), x*2.5) });
+    [15, 30, 45].forEach((y, i) => M.rmesh.push({ w: [[.8, y, ZR], [LX, y, ZR], [LX, y, .8]], s: G(from(13), 160 + i*70) }));
+    M.rmesh.forEach(l => { l.el = mk('path', { class: 'nf' }, g); });
+    M.ragg = dots(g, 40, (a, b) => [3 + a*(LX - 6), WY, 1.5 + b*(ZR - 3)], from(11, 13))
+      .concat(dots(g, 10, (a, b) => [LX, 3 + a*(WY - 6), 1.5 + b*(ZR - 3)], from(11, 13)));
+
+    M.gridX = XC.map((x, i) => ({ w: [[x, -12, ZR], [x, WY + 12, ZR]], el: mk('path', { class: 'nf dash' }, g), s: G(from(1, 9), i*110) }));
+    M.gridY = YC.map((y, j) => ({ w: [[-12, y, ZR], [LX + 12, y, ZR]], el: mk('path', { class: 'nf dash' }, g), s: G(from(2, 9), j*160) }));
+    M.gdots = [];
+    XC.forEach(x => YC.forEach(y => { const el = mk('circle', { r: 1.2, class: 'dot m' }, g); place(el, P(x, y, ZR)); M.gdots.push({ el, s: G(from(2, 9), 260 + x*2 + y*3) }); }));
+
+    M.cols = [];
+    XC.forEach((x, i) => YC.forEach((y, j) => M.cols.push({ x, y, i, j })));
+    M.cols.sort((a, b) => (a.x + a.y) - (b.x + b.y)).forEach(c => {
+      [c.ring, c.inner] = ringsOf([c.x - CW, c.y - CW, c.x + CW, c.y + CW], 1.8, .8);
+      c.el = solid(g); c.mesh = mk('path', { class: 'nf' }, c.el.g);
+      c.s = G(from(9), (c.i + c.j)*90); c.ms = G(from(13), 300 + (c.i + c.j)*60);
+      c.agg = c.j === 1 ? dots(c.el.g, 9, (a, b) => [c.x - CW*.75 + a*CW*1.5, c.y + CW, ZR + 3 + b*(ZD0 - ZR - 6)], from(11, 13)) : [];
     });
-    M.origin = mk('circle', { r: 1.7, class: 'dot' }, g); place(M.origin, P(...O));
 
-    M.env = mk('path', { class: 'nf dash' }, g);
-    M.envE = EDGES.map(e => ({ a: K[e[0]], b: K[e[1]], s: G(k => (k >= 3 && k < 9) || (k >= 12 && k < 15), (K[e[0]][0] + K[e[0]][1] + K[e[0]][2] - Z0)*1.6) }));
-
-    const m = 7, z0 = Z0, z1 = Z0 + H;
-    M.cuts = [
-      ...[L/3, 2*L/3].map(c => ({ plane: [[c,-m,z0-m],[c,B+m,z0-m],[c,B+m,z1+m],[c,-m,z1+m],[c,-m,z0-m]], seam: [[c,0,z1],[c,B,z1],[c,B,z0]] })),
-      ...[CV, B - CV].map(c => ({ plane: [[-m,c,z0-m],[L+m,c,z0-m],[L+m,c,z1+m],[-m,c,z1+m],[-m,c,z0-m]], seam: [[1.5,c,z1],[L,c,z1],[L,c,z0]] })),
-      ...[z0 + 6, z1 - 6].map(c => ({ plane: [[-m,-m,c],[L+m,-m,c],[L+m,B+m,c],[-m,B+m,c],[-m,-m,c]], seam: [[1.5,B,c],[L,B,c],[L,1.5,c]] })),
+    const top = n => 4 + n*(LX - 8)/12;
+    M.deck = [
+      { b: [4, 0, LX - 4, 16], dl: 0, lines: [...Array.from({ length: 11 }, (_, n) => [[top(n + 1), .8, ZD1], [top(n + 1), 16, ZD1]]), [[5, 8, ZD1], [LX - 5, 8, ZD1]]] },
+      ...XC.map((x, i) => ({ b: [x - 7, 16, x + 7, 44], dl: 140 + i*110, lines: [[[x, 16, ZD1], [x, 44, ZD1]]] })),
+      { b: [4, 44, LX - 4, WY], dl: 620, lines: [...Array.from({ length: 11 }, (_, n) => [[top(n + 1), 44, ZD1], [top(n + 1), WY, ZD1], [top(n + 1), WY, ZD0 + .8]]), [[5, 52, ZD1], [LX - 5, 52, ZD1]]] },
     ];
-    M.cuts.forEach((c, i) => {
-      const dl = (i >> 1)*360 + (i & 1)*120;
-      c.planeP = c.plane.map(p => P(...p)); c.seamP = c.seam.map(p => P(...p));
-      c.pl = mk('path', { class: 'nf dash' }, g); c.p = G(k => k === 9, dl); c.s = G(from(9, 12), dl + 260);
+    M.deck.forEach((d, n) => {
+      [d.ring, d.inner] = ringsOf(d.b, 1.6, .8);
+      d.el = solid(g); d.mesh = mk('path', { class: 'nf' }, d.el.g);
+      d.s = G(from(10), d.dl); d.ms = G(from(14), d.dl*.6);
+      d.agg = n === M.deck.length - 1 ? dots(d.el.g, 34, (a, b) => [6 + a*(LX - 12), WY, ZD0 + 1.5 + b*(ZD1 - ZD0 - 3)], from(11, 13)) : [];
     });
 
-    M.area = mk('path', { class: 'sil' }, g); M.areaE = G(from(7, 9));
-    const hidden = new Set([0, 3, 4]);
-    M.wire = EDGES.map((e, i) => ({ a: K[e[0]], b: K[e[1]], hid: hidden.has(i), el: mk('path', { class: 'nf sil' }, g), s: G(from(6, 9), (i >> 2)*260 + (i & 3)*60) }));
+    M.bodies = [{ b: [26, 10, 54, 50], h: 16, r: 7 }, { b: [66, 4, 114, 56], h: 26, r: 6, ribs: [80, 90, 100] }, { b: [124, 10, 160, 50], h: 20, r: 12 }];
+    M.plates = [];
+    M.bodies.forEach((bd, i) => [bd.b[0] + 4, bd.b[2] - 4].forEach(x => [bd.b[1] + 4, bd.b[3] - 4].forEach(y =>
+      M.plates.push({ x, y: clamp(y, 8, 52), s: G(from(12), i*150 + (y > 30 ? 80 : 0)) }))));
+    M.plates.sort((a, b) => (a.x + a.y) - (b.x + b.y)).forEach(p => { [p.ring, p.inner] = ringsOf([p.x - 4, p.y - 4, p.x + 4, p.y + 4], 1, .5); p.el = solid(g); });
+    M.bodies.forEach((bd, i) => {
+      [bd.ring, bd.inner] = ringsOf(bd.b, bd.r, 1.6);
+      bd.el = solid(g); bd.rib = bd.ribs ? mk('path', { class: 'nf lo' }, bd.el.g) : null;
+      bd.s = G(from(17), i*170);
+    });
+    M.shaft = [[6, 26], [54, 66], [114, 124], [160, 176]].map(([a, b], i) => ({ w: [[a, 30, ZSH], [b, 30, ZSH]], el: mk('path', { class: 'nf sil' }, g), s: G(from(18), i*90) }));
+    M.orbits = [16, 60, 119, 168].map((x, i) => ({ x, el: mk('path', { class: 'nf dash' }, g), dot: mk('circle', { r: 1.3, class: 'dot' }, g), s: G(from(19), i*90), ph: i*1.3 }));
 
-    const LOOP = rrect(CV - 1.6, CV - 1.6, B - CV + 1.6, H - CV + 1.6, 2.4, 3);
-    M.LOOP = LOOP;
-    M.bars = [[CV, CV], [B - CV, CV], [CV, H - CV], [B - CV, H - CV]].map(([y, z], i) => ({ y, z: Z0 + z, el: mk('path', { class: 'nf sil' }, g), s: G(from(13), (i >> 1)*260 + (i & 1)*110) }));
-    M.links = Array.from({ length: 12 }, (_, i) => { const x = 8 + i*(L - 16)/11; return { x, el: mk('path', { class: 'nf' }, g), s: G(from(14), Math.abs(x - L/2)/(L/2)*320) }; });
-
-    M.ext = solid(g); M.extE = G(from(8));
-    M.beam = solid(g); M.lift = G(from(12, 15));
-    const XS = [0, L/3, 2*L/3, L], YS = [0, CV, B - CV, B], ZS = [Z0, Z0 + 6, Z0 + H - 6, Z0 + H];
-    M.blocks = [];
-    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) for (let q = 0; q < 3; q++)
-      M.blocks.push({ b: [XS[i], YS[j], ZS[q], XS[i+1], YS[j+1], ZS[q+1]], o: [i - 1, j - 1, q - 1], key: XS[i] + XS[i+1] + YS[j] + YS[j+1] + ZS[q] + ZS[q+1],
-        s: G(k => k === 10, (Math.abs(i - 1) + Math.abs(j - 1) + Math.abs(q - 1))*55) });
-    M.blocks.sort((a, b) => a.key - b.key).forEach(b => { b.el = solid(g); });
-    M.cuts.forEach(c => { c.sm = mk('path', { class: 'nf' }, g); });
-
-    let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647)/2147483647;
-    M.agg = [];
-    const add = (n, at) => { for (let i = 0; i < n; i++){ const p = at(rnd(), rnd()), big = rnd() < .22;
-      const el = mk('circle', { r: big ? .9 : .55, class: big ? 'dot m' : 'dot off' }, g); place(el, P(...p));
-      M.agg.push({ el, s: G(from(16, 18), Math.hypot(p[0], B - p[1], Z0 + H - p[2])/L*900) }); } };
-    add(60, (a, b) => [4 + a*(L - 8), 2 + b*(B - 4), Z0 + H]);
-    add(84, (a, b) => [4 + a*(L - 8), B, Z0 + 2 + b*(H - 4)]);
-    add(10, (a, b) => [L, 2 + a*(B - 4), Z0 + 2 + b*(H - 4)]);
-
-    const X13 = Array.from({ length: 13 }, (_, i) => i*L/12), ZN = [0, H/4, H/2, 3*H/4, H];
-    M.mesh = [];
-    for (let i = 1; i < 12; i++) M.mesh.push({ w: [[X13[i], .8, Z0 + H], [X13[i], B, Z0 + H], [X13[i], B, Z0 + .8]], ph: 18, s: G(from(18), i*45) });
-    [H/4, H/2, 3*H/4].forEach((z, i) => M.mesh.push({ w: [...X13.map(x => [Math.max(1.8, x), B, Z0 + z]), [L, .8, Z0 + z]], ph: 19, s: G(from(19), i*70) }));
-    [B/3, 2*B/3].forEach((y, i) => M.mesh.push({ w: [...X13.map(x => [Math.max(1.8, x), y, Z0 + H]), [L, y, Z0 + .8]], ph: 19, s: G(from(19), 210 + i*70) }));
-    M.mesh.forEach(l => { l.el = mk('path', { class: 'nf' }, g); });
-    M.nodes = [];
-    X13.forEach((x, i) => ZN.forEach((z, j) => M.nodes.push({ x, z: Z0 + z, el: mk('circle', { r: .8, class: 'dot off' }, g), s: G(from(19), 300 + (i + j)*28) })));
-
-    M.stubs = [[CV, CV], [B - CV, CV], [CV, H - CV], [B - CV, H - CV]].map(([y, z], i) => ({ y, z: Z0 + z, s: G(from(17), i*90),
-      hole: mk('path', { class: 'nf' }, g), el: mk('path', { class: 'nf sil' }, g), tip: mk('path', { class: 'sil' }, g) }));
-
-    M.cracks = [];
-    [-24, -16, -8, 0, 8, 16, 24].forEach(o => M.cracks.push({ x: L/2 + o, on: .26 + Math.abs(o)/24*.14, h: .74 - Math.abs(o)/24*.18, lean: 0 }));
-    [[L/3 - 13, .5, .6], [L/3 - 27, .68, .5], [2*L/3 + 13, .5, -.6], [2*L/3 + 27, .68, -.5]].forEach(([x, on, lean]) => M.cracks.push({ x, on, h: .55, lean }));
-    M.cracks.forEach((c, i) => { c.el = mk('path', { class: 'nf hi' }, g); c.j = i % 2 ? 1 : -1; });
-
-    M.kps = [0, 1, 3, 2, 4, 5, 7, 6].map((ix, n) => ({ p: K[ix], n, ph: n < 4 ? 4 : 5,
-      drop: mk('path', { class: 'nf dash' }, g), el: mk('circle', { r: 1.8, class: 'dot m' }, g), s: G(from(n < 4 ? 4 : 5, 9), (n & 3)*110) }));
-
-    M.weights = [L/3, 2*L/3].map(x => ({ x, pad: solid(g), ps: G(from(22)), discs: [0, 1, 2, 3].map(n => ({ n, el: solid(g), s: G(from(n < 2 ? 23 : 24), (n & 1)*130) })) }));
-    M.lam = tween(1, 900);
+    M.sticks = [
+      ...M.cols.map(c => ({ w: [[c.x, c.y, ZR], [c.x, c.y, 66]], s: G(from(5, 9), (c.i + c.j)*70) })),
+      ...YC.map((y, j) => ({ w: [[XC[0], y, 66], [XC[3], y, 66]], s: G(from(6, 10), j*160) })),
+      ...XC.map((x, i) => ({ w: [[x, YC[0], 66], [x, YC[1], 66]], s: G(from(6, 10), 300 + i*90) })),
+    ];
+    M.sticks.forEach(s => { s.el = mk('path', { class: 'nf sil' }, g); });
+    M.kps = [];
+    M.cols.forEach(c => [[ZR, 3, 9], [66, 4, 10]].forEach(([z, a, b]) =>
+      M.kps.push({ p: [c.x, c.y, z], ph: a, s: G(from(a, b), (c.i + c.j)*70), drop: mk('path', { class: 'nf dash' }, g), el: mk('circle', { r: 1.6, class: 'dot m' }, g) })));
+    M.m1 = tween(0); M.m2 = tween(1);
     return M;
   }
-  return { L, B, H, CV, Z0, LIFT, DEF, N, STAGES, DETAIL, S, setD, cls, show, mix, line, box, disc, bend, val, build,
-    HL: { rings, prism, rrect, ringAt, run, hull, poly, open, seg, fillet, clamp, tset, tval, put, place } };
+  return { LX, WY, ZR, ZD0, ZD1, ZG, ZM, ZSH, N, CW, STAGES, DETAIL, S, setD, cls, show, mix, line, disc, val, build };
 })();
 </script>
 <script>
-/* Drawing: every frame reads each part's gate and writes only the paths whose values changed. */
+/* Drawing. In the last stage the table top sways (mode 1) and then twists (mode 2): S.off gives the
+   sideways offset at each x, and Pw applies it in proportion to height, so columns lean and the table moves. */
 (() => {
-  const { rings, prism, rrect, ringAt, run, hull, poly, open, seg, fillet, clamp, tset, tval, put, place } = HL;
-  const { L, B, H, CV, Z0, LIFT, DEF, S, setD, cls, show, mix, line, box, disc, bend, val } = BEAM;
-  const XS = Array.from({ length: 33 }, (_, i) => i*L/32);
-  const taper = (P, front, foot, top, inner, z0, z1) =>
-    ({ sil: poly(hull(ringAt(P, foot, z0).concat(ringAt(P, top, z1)))), crease: open(ringAt(P, run(inner, front), z1)) });
-  /* The beam as one outline, raised by zo and bent by d(x): silhouette with rounded corners, and its top crease. */
-  function beamPaths(M, zo, d){
-    const { P } = M, top = x => Z0 + zo + H + d(x), bot = x => Z0 + zo + d(x);
-    const pts = [...XS.map(x => P(x, 0, top(x))), P(L, 0, bot(L)), P(L, B, bot(L)), ...XS.slice(0, -1).reverse().map(x => P(x, B, bot(x))), P(0, B, top(0))];
-    const r = pts.map(() => 0), R = 2.4*M.C.S;
-    [0, 32, 33, 34, 66, 67].forEach(i => { r[i] = R; });
-    return { sil: poly(fillet(pts, r, 3)), crease: open([...XS.slice(1, -1).map(x => P(x, B - 1.1, top(x))), P(L - 1.1, B - 1.1, top(L)), P(L - 1.1, 1.1, top(L))]) };
-  }
-  const ring = (P, x, y, z, r) => poly(Array.from({ length: 12 }, (_, i) => { const a = i/12*Math.PI*2; return P(x, y + r*Math.cos(a), z + r*Math.sin(a)); }));
+  const { prism, rings, ringAt, run, poly, open, fillet, tset, tval, place, reducedMotion } = HL;
+  const { LX, WY, ZR, ZD0, ZD1, ZG, ZM, ZSH, S, setD, cls, show, line, val } = TG;
+  const putc = (el, s) => {
+    if (el._s !== s.sil){ el._s = s.sil; el.sil.setAttribute('d', s.sil); }
+    if (el._k !== s.crease){ el._k = s.crease; el.cr.setAttribute('d', s.crease); }
+  };
+  const OMEGA = 2*Math.PI/1.3;
 
-  BEAM.draw = (M) => {
-    const { P, front } = M, k = S.k;
+  TG.draw = M => {
+    const { P, Pw, front } = M, k = S.k;
+    tset(M.m1, k === 20 ? 1 : 0, S.now, 0); tset(M.m2, k === 21 ? 1 : 0, S.now, 0);
+    const a1 = tval(M.m1, S.now), a2 = tval(M.m2, S.now), osc = reducedMotion() ? 1 : Math.sin(S.now/1000*OMEGA);
+    S.off = x => (4.5*a1 + 5*a2*(x - LX/2)/(LX/2))*osc;
 
-    const vpl = val(M.plinth.e); show(M.plinth.el.g, vpl > .02);
-    if (vpl > .02 && vpl !== M.plinth.last){
-      M.plinth.last = vpl;
-      const hw = (L/2 + 16)*vpl, hh = (B/2 + 9)*vpl, [r1, r2] = rings(L/2 - hw, B/2 - hh, L/2 + hw, B/2 + hh, 8, Math.min(2, hh*.4));
-      put(M.plinth.el, prism(P, front, r1, r2, -3, 0));
+    const vg = val(M.ground.s); show(M.ground.el.g, vg > .02);
+    if (vg > .02){
+      const hw = (LX/2 + 14)*vg, hh = (WY/2 + 12)*vg, [r1, r2] = rings(LX/2 - hw, WY/2 - hh, LX/2 + hw, WY/2 + hh, 8, Math.min(2, hh*.4));
+      putc(M.ground.el, prism(P, front, r1, r2, ZG - 3, ZG));
     }
-    cls(M.plinth.el.sil, k === 20 ? 'sil hi' : 'sil');
+    cls(M.ground.el.sil, k === 15 ? 'sil hi' : 'sil');
+    M.springs.forEach(s => { setD(s.el, line(s.w.map(p => P(...p)), val(s.s))); cls(s.el, k === 16 ? 'nf hi' : 'nf'); });
 
-    const vs = val(M.sup), son = vs > .01, xp = 9, xr = L - 9;
-    [M.pin.g, M.pad.g, ...M.pucks.map(p => p.el.g)].forEach(el => show(el, son));
-    if (son && vs !== M.supLast){
-      M.supLast = vs;
-      put(M.pin, taper(P, front, rrect(xp - 9, -2, xp + 9, B + 2, 2.4, 4), rrect(xp - 2.6, -2, xp + 2.6, B + 2, 1.2, 4), rrect(xp - 1.8, -1.2, xp + 1.8, B + 1.2, .6, 4), 0, Z0*vs));
-      M.pucks.forEach(p => put(p.el, prism(P, front, disc(xr, p.y, 2.6), disc(xr, p.y, 1.8), 0, 5*vs)));
-      put(M.pad, box(P, front, xr - 8, -2, 5*vs, xr + 8, B + 2, 5*vs + (Z0 - 5)*vs, 2, .8));
-    }
-    cls(M.pin.sil, k === 21 ? 'sil hi' : 'sil'); cls(M.pad.sil, k === 21 ? 'sil hi' : 'sil');
+    const va = val(M.rareaS), vr = val(M.raftS);
+    show(M.rarea, va > .001 && vr < .02);
+    if (va > .001) setD(M.rarea, poly(fillet([P(0, 0, 0), P(LX, 0, 0), P(LX, WY*va, 0), P(0, WY*va, 0)], [2, 2, 2, 2])));
+    cls(M.rarea, k === 7 ? 'hi' : 'sil');
+    show(M.raft.g, vr > .001);
+    if (vr > .001) putc(M.raft, prism(P, front, M.raftR[0], M.raftR[1], 0, Math.max(.6, ZR*vr)));
+    cls(M.raft.sil, k === 8 ? 'sil hi' : 'sil');
+    M.rmesh.forEach(l => setD(l.el, line(l.w.map(p => P(...p)), val(l.s))));
+    M.ragg.forEach(d => { const on = val(d.s) > .5; show(d.el, on); if (on && !d.at){ d.at = 1; place(d.el, P(...d.p)); } });
 
-    M.axes.forEach(a => {
-      const v = val(a.s), O = M.O;
-      setD(a.el, line([P(...O), P(O[0] + a.e[0]*v, O[1] + a.e[1]*v, O[2] + a.e[2]*v)]));
-      cls(a.el, k === a.ph ? 'nf hi' : 'nf sil');
-      a.ticks.forEach(t => show(t.el, v >= t.f - 1e-3));
+    M.gridX.concat(M.gridY).forEach((l, i) => { setD(l.el, line(l.w.map(p => P(...p)), val(l.s))); cls(l.el, (k === 1 && i < 4) || (k === 2 && i >= 4) ? 'nf dash hi' : 'nf dash'); });
+    M.gdots.forEach(d => show(d.el, val(d.s) > .5));
+
+    M.cols.forEach(c => {
+      const v = val(c.s), on = v > .001; show(c.el.g, on);
+      if (on){
+        const z1 = ZR + (ZD0 - ZR)*v, vm = val(c.ms);
+        putc(c.el, prism(Pw, front, c.ring, c.inner, ZR, z1));
+        let d = '';
+        if (vm > .001) [20, 30, 40, 50].forEach((z, n) => { if (z < z1 && vm > n*.22) d += open(ringAt(Pw, run(c.ring, front), z)); });
+        setD(c.mesh, d);
+        c.agg.forEach(a => { const o = val(a.s) > .5 && a.p[2] < z1; show(a.el, o); if (o) place(a.el, Pw(...a.p)); });
+      }
+      cls(c.el.sil, k === 9 ? 'sil hi' : 'sil');
     });
-    show(M.origin, k < 6); cls(M.origin, k === 0 ? 'dot' : 'dot m');
-
-    let env = '';
-    M.envE.forEach(e => { const v = val(e.s); if (v > .001) env += seg(P(...e.a), P(...mix(e.a, e.b, v))); });
-    setD(M.env, env); cls(M.env, k === 3 ? 'nf dash hi' : 'nf dash');
-    M.cuts.forEach(c => setD(c.pl, line(c.planeP, val(c.p))));
-
-    const va = val(M.areaE), ve = val(M.extE);
-    show(M.area, va > .001 && ve < .02 && k < 9);
-    if (va > .001){ const z = Z0 + H*va; setD(M.area, poly(fillet([P(0, 0, Z0), P(L, 0, Z0), P(L, 0, z), P(0, 0, z)], [1.6, 1.6, 1.6, 1.6]))); }
-    cls(M.area, k === 7 ? 'hi' : 'sil');
-    M.wire.forEach(w => { const v = val(w.s); setD(w.el, line([P(...w.a), P(...mix(w.a, w.b, v))])); cls(w.el, w.hid ? 'nf dash' : k === 6 ? 'nf hi' : 'nf sil'); });
-
-    M.bars.forEach(b => { const v = val(b.s); setD(b.el, line([P(3, b.y, b.z), P(3 + (L - 6)*v, b.y, b.z)])); cls(b.el, k === 13 ? 'nf hi' : 'nf sil'); });
-    M.links.forEach(l => { const v = val(l.s), dr = 18*(1 - v); setD(l.el, v > .001 ? poly(M.LOOP.map(q => P(l.x, q.u, Z0 + q.v + dr))) : ''); cls(l.el, k === 14 ? 'nf hi' : 'nf'); });
-
-    tset(M.lam, k >= 25 ? (k - 24)/4 : 0, S.now, 0);
-    const lam = tval(M.lam, S.now), dfn = x => -DEF*lam*bend(x), Pd = (x, y, z) => P(x, y, z + dfn(x));
-    const lift = LIFT*val(M.lift);
-    let gap = 0; M.blocks.forEach(b => { b.v = val(b.s); gap = Math.max(gap, b.v); });
-    const split = gap > .001 && k >= 9;
-    show(M.ext.g, k < 9 && ve > .001);
-    if (k < 9 && ve > .001 && ve !== M.extLast){ M.extLast = ve; put(M.ext, box(P, front, 0, 0, Z0, L, Math.max(1.6, B*ve), Z0 + H)); }
-    cls(M.ext.sil, k === 8 ? 'sil hi' : 'sil');
-    const whole = k >= 9 && !split;
-    show(M.beam.g, whole);
-    if (whole){ const key = lift.toFixed(3) + ':' + lam.toFixed(4); if (key !== M.beamKey){ M.beamKey = key; put(M.beam, beamPaths(M, lift, dfn)); } }
-    cls(M.beam.sil, k === 12 || k === 15 ? 'sil hi' : 'sil');
-    M.blocks.forEach(b => {
-      show(b.el.g, split);
-      if (split && b.v !== b.last){ b.last = b.v; const o = b.o.map(c => c*7*b.v);
-        put(b.el, box(P, front, b.b[0] + o[0], b.b[1] + o[1], b.b[2] + o[2], b.b[3] + o[0], b.b[4] + o[1], b.b[5] + o[2], 1.6, .7)); }
-      cls(b.el.sil, k === 10 && !b.o.some(Boolean) ? 'sil hi' : 'sil');
+    M.deck.forEach(d => {
+      const v = val(d.s), on = v > .001; show(d.el.g, on);
+      if (on){
+        putc(d.el, prism(Pw, front, d.ring, d.inner, ZD0, ZD0 + (ZD1 - ZD0)*Math.max(v, .06)));
+        const vm = val(d.ms);
+        setD(d.mesh, vm > .001 && v > .99 ? d.lines.map(w => line(w.map(p => Pw(...p)), vm)).join('') : '');
+        d.agg.forEach(a => { const o = val(a.s) > .5; show(a.el, o); if (o) place(a.el, Pw(...a.p)); });
+      }
+      cls(d.el.sil, k === 10 ? 'sil hi' : 'sil');
     });
-    M.cuts.forEach(c => { const v = val(c.s); setD(c.sm, split || lift > .01 ? '' : line(c.seamP, v)); cls(c.sm, k === 9 ? 'nf hi' : 'nf'); });
-
-    M.agg.forEach(a => show(a.el, val(a.s) > .5));
-    M.mesh.forEach(l => {
-      const v = val(l.s), key = v + ':' + lam;
-      if (key !== l.key){ l.key = key; setD(l.el, v > .001 ? line(l.w.map(p => Pd(...p)), v) : ''); }
-      cls(l.el, k === l.ph ? 'nf sil' : 'nf');
+    M.plates.forEach(p => {
+      const v = val(p.s), on = v > .001; show(p.el.g, on);
+      if (on){ const dz = 14*(1 - v); putc(p.el, prism(Pw, front, p.ring, p.inner, ZD1 + dz, ZD1 + 1.2 + dz)); }
+      cls(p.el.sil, k === 12 ? 'sil hi' : 'sil');
     });
-    M.nodes.forEach(n => { const on = val(n.s) > .5; show(n.el, on); if (on && n.lam !== lam){ n.lam = lam; place(n.el, Pd(n.x, B, n.z)); } });
-    M.stubs.forEach(s => {
-      const v = val(s.s), x = L + 16*v;
-      setD(s.hole, v > .001 ? ring(P, L, s.y, s.z, 1.4) : '');
-      setD(s.el, line([P(L, s.y, s.z), P(x, s.y, s.z)]));
-      setD(s.tip, v > .001 ? ring(P, x, s.y, s.z, 1.4) : '');
-      cls(s.el, k === 17 ? 'nf hi' : 'nf sil'); cls(s.tip, k === 17 ? 'hi' : 'sil');
+    M.bodies.forEach(bd => {
+      const v = val(bd.s), on = v > .001; show(bd.el.g, on);
+      if (on){
+        const z0 = ZM + 24*(1 - v);
+        putc(bd.el, prism(Pw, front, bd.ring, bd.inner, z0, z0 + bd.h));
+        if (bd.rib) setD(bd.rib, bd.ribs.map(x => line([Pw(x, bd.b[1] + 3, z0 + bd.h), Pw(x, bd.b[3] - 3, z0 + bd.h)])).join(''));
+      }
+      cls(bd.el.sil, k === 17 ? 'sil hi' : 'sil');
     });
-    M.cracks.forEach(c => {
-      const gr = clamp((lam - c.on)/(1 - c.on)*1.7, 0, 1), h = c.h*H*gr;
-      setD(c.el, gr > .01 ? open([0, 1, 2, 3, 4].map(i => { const x = c.x + c.lean*h*i/4 + (i % 2 ? c.j*1.1 : 0); return Pd(x, B, Z0 + h*i/4); })) : '');
+    M.shaft.forEach(s => { setD(s.el, line(s.w.map(p => Pw(...p)), val(s.s))); cls(s.el, k === 18 ? 'nf hi' : 'nf sil'); });
+    const th = reducedMotion() ? .8 : S.now/1000*2*Math.PI*.9;
+    M.orbits.forEach(o => {
+      const v = val(o.s), R = 3.6*v;
+      setD(o.el, v > .001 ? poly(Array.from({ length: 16 }, (_, i) => { const a = i/16*Math.PI*2; return Pw(o.x, 30 + R*Math.cos(a), ZSH + R*Math.sin(a)); })) : '');
+      show(o.dot, v > .5);
+      if (v > .5) place(o.dot, Pw(o.x, 30 + R*Math.cos(th + o.ph), ZSH + R*Math.sin(th + o.ph)));
     });
 
+    M.sticks.forEach((s, i) => { setD(s.el, line(s.w.map(p => P(...p)), val(s.s))); cls(s.el, k === (i < 8 ? 5 : 6) ? 'nf hi' : 'nf sil'); });
     let newest = -1;
-    M.kps.forEach(q => {
-      const v = val(q.s), [x, y, z0] = q.p, z = z0 + 22*(1 - v);
+    M.kps.forEach((q, n) => {
+      const v = val(q.s), [x, y, z0] = q.p, z = z0 + 20*(1 - v);
       show(q.el, v > .001); place(q.el, P(x, y, z));
-      setD(q.drop, v > .001 && v < .999 ? line([P(x, y, 0), P(x, y, z)]) : '');
-      if (k >= q.ph && k < 9) newest = q.n;
+      setD(q.drop, v > .001 && v < .999 ? line([P(x, y, ZG), P(x, y, z)]) : '');
+      if (k === q.ph) newest = n;
     });
-    M.kps.forEach(q => cls(q.el, q.n === newest ? 'dot' : 'dot m'));
-
-    M.weights.forEach(s => {
-      const z0 = Z0 + H + dfn(s.x), vp = val(s.ps);
-      show(s.pad.g, vp > .01);
-      if (vp > .01) put(s.pad, box(P, front, s.x - 7, -2, z0 + 20*(1 - vp), s.x + 7, B + 2, z0 + 3 + 20*(1 - vp), 2, .8));
-      cls(s.pad.sil, k === 22 ? 'sil hi' : 'sil');
-      s.discs.forEach(d => {
-        const v = val(d.s), z = z0 + 3 + d.n*3.9 + 24*(1 - v);
-        show(d.el.g, v > .01);
-        if (v > .01) put(d.el, prism(P, front, disc(s.x, B/2, 6.5), disc(s.x, B/2, 5.6), z, z + 3.6));
-        cls(d.el.sil, (k === 23 && d.n === 1) || (k === 24 && d.n === 3) ? 'sil hi' : 'sil');
-      });
-    });
+    M.kps.forEach((q, n) => cls(q.el, n === newest ? 'dot' : 'dot m'));
   };
 })();
 
 /* Playback: the loop's clock, scrubbing by the pointer's x, and the stage rail. */
 (() => {
-  const { register, pointer, reducedMotion, mk, inject, clamp } = HL, { N, STAGES, DETAIL, S } = BEAM;
+  const { register, pointer, reducedMotion, mk, inject, clamp } = HL, { N, STAGES, DETAIL, S } = TG;
   inject(document);
   const stage = document.getElementById('stage'), svg = mk('svg', { viewBox: '0 0 400 320', 'aria-hidden': 'true' }, stage);
-  const M = BEAM.build(svg), DW = 1050, HOLD = 3400, CYC = (N + 1)*DW + HOLD;
+  const M = TG.build(svg), DW = 1100, HOLD = 3800, CYC = (N + 1)*DW + HOLD;
   let t0 = null, man = null, shown = -1, R = null;
   const at = now => {
     if (man !== null) return man;
@@ -927,7 +879,7 @@ const BEAM = (() => {
     document.getElementById('read').textContent = DETAIL[k];
     btns.forEach((b, i) => { if (i === s) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); b.classList.toggle('done', i < s); });
   }
-  R = register(stage, (dt, now) => { S.now = now; S.k = at(now); ui(S.k); BEAM.draw(M); return !reducedMotion(); });
+  R = register(stage, (dt, now) => { S.now = now; S.k = at(now); ui(S.k); TG.draw(M); return !reducedMotion(); });
   const pick = p => { man = clamp(Math.round((p[0] - 24)/352*N), 0, N); R.wake(); };
   pointer(stage, { move: pick, down: pick, leave: () => { if (man !== null && !reducedMotion()) t0 = performance.now() - man*DW; man = null; R.wake(); } });
 })();

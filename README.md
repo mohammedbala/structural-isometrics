@@ -1,7 +1,8 @@
 # structural-isometrics
 
-Animated, isometric line studies of structural modeling.
+Animated, isometric line studies of structural models. Each page is one looping black-and-white animation; move across the drawing to scrub it, or pick a stage from the rail underneath.
 
-- [`concrete-hairline/index.html`](concrete-hairline/index.html): twelve looping black-and-white figures of a reinforced concrete beam model being built: dimensions, keypoints, lines, areas, volume, partition, reinforcement, materials, mesh, supports, loads and cracking. Move across a figure to step through it.
+- [`concrete-hairline/index.html`](concrete-hairline/index.html): a reinforced concrete beam, built in twelve stages: dimensions, keypoints, lines, area, volume, partition, reinforcement, materials, mesh, supports, loads and cracking.
+- [`turbine-foundation/index.html`](turbine-foundation/index.html): a tabletop turbine-generator foundation, built in ten stages: column grid, keypoints, frame, raft plan, volumes (raft, columns, beam-grid table top), materials, mesh, soil springs, the machine with its unbalance, and the first two vibration modes.
 
-The figures are drawn on the [hairline](https://github.com/lucasmarkes/hairline) kernel by Lucas Marques (MIT), inlined unchanged. The page is written as an artifact body (no `<html>`/`<head>` wrapper); opened directly in a browser it still renders.
+Both are drawn on the [hairline](https://github.com/lucasmarkes/hairline) kernel by Lucas Marques (MIT), inlined unchanged. The pages are written as artifact bodies (no `<html>`/`<head>` wrapper); opened directly in a browser they still render. Deflections, crack patterns and mode shapes are illustrative sketches, not analysis output.
