@@ -57,9 +57,9 @@ footer a{color:inherit}
   <div class="plate">
     <span class="tag" id="stageName"></span>
     <span class="tag" id="read"></span>
-    <div id="stage" data-hairline="building-substructure" role="img" aria-label="An industrial building substructure is drawn in lines: the grade datum, a column grid, four rooms at different floor levels, walls, slabs on grade with the main slab one foot above grade, a depressed pit with its own slab and walls, materials and a mesh."></div>
+    <div id="stage" data-hairline="building-substructure" role="img" aria-label="An industrial building substructure is drawn in lines: against the grade datum, slab outlines at four floor levels, then walls, then slabs on grade with the main slab one foot above grade and a depressed pit, then materials and a mesh."></div>
   </div>
-  <ol class="rail" id="rail" aria-label="Stages" style="--cols:7"></ol>
+  <ol class="rail" id="rail" aria-label="Stages" style="--cols:5"></ol>
   <footer>Drawn on the <a href="https://github.com/lucasmarkes/hairline">hairline</a> kernel by Lucas Marques, MIT licence.</footer>
 </div>
 <script>
@@ -639,14 +639,14 @@ var HL = (() => {
 /* An industrial building substructure: walls and slabs on grade, no footings. Rooms: production hall at
    +1'-0" (one foot above grade), loading dock at +4'-0", office at +1'-6", and a process pit at -3'-0"
    inside the hall with its own walls and floor slab. Heights are drawn at 5 units per foot against a
-   160 x 100 plan. Seven stages, 12 phases. */
+   160 x 100 plan. Five stages, 10 phases; the grade outline stays on screen throughout. */
 const BS = (() => {
   const { Cam, fit, proj, facing, rings, lerp, tween, tset, tval, mk, solid, place, flatDot, open, prism } = HL;
-  const FT = 5, TS = 2.5, ZW = -17.5, N = 12;
+  const FT = 5, TS = 2.5, ZW = -17.5, N = 10;
   const FF = { hall: FT, dock: 4*FT, office: 1.5*FT, pit: -3*FT };
-  const STAGES = [['grade',1],['rooms',3],['walls',5],['slabs on grade',6],['pit',8],['materials',10],['mesh',11]];
-  const DETAIL = ['ready','grade ±0′-0″','grid 4 × 3','rooms 4','FF +1′ +4′ +1.5′ −3′','walls','hall +1′-0″','dock +4′ · office +1′-6″',
-    'pit slab −3′-0″','pit walls','concrete','slabs','walls'];
+  const STAGES = [['slabs',1],['walls',3],['slab on grade',5],['materials',8],['mesh',9]];
+  const DETAIL = ['grade ±0′-0″','slab outlines 4','FF +1′ +4′ +1.5′ −3′','walls','pit walls','hall +1′-0″','dock +4′ · office +1′-6″',
+    'pit −3′-0″','concrete','slabs','walls'];
   const setD = (el, d) => { if (el._d !== d){ el._d = d; el.setAttribute('d', d); } };
   const cls = (el, c) => { if (el._c !== c){ el._c = c; el.setAttribute('class', c); } };
   const show = (el, on) => { const v = on ? '' : 'none'; if (el._v !== v){ el._v = v; el.style.display = v; } };
@@ -686,12 +686,7 @@ const BS = (() => {
     const outside = (x, y) => x < 0 || y < 0 || x > 160 || y > 100;
 
     groundDots((x, y) => outside(x, y) && (x < 0 || y < 0));
-    M.gradeBack = [{ w: [[-8, 108, 0], [-8, -8, 0], [168, -8, 0]], s: G(from(1)) }]; paths(M.gradeBack, 'nf dash');
-    M.gridL = [
-      ...[0, 50, 100, 160].map((x, i) => ({ w: [[x, -6, 0], [x, 106, 0]], s: G(from(2, 5), i*100) })),
-      ...[0, 40, 100].map((y, i) => ({ w: [[-6, y, 0], [166, y, 0]], s: G(from(2, 5), 400 + i*100) })),
-    ];
-    paths(M.gridL, 'nf dash');
+    M.gradeBack = [{ w: [[-8, 108, 0], [-8, -8, 0], [168, -8, 0]], s: G(from(0)) }]; paths(M.gradeBack, 'nf dash');
 
     M.boxes = [];
     const box = (b, z0, z1, o) => {
@@ -700,59 +695,58 @@ const BS = (() => {
     };
     const add = list => list.forEach(it => { it.el = solid(g); M.boxes.push(it); });
 
-    add([box([25, 62, 55, 88], FF.pit - TS, FF.pit, { gate: from(8), ph: 8 })]);
+    add([box([25, 62, 55, 88], FF.pit - TS, FF.pit, { gate: from(7), ph: 7 })]);
     const walls = [
       [[0, 0, 98.5, 3], FF.hall], [[98.5, 0, 160, 3], FF.dock], [[0, 3, 3, 97], FF.hall], [[0, 97, 98.5, 100], FF.hall],
       [[98.5, 97, 160, 100], FF.office], [[157, 3, 160, 61.5], FF.dock], [[157, 61.5, 160, 97], FF.office],
       [[98.5, 3, 101.5, 61.5], FF.dock], [[98.5, 61.5, 101.5, 97], FF.office], [[101.5, 58.5, 157, 61.5], FF.dock],
-    ].map(([b, ff]) => box(b, ZW, ff - TS, { gate: from(5), dl: ctr(b)*2.2, ph: 5, mode: 'rise' }));
+    ].map(([b, ff]) => box(b, ZW, ff - TS, { gate: from(3), dl: ctr(b)*2.2, ph: 3, mode: 'rise' }));
     [[22, 59, 58, 62], [22, 62, 25, 88], [55, 62, 58, 88], [22, 88, 58, 91]].forEach((b, i) =>
-      walls.push(box(b, FF.pit - TS, FF.hall - TS, { gate: from(9), dl: i*110, ph: 9, mode: 'rise' })));
+      walls.push(box(b, FF.pit - TS, FF.hall - TS, { gate: from(4), dl: i*110, ph: 4, mode: 'rise' })));
     add(walls.sort((a, b) => a.key - b.key));
-    add([box([98.5, 0, 160, 61.5], FF.dock - TS, FF.dock, { gate: from(7), ph: 7 })]);
-    add([[0, 0, 98.5, 62], [0, 62, 25, 88], [55, 62, 98.5, 88], [0, 88, 98.5, 100]].map((b, i) => box(b, FF.hall - TS, FF.hall, { gate: from(6), dl: i*110, ph: 6 })));
-    add([box([98.5, 61.5, 160, 100], FF.office - TS, FF.office, { gate: from(7), dl: 200, ph: 7 })]);
+    add([box([98.5, 0, 160, 61.5], FF.dock - TS, FF.dock, { gate: from(6), ph: 6 })]);
+    add([[0, 0, 98.5, 62], [0, 62, 25, 88], [55, 62, 98.5, 88], [0, 88, 98.5, 100]].map((b, i) => box(b, FF.hall - TS, FF.hall, { gate: from(5), dl: i*110, ph: 5 })));
+    add([box([98.5, 61.5, 160, 100], FF.office - TS, FF.office, { gate: from(6), dl: 200, ph: 6 })]);
 
     M.mesh = [];
     const meshRect = (b, z, dl) => {
-      for (let x = Math.ceil((b[0] + 1)/12.5)*12.5; x < b[2] - 1; x += 12.5) M.mesh.push({ w: [[x, b[1] + .8, z], [x, b[3] - .2, z]], ph: 11, s: G(from(11), dl + x*2.4) });
-      for (let y = Math.ceil((b[1] + 1)/12.5)*12.5; y < b[3] - 1; y += 12.5) M.mesh.push({ w: [[b[0] + .8, y, z], [b[2] - .2, y, z]], ph: 11, s: G(from(11), dl + 220 + y*2.4) });
+      for (let x = Math.ceil((b[0] + 1)/12.5)*12.5; x < b[2] - 1; x += 12.5) M.mesh.push({ w: [[x, b[1] + .8, z], [x, b[3] - .2, z]], ph: 9, s: G(from(9), dl + x*2.4) });
+      for (let y = Math.ceil((b[1] + 1)/12.5)*12.5; y < b[3] - 1; y += 12.5) M.mesh.push({ w: [[b[0] + .8, y, z], [b[2] - .2, y, z]], ph: 9, s: G(from(9), dl + 220 + y*2.4) });
     };
     meshRect([98.5, 0, 160, 61.5], FF.dock, 0); meshRect([25, 62, 55, 88], FF.pit, 100);
     [[0, 0, 98.5, 62], [0, 62, 25, 88], [55, 62, 98.5, 88], [0, 88, 98.5, 100]].forEach(b => meshRect(b, FF.hall, 60));
     meshRect([98.5, 61.5, 160, 100], FF.office, 160);
-    for (let x = 12.5; x < 160; x += 12.5) M.mesh.push({ w: [[x, 100, (x < 98.5 ? FF.hall : FF.office) - TS], [x, 100, ZW + .6]], ph: 12, s: G(from(12), x*3) });
-    for (let y = 12.5; y < 100; y += 12.5) M.mesh.push({ w: [[160, y, (y < 61.5 ? FF.dock : FF.office) - TS], [160, y, ZW + .6]], ph: 12, s: G(from(12), 480 + y*3) });
-    [-10, -2.5].forEach((z, i) => M.mesh.push({ w: [[1.2, 100, z], [160, 100, z], [160, 1.2, z]], ph: 12, s: G(from(12), 300 + i*120) }));
+    for (let x = 12.5; x < 160; x += 12.5) M.mesh.push({ w: [[x, 100, (x < 98.5 ? FF.hall : FF.office) - TS], [x, 100, ZW + .6]], ph: 10, s: G(from(10), x*3) });
+    for (let y = 12.5; y < 100; y += 12.5) M.mesh.push({ w: [[160, y, (y < 61.5 ? FF.dock : FF.office) - TS], [160, y, ZW + .6]], ph: 10, s: G(from(10), 480 + y*3) });
+    [-10, -2.5].forEach((z, i) => M.mesh.push({ w: [[1.2, 100, z], [160, 100, z], [160, 1.2, z]], ph: 10, s: G(from(10), 300 + i*120) }));
     paths(M.mesh, 'nf');
 
     let seed = 3; const rnd = () => (seed = (seed*16807) % 2147483647)/2147483647;
     M.agg = [];
     const dots = (n, at) => { for (let i = 0; i < n; i++){ const p = at(rnd(), rnd()), big = rnd() < .22;
       const el = mk('circle', { r: big ? .85 : .5, class: big ? 'dot m' : 'dot off' }, g); place(el, P(...p));
-      M.agg.push({ el, s: G(from(10, 11), Math.hypot(p[0], 100 - p[1])*4) }); } };
+      M.agg.push({ el, s: G(from(8, 9), Math.hypot(p[0], 100 - p[1])*4) }); } };
     dots(70, (a, b) => [2 + a*156, 100, ZW + 1 + b*(FF.hall - TS - ZW - 2)]);
     dots(44, (a, b) => [160, 2 + a*96, ZW + 1 + b*(FF.office - TS - ZW - 2)]);
     dots(16, (a, b) => [102 + a*54, 61.5, FF.office + 1 + b*(FF.dock - FF.office - 2)]);
 
-    M.gradeWall = [{ w: [[0, 100, 0], [160, 100, 0], [160, 0, 0]], s: G(from(5)) }]; paths(M.gradeWall, 'nf sil');
-    M.gradeFront = [{ w: [[-8, 108, 0], [168, 108, 0], [168, -8, 0]], s: G(from(1)) }]; paths(M.gradeFront, 'nf dash');
+    M.gradeWall = [{ w: [[0, 100, 0], [160, 100, 0], [160, 0, 0]], s: G(from(3)) }]; paths(M.gradeWall, 'nf sil');
+    M.gradeFront = [{ w: [[-8, 108, 0], [168, 108, 0], [168, -8, 0]], s: G(from(0)) }]; paths(M.gradeFront, 'nf dash');
     groundDots((x, y) => outside(x, y) && !(x < 0 || y < 0));
     const rect = (b, z) => [[b[0], b[1], z], [b[2], b[1], z], [b[2], b[3], z], [b[0], b[3], z], [b[0], b[1], z]];
     M.rooms = [[[0, 0, 98.5, 100], FF.hall], [[98.5, 0, 160, 61.5], FF.dock], [[98.5, 61.5, 160, 100], FF.office], [[25, 62, 55, 88], FF.pit]]
-      .map(([b, z], i) => ({ w: rect(b, z), s: G(from(3, 6), i*140) }));
+      .map(([b, z], i) => ({ w: rect(b, z), s: G(from(1, 5), i*140) }));
     paths(M.rooms, 'nf sil');
-    M.marks = [[166, 0, FF.dock], [166, 100, FF.office], [55, 88, FF.pit]].map(([x, y, z], i) => ({ x, y, z, s: G(from(4, 6), 150 + i*150),
+    M.marks = [[166, 0, FF.dock], [166, 100, FF.office], [55, 88, FF.pit]].map(([x, y, z], i) => ({ x, y, z, s: G(from(2, 5), 150 + i*150),
       el: mk('path', { class: 'nf dash' }, g), dot: mk('circle', { r: 1.5, class: 'dot m' }, g) }));
-    M.foot1 = { s: G(from(4)), el: mk('path', { class: 'nf sil' }, g), dot: mk('circle', { r: 1.5, class: 'dot' }, g) };
+    M.foot1 = { s: G(from(2)), el: mk('path', { class: 'nf sil' }, g), dot: mk('circle', { r: 1.5, class: 'dot' }, g) };
     return M;
   }
 
   function draw(M){
     const { P, front } = M, k = S.k;
     const guide = (l, hiAt, base) => { setD(l.el, line(l.w.map(p => P(...p)), val(l.s))); cls(l.el, k === hiAt ? base + ' hi' : base); };
-    M.gradeBack.forEach(l => guide(l, 1, 'nf dash'));
-    M.gridL.forEach(l => guide(l, 2, 'nf dash'));
+    M.gradeBack.forEach(l => guide(l, -1, 'nf dash'));
     M.boxes.forEach(it => {
       const v = val(it.s), on = v > .001; show(it.el.g, on);
       if (on){
@@ -765,19 +759,19 @@ const BS = (() => {
     });
     M.mesh.forEach(l => { setD(l.el, line(l.w.map(p => P(...p)), val(l.s))); cls(l.el, k === l.ph ? 'nf sil' : 'nf'); });
     M.agg.forEach(d => show(d.el, val(d.s) > .5));
-    M.gradeWall.forEach(l => guide(l, 6, 'nf sil'));
-    M.gradeFront.forEach(l => guide(l, 1, 'nf dash'));
-    M.rooms.forEach(l => guide(l, 3, 'nf sil'));
+    M.gradeWall.forEach(l => guide(l, 5, 'nf sil'));
+    M.gradeFront.forEach(l => guide(l, -1, 'nf dash'));
+    M.rooms.forEach(l => guide(l, 1, 'nf sil'));
     M.marks.forEach(m => {
       const v = val(m.s), zt = m.z*v;
       setD(m.el, v > .001 ? open([P(m.x, m.y, 0), P(m.x, m.y, zt)]) : '');
-      show(m.dot, v > .5); place(m.dot, P(m.x, m.y, zt)); cls(m.dot, k === 4 ? 'dot' : 'dot m');
+      show(m.dot, v > .5); place(m.dot, P(m.x, m.y, zt)); cls(m.dot, k === 2 ? 'dot' : 'dot m');
     });
     /* the one-foot step from grade to the hall slab, at the front-left corner */
     const f = M.foot1, v1 = val(f.s), z1 = FF.hall*v1;
     setD(f.el, v1 > .001 ? open([P(-1, 100, 0), P(-5, 100, 0), P(-5, 100, z1), P(-1, 100, z1)]) : '');
     show(f.dot, v1 > .5); place(f.dot, P(-5, 100, z1));
-    cls(f.el, k === 4 || k === 6 ? 'nf hi' : 'nf sil');
+    cls(f.el, k === 2 || k === 5 ? 'nf hi' : 'nf sil');
   }
   return { N, STAGES, DETAIL, S, build, draw };
 })();
