@@ -1,0 +1,1037 @@
+<title>Concrete Beam Sequence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&display=swap">
+<style>
+/* Layout: a header line, then a grid of 5:4 plates, one looping figure each. Black and white only:
+   the hairline palette is set to pure greys, white on black in dark, black on white in light. */
+:root{
+  color-scheme:light;
+  --ground:#ffffff; --ink:#000000; --muted:#6c6c6c; --line:#e4e4e4;
+  --hairline-plate:#ffffff; --hairline-hi:#000000; --hairline-edge:#6a6a6a; --hairline-mid:#adadad; --hairline-lo:#dedede; --hairline-stroke:0.9;
+  --f-sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#000000; --ink:#ffffff; --muted:#8c8c8c; --line:#1e1e1e;
+    --hairline-plate:#000000; --hairline-hi:#ffffff; --hairline-edge:#8e8e8e; --hairline-mid:#4c4c4c; --hairline-lo:#262626;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#000000; --ink:#ffffff; --muted:#8c8c8c; --line:#1e1e1e;
+  --hairline-plate:#000000; --hairline-hi:#ffffff; --hairline-edge:#8e8e8e; --hairline-mid:#4c4c4c; --hairline-lo:#262626;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:13px/1.5 var(--f-sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:clamp(16px,3vw,40px);padding-block:44px 64px;display:grid;gap:28px}
+.wrap > *{min-width:0}
+header{display:grid;gap:10px}
+h1{margin:0;font:300 clamp(30px,4vw,46px)/1.04 var(--f-sans);letter-spacing:-.025em;text-wrap:balance}
+header p{margin:0;max-width:58ch;color:var(--muted);font-size:14px;text-wrap:pretty}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px}
+.tile{position:relative;margin:0;min-width:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--ground)}
+.tag{position:absolute;top:12px;z-index:1;font:11px/1 var(--f-mono);letter-spacing:.02em;color:var(--muted);pointer-events:none}
+.tag.name{left:14px}
+.tag.read{right:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+footer{font:11px/1.7 var(--f-mono);color:var(--muted)}
+footer a{color:inherit}
+</style>
+<div class="wrap">
+  <header>
+    <h1>Concrete beam, built in twelve lines</h1>
+    <p>A reinforced concrete beam model, from its dimensions to its first cracks. Each figure loops on its own. Move across one to step through it.</p>
+  </header>
+  <main class="grid" id="grid"></main>
+  <footer>Drawn on the <a href="https://github.com/lucasmarkes/hairline">hairline</a> kernel by Lucas Marques, MIT licence.</footer>
+</div>
+<script>
+/* hairline kernel sha256:8e2abcbdf63c7755195ee942c39e9c8ea6a539d1147e986dd1c153559121f075 */
+/*
+ * HL: everything a figure may call. Read this index; the code under it is the
+ * package's src/core, unchanged, and a figure should not need to read it.
+ *
+ * Every figure is drawn in a 400 × 320 viewBox. World space is x/y on the
+ * ground and z up. Plates are filled with the ground colour and painted back
+ * to front, so a nearer one covers a farther one: append in that order. At
+ * the default camera, Cam(45, 0.5, S), +x runs down to the right and +y down
+ * to the left, so the corner with the largest x and y is nearest the viewer:
+ * append by ascending x + y, from the far corner (smallest x and y) to it.
+ *
+ * Camera
+ *   Cam(azDeg, k, S)                       a camera: azimuth in degrees, k = sin(elevation) (0.5 is the 2:1 view), S = scale
+ *   fit(C, points, cx, cy)                 centres the box of [x, y, z] points on (cx, cy); call it once, before proj
+ *                                          it only centres, it never scales: choose S by trying values, with the most extreme pose in points.
+ *                                          The six figures use S 1.42 to 2.12; the boxes they fit come out 230 to 310 wide and 180 to 245 tall
+ *   proj(C)                                returns P(x, y, z), which gives [sx, sy]
+ *   unproj(C, sx, sy, z)                   the world [x, y] under a screen point, on the plane at height z
+ *   facing(C)                              returns front(sample): whether a ring sample faces the camera
+ * Rounded solids
+ *   rrect(u0, v0, u1, v1, r, n)            a rounded rectangle, as a ring of samples {u, v, nu, nv}
+ *   circ(R, n)                             a circle, as a ring
+ *   rings(x0, y0, x1, y1, r, b)            [ring, inner]: a rounded footprint and its crease ring, inset by b
+ *                                          r, the corner radius, is cut to half the shorter side. b, the crease's inset in world units
+ *                                          (0.6 to 2.2 in the figures), must stay under half the shorter side or the crease turns inside out
+ *   prism(P, front, ring, inner, z0, z1)   {sil, crease}: a solid standing from z0 to z1, as two path strings
+ *   ringAt(P, ring, z)                     the ring's points, projected at height z
+ *   run(ring, keep)                        the one cyclic run of samples that pass keep
+ *   hull(points)                           the convex hull of screen points
+ *   extremes(P, ring)                      [left, right, nearest] samples: where dashed drops fall from
+ *   fillet(points, radii, n)               rounds every vertex of a closed polygon; returns the new points
+ *                                          radii is an array, one radius per vertex, each cut to half its shorter edge; a single number gives NaN.
+ *                                          n is the steps round each corner, default 4: each vertex becomes n + 1 points
+ *   ghost(P, front, ring, z0, depth)       a reflection's path {d, y0, y1}; reflect() draws it for you
+ * Paths and numbers
+ *   poly(points)                           a closed path string
+ *   open(points)                           an open polyline string
+ *   seg(a, b)                              one segment between two screen points [sx, sy], as its own subpath; project world points with P first
+ *   clamp(v, a, b)
+ *   lerp(a, b, t)
+ *   rad(deg)
+ *   r2(n)                                  two decimals
+ * The continuous clock: one spring per moving number
+ *   spring(x, opts)                        at rest on x; write .t to retarget; opts {k, c, m, eps}, default k 100, c 18, m 1
+ *   stepS(sp, dt)                          advances by dt seconds; returns whether it is still moving
+ * The discrete clock: a 700ms tween on (.32, .72, 0, 1)
+ *   tween(v, dur)                          at rest on v; dur defaults to 700 (ms)
+ *   tset(tw, to, now, delay)               retargets from where it is, after delay ms: the stagger
+ *                                          the same target again does nothing, so calling it on every pointer move is safe
+ *   tval(tw, now)                          its value at now
+ *   tdone(tw, now)                         whether it has landed
+ *   bezier(x1, y1, x2, y2)                 a CSS cubic-bezier, as a function of progress
+ *   EASE_LIFT                              the lift curve itself
+ *   reducedMotion()                        true when the reader asked for less motion; springs and tweens already land at once
+ *   setReducedMotion(on)                   the loop's business, not a figure's
+ * Drawing
+ *   mk(tag, attrs, parent)                 one svg element: the only way a figure makes a node
+ *   solid(parent)                          {g, sil, cr}: a group holding a silhouette path and a crease path
+ *   put(solid, paths)                      writes prism()'s {sil, crease} into solid()'s {sil, cr}: sil into sil, crease into cr
+ *   flatDot(parent, C, r, cls)             a dot lying on the ground plane; cls is "dot", "dot m" or "dot off"
+ *   place(el, point)                       moves a dot or a circle to [sx, sy]
+ *   reflect(svg, parent, P, front, ring, z0, depth)   a fading mirror under a solid
+ *   fade(svg, y0, y1, a0)                  a vertical fade, as a mask; returns the value for a mask attribute
+ * Life
+ *   register(stage, tick)                  joins the one frame loop; tick(dt in seconds, now in ms) returns true to ask for another frame; gives {wake, unregister}
+ *   pointer(stage, handlers)               {move(point), down(point), leave()}, points in viewBox units; returns its disposer
+ *   disposer()                             {add, on, dispose}: collects tear-down, so destroy is bag.dispose
+ * The bench's business, not a figure's
+ *   css(lightDark)
+ *   inject(root)
+ *
+ * Classes, on path, polygon, ellipse and line. They are the whole palette; a
+ * figure sets no colour, width or fill of its own.
+ *     (none)   filled with the ground colour, medium stroke
+ *     sil      the silhouette's stroke        hi    the bright stroke: the only highlight
+ *     lo       the dim stroke                 nf    no fill        fo   fill only, no stroke
+ *     dash     a dashed guide
+ *     dot      a bright dot                   dot m   a medium dot     dot off   a dim dot
+ */
+var HL = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // packages/hairline/src/core/kernel.ts
+  var kernel_exports = {};
+  __export(kernel_exports, {
+    Cam: () => Cam,
+    EASE_LIFT: () => EASE_LIFT,
+    bezier: () => bezier,
+    circ: () => circ,
+    clamp: () => clamp,
+    css: () => css,
+    disposer: () => disposer,
+    extremes: () => extremes,
+    facing: () => facing,
+    fade: () => fade,
+    fillet: () => fillet,
+    fit: () => fit,
+    flatDot: () => flatDot,
+    ghost: () => ghost,
+    hull: () => hull,
+    inject: () => inject,
+    lerp: () => lerp,
+    mk: () => mk,
+    open: () => open,
+    place: () => place,
+    pointer: () => pointer,
+    poly: () => poly,
+    prism: () => prism,
+    proj: () => proj,
+    put: () => put,
+    r2: () => r2,
+    rad: () => rad,
+    reducedMotion: () => reducedMotion,
+    reflect: () => reflect,
+    register: () => register,
+    ringAt: () => ringAt,
+    rings: () => rings,
+    rrect: () => rrect,
+    run: () => run,
+    seg: () => seg,
+    setReducedMotion: () => setReducedMotion,
+    solid: () => solid,
+    spring: () => spring,
+    stepS: () => stepS,
+    tdone: () => tdone,
+    tset: () => tset,
+    tval: () => tval,
+    tween: () => tween,
+    unproj: () => unproj
+  });
+
+  // packages/hairline/src/core/iso.ts
+  var clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  var lerp = (a, b, t) => a + (b - a) * t;
+  var rad = (d) => d * Math.PI / 180;
+  var r2 = (n) => Math.round(n * 100) / 100;
+  var poly = (pts) => "M" + pts.map((p) => r2(p[0]) + " " + r2(p[1])).join("L") + "Z";
+  var seg = (a, b) => `M${r2(a[0])} ${r2(a[1])}L${r2(b[0])} ${r2(b[1])}`;
+  var open = (pts) => pts.length < 2 ? "" : "M" + pts.map((p) => r2(p[0]) + " " + r2(p[1])).join("L");
+  var Cam = (azDeg, k, S) => ({ az: rad(azDeg), k, S, ox: 0, oy: 0 });
+  function proj(C) {
+    const c = Math.cos(C.az), s = Math.sin(C.az), zf = Math.sqrt(1 - C.k * C.k);
+    return (x, y, z) => {
+      const X = x * c - y * s, Y = x * s + y * c;
+      return [C.ox + C.S * X, C.oy + C.S * (Y * C.k - z * zf)];
+    };
+  }
+  function unproj(C, sx, sy, z) {
+    const c = Math.cos(C.az), s = Math.sin(C.az), zf = Math.sqrt(1 - C.k * C.k);
+    const X = (sx - C.ox) / C.S, Y = ((sy - C.oy) / C.S + z * zf) / C.k;
+    return [X * c + Y * s, -X * s + Y * c];
+  }
+  function fit(C, pts, cx, cy) {
+    C.ox = 0;
+    C.oy = 0;
+    const P = proj(C);
+    let a = 1e9, b = -1e9, c = 1e9, d = -1e9;
+    for (const p of pts) {
+      const q = P(p[0], p[1], p[2]);
+      a = Math.min(a, q[0]);
+      b = Math.max(b, q[0]);
+      c = Math.min(c, q[1]);
+      d = Math.max(d, q[1]);
+    }
+    C.ox = cx - (a + b) / 2;
+    C.oy = cy - (c + d) / 2;
+  }
+  function rrect(u0, v0, u1, v1, r, n = 4) {
+    r = Math.max(0, Math.min(r, (u1 - u0) / 2, (v1 - v0) / 2));
+    const out = [];
+    for (const [cu, cv, a0] of [[u1 - r, v1 - r, 0], [u0 + r, v1 - r, 90], [u0 + r, v0 + r, 180], [u1 - r, v0 + r, 270]])
+      for (let k = 0; k <= n; k++) {
+        const a = rad(a0 + 90 * k / n), ca = Math.cos(a), sa = Math.sin(a);
+        out.push({ u: cu + r * ca, v: cv + r * sa, nu: ca, nv: sa });
+      }
+    return out;
+  }
+  function circ(R, n = 96) {
+    const out = [];
+    for (let k = 0; k < n; k++) {
+      const a = k / n * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a);
+      out.push({ u: R * ca, v: R * sa, nu: ca, nv: sa });
+    }
+    return out;
+  }
+  function hull(input) {
+    const pts = input.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const x = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], up = [];
+    for (const p of pts) {
+      while (lo.length > 1 && x(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop();
+      lo.push(p);
+    }
+    for (let i = pts.length - 1; i >= 0; i--) {
+      const p = pts[i];
+      while (up.length > 1 && x(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop();
+      up.push(p);
+    }
+    lo.pop();
+    up.pop();
+    return lo.concat(up);
+  }
+  var ringAt = (P, ring, z) => ring.map((q) => P(q.u, q.v, z));
+  var facing = (C) => {
+    const s = Math.sin(C.az), c = Math.cos(C.az);
+    return (q) => q.nu * s + q.nv * c >= -1e-6;
+  };
+  function run(ring, keep) {
+    const n = ring.length;
+    let s = -1;
+    for (let i = 0; i < n; i++) if (keep(ring[i]) && !keep(ring[(i + n - 1) % n])) {
+      s = i;
+      break;
+    }
+    if (s < 0) return keep(ring[0]) ? ring.slice() : [];
+    const out = [];
+    for (let k = 0; k < n && keep(ring[(s + k) % n]); k++) out.push(ring[(s + k) % n]);
+    return out;
+  }
+  function prism(P, front, ring, inner, z0, z1) {
+    return {
+      sil: poly(hull(ringAt(P, ring, z1).concat(ringAt(P, ring, z0)))),
+      crease: inner ? open(ringAt(P, run(inner, front), z1)) : ""
+    };
+  }
+  var rings = (x0, y0, x1, y1, r, b) => [
+    rrect(x0, y0, x1, y1, r),
+    rrect(x0 + b, y0 + b, x1 - b, y1 - b, Math.max(0.3, r - b))
+  ];
+  function extremes(P, ring) {
+    const pr = ring.map((q) => P(q.u, q.v, 0));
+    let a = 0, b = 0, c = 0;
+    pr.forEach((p, k) => {
+      if (p[0] < pr[a][0]) a = k;
+      if (p[0] > pr[b][0]) b = k;
+      if (p[1] > pr[c][1]) c = k;
+    });
+    return [ring[a], ring[b], ring[c]];
+  }
+  function fillet(pts, rs, n = 4) {
+    const m = pts.length, out = [];
+    for (let i = 0; i < m; i++) {
+      const a = pts[(i + m - 1) % m], p = pts[i], b = pts[(i + 1) % m];
+      const la = Math.hypot(a[0] - p[0], a[1] - p[1]), lb = Math.hypot(b[0] - p[0], b[1] - p[1]);
+      const t = Math.min(rs[i], la / 2, lb / 2);
+      const p1 = [p[0] + (a[0] - p[0]) / la * t, p[1] + (a[1] - p[1]) / la * t];
+      const p2 = [p[0] + (b[0] - p[0]) / lb * t, p[1] + (b[1] - p[1]) / lb * t];
+      for (let k = 0; k <= n; k++) {
+        const s = k / n, w = 1 - s;
+        out.push([w * w * p1[0] + 2 * w * s * p[0] + s * s * p2[0], w * w * p1[1] + 2 * w * s * p[1] + s * s * p2[1]]);
+      }
+    }
+    return out;
+  }
+  function ghost(P, front, ring, z0, depth) {
+    const f = run(ring, front), lowP = ringAt(P, f, z0 - depth);
+    return {
+      d: open(lowP) + [f[0], f[f.length - 1]].map((q) => seg(P(q.u, q.v, z0), P(q.u, q.v, z0 - depth))).join(""),
+      y0: Math.min(...ringAt(P, f, z0).map((p) => p[1])),
+      y1: Math.max(...lowP.map((p) => p[1])) + 2
+    };
+  }
+
+  // packages/hairline/src/core/motion.ts
+  var reduced = false;
+  var setReducedMotion = (on) => {
+    reduced = on;
+  };
+  var reducedMotion = () => reduced;
+  function spring(x, o = {}) {
+    return { x, v: 0, t: x, k: o.k ?? 100, c: o.c ?? 18, m: o.m ?? 1, eps: o.eps ?? 0.01 };
+  }
+  function stepS(sp, dt) {
+    if (reduced) {
+      sp.x = sp.t;
+      sp.v = 0;
+      return false;
+    }
+    const n = Math.max(1, Math.ceil(dt * 240)), h = dt / n;
+    for (let i = 0; i < n; i++) {
+      const a = (-sp.k * (sp.x - sp.t) - sp.c * sp.v) / sp.m;
+      sp.v += a * h;
+      sp.x += sp.v * h;
+    }
+    if (Math.abs(sp.x - sp.t) < sp.eps && Math.abs(sp.v) < sp.eps * 10) {
+      sp.x = sp.t;
+      sp.v = 0;
+      return false;
+    }
+    return true;
+  }
+  function bezier(x1, y1, x2, y2) {
+    const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+    const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+    const X = (u) => ((ax * u + bx) * u + cx) * u;
+    const Y = (u) => ((ay * u + by) * u + cy) * u;
+    const dX = (u) => (3 * ax * u + 2 * bx) * u + cx;
+    return (t) => {
+      if (t <= 0) return 0;
+      if (t >= 1) return 1;
+      let u = t;
+      for (let i = 0; i < 8; i++) {
+        const e = X(u) - t;
+        if (Math.abs(e) < 1e-5) break;
+        const d = dX(u);
+        if (Math.abs(d) < 1e-6) break;
+        u -= e / d;
+      }
+      if (!(u >= 0 && u <= 1) || Math.abs(X(u) - t) > 1e-4) {
+        let lo = 0, hi = 1;
+        u = t;
+        for (let i = 0; i < 24; i++) {
+          if (X(u) < t) lo = u;
+          else hi = u;
+          u = (lo + hi) / 2;
+        }
+      }
+      return Y(u);
+    };
+  }
+  var EASE_LIFT = bezier(0.32, 0.72, 0, 1);
+  var tween = (v, dur = 700) => ({ from: v, to: v, t0: -1e9, dur });
+  var tval = (tw, now) => {
+    const p = clamp((now - tw.t0) / tw.dur, 0, 1);
+    return tw.from + (tw.to - tw.from) * (reduced ? 1 : EASE_LIFT(p));
+  };
+  var tset = (tw, to, now, delay) => {
+    if (tw.to === to) return;
+    tw.from = tval(tw, now);
+    tw.to = to;
+    tw.t0 = now + delay;
+  };
+  var tdone = (tw, now) => reduced || now >= tw.t0 + tw.dur;
+
+  // packages/hairline/src/core/stage.ts
+  var NS = "http://www.w3.org/2000/svg";
+  function mk(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    if (attrs) for (const k in attrs) e.setAttribute(k, String(attrs[k]));
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function solid(parent) {
+    const g = mk("g", {}, parent);
+    return { g, sil: mk("path", { class: "sil" }, g), cr: mk("path", { class: "nf lo" }, g) };
+  }
+  var put = (el, s) => {
+    el.sil.setAttribute("d", s.sil);
+    el.cr.setAttribute("d", s.crease);
+  };
+  var flatDot = (parent, C, r, cls) => mk("ellipse", { rx: r2(r * C.S), ry: r2(r * C.S * C.k), class: cls }, parent);
+  var place = (el, q) => {
+    el.setAttribute("cx", String(r2(q[0])));
+    el.setAttribute("cy", String(r2(q[1])));
+  };
+  var fid = 0;
+  function fade(svg, y0, y1, a0 = 0.7) {
+    const id = "hl-fd" + ++fid, defs = mk("defs", {}, svg);
+    const lg = mk("linearGradient", { id: id + "g", gradientUnits: "userSpaceOnUse", x1: 0, y1: r2(y0), x2: 0, y2: r2(y1) }, defs);
+    mk("stop", { offset: 0, "stop-color": "#fff", "stop-opacity": a0 }, lg);
+    mk("stop", { offset: 1, "stop-color": "#fff", "stop-opacity": 0 }, lg);
+    const m = mk("mask", { id, maskUnits: "userSpaceOnUse", x: 0, y: 0, width: 400, height: 320 }, defs);
+    mk("rect", { x: 0, y: 0, width: 400, height: 320, fill: `url(#${id}g)` }, m);
+    return `url(#${id})`;
+  }
+  function reflect(svg, parent, P, front, ring, z0, depth) {
+    const r = ghost(P, front, ring, z0, depth);
+    const gh = mk("g", { class: "ghost", mask: fade(svg, r.y0, r.y1) }, parent);
+    mk("path", { d: r.d }, gh);
+  }
+  var boards = [];
+  var byStage = /* @__PURE__ */ new Map();
+  var raf = 0;
+  var last = 0;
+  var io = null;
+  var rm = null;
+  function frame(now) {
+    const dt = Math.min(0.05, Math.max(0, (now - last) / 1e3));
+    last = now;
+    let any = false;
+    for (const b of boards.slice()) if (b.vis && b.awake) {
+      b.awake = !!b.tick(dt, now);
+      any = any || b.awake;
+    }
+    raf = any ? requestAnimationFrame(frame) : 0;
+  }
+  function wake(b) {
+    b.awake = true;
+    if (!raf) {
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
+  }
+  var onMotion = () => {
+    setReducedMotion(!!rm?.matches);
+    boards.forEach(wake);
+  };
+  function start() {
+    if (io) return;
+    io = new IntersectionObserver((es) => {
+      for (const e of es) {
+        const b = byStage.get(e.target);
+        if (!b) continue;
+        b.vis = e.isIntersecting;
+        if (b.vis) wake(b);
+      }
+    }, { rootMargin: "80px" });
+    rm = matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(rm.matches);
+    rm.addEventListener("change", onMotion);
+  }
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    io?.disconnect();
+    io = null;
+    rm?.removeEventListener("change", onMotion);
+    rm = null;
+  }
+  function register(stage, tick) {
+    start();
+    const b = { stage, tick, vis: false, awake: true };
+    boards.push(b);
+    byStage.set(stage, b);
+    io.observe(stage);
+    tick(0, performance.now());
+    let gone = false;
+    return {
+      wake: () => {
+        if (!gone) wake(b);
+      },
+      unregister: () => {
+        if (gone) return;
+        gone = true;
+        boards = boards.filter((x) => x !== b);
+        if (byStage.get(stage) === b) {
+          byStage.delete(stage);
+          io?.unobserve(stage);
+        }
+        if (!boards.length) stop();
+      }
+    };
+  }
+  function pointer(stage, on) {
+    let tm = 0;
+    const pt = (e) => {
+      const r = stage.getBoundingClientRect();
+      return [(e.clientX - r.left) / r.width * 400, (e.clientY - r.top) / r.height * 320];
+    };
+    const move = (e) => {
+      clearTimeout(tm);
+      on.move(pt(e), e);
+    };
+    const down = (e) => {
+      clearTimeout(tm);
+      if (e.pointerType !== "mouse") stage.releasePointerCapture?.(e.pointerId);
+      if (on.down) on.down(pt(e), e);
+      else on.move(pt(e), e);
+    };
+    const leave = (e) => {
+      clearTimeout(tm);
+      tm = window.setTimeout(() => on.leave(e), e.pointerType === "mouse" ? 0 : 1400);
+    };
+    stage.addEventListener("pointermove", move);
+    stage.addEventListener("pointerdown", down);
+    stage.addEventListener("pointerleave", leave);
+    return () => {
+      clearTimeout(tm);
+      stage.removeEventListener("pointermove", move);
+      stage.removeEventListener("pointerdown", down);
+      stage.removeEventListener("pointerleave", leave);
+    };
+  }
+  function disposer() {
+    let fns = [];
+    return {
+      add: (fn) => {
+        fns.push(fn);
+      },
+      on: (target, type, fn, opts) => {
+        const h = fn;
+        target.addEventListener(type, h, opts);
+        fns.push(() => target.removeEventListener(type, h, opts));
+      },
+      dispose: () => {
+        const run2 = fns;
+        fns = [];
+        for (let i = run2.length - 1; i >= 0; i--) run2[i]();
+      }
+    };
+  }
+
+  // packages/hairline/src/core/styles.ts
+  var LIGHT = { plate: "#ffffff", hi: "#232327", edge: "#a4a4ac", mid: "#c3c3c9", lo: "#e0e0e4" };
+  var DARK = { plate: "#08090a", hi: "#d0d6e0", edge: "#5b5d64", mid: "#3e3e44", lo: "#29292d" };
+  var KEYS = ["plate", "hi", "edge", "mid", "lo"];
+  var vars = (p) => KEYS.map((k) => `--hl-${k}:var(--hairline-${k},${p[k]});`).join("");
+  var EASE = "cubic-bezier(0.5,0,0.1,1)";
+  var SVG = ":where([data-hairline]>svg)";
+  function css(lightDark) {
+    const both = Object.fromEntries(KEYS.map((k) => [k, `light-dark(${LIGHT[k]},${DARK[k]})`]));
+    return [
+      // the box, and the palette: light unless something below says otherwise
+      `:where([data-hairline]){display:block;position:relative;aspect-ratio:5/4;touch-action:pan-y;user-select:none;-webkit-user-select:none;--hl-sw:var(--hairline-stroke,0.9);${vars(LIGHT)}}`,
+      // the page's color-scheme
+      lightDark ? `:where([data-hairline]){${vars(both)}}` : "",
+      // an ancestor that says dark
+      `:where(.dark,[data-theme="dark"]) :where([data-hairline]){${vars(DARK)}}`,
+      // the figure's own theme option
+      `:where([data-hairline][data-hairline-theme="light"]){${vars(LIGHT)}}`,
+      `:where([data-hairline][data-hairline-theme="dark"]){${vars(DARK)}}`,
+      `:where([data-hairline]:focus-visible){outline:1.5px solid var(--hl-hi);outline-offset:2px}`,
+      `${SVG}{position:absolute;inset:0;width:100%;height:100%;display:block}`,
+      // Riffle's live region: read, not seen
+      `:where([data-hairline]>[data-hairline-live]){position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}`,
+      // the drawing: plates are filled with the plate colour and painted back to front
+      `${SVG} :where(path,polygon,ellipse,line){fill:var(--hl-plate);stroke:var(--hl-mid);stroke-width:var(--hl-sw);vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round;transition:stroke 260ms ${EASE}}`,
+      `${SVG} :where(.nf){fill:none}`,
+      `${SVG} :where(.fo){stroke:none}`,
+      `${SVG} :where(.sil){stroke:var(--hl-edge)}`,
+      `${SVG} :where(.hi){stroke:var(--hl-hi)}`,
+      `${SVG} :where(.lo){stroke:var(--hl-lo)}`,
+      `${SVG} :where(.dash){stroke-dasharray:1 3}`,
+      `${SVG} :where(.dot){stroke:none;fill:var(--hl-hi);transition:fill 260ms ${EASE}}`,
+      `${SVG} :where(.dot.m){fill:var(--hl-edge)}`,
+      `${SVG} :where(.dot.off){fill:var(--hl-lo)}`,
+      `${SVG} :where(.ghost path){fill:none;stroke:var(--hl-mid)}`
+    ].join("");
+  }
+  var done = /* @__PURE__ */ new WeakSet();
+  function inject(root) {
+    if (done.has(root)) return;
+    done.add(root);
+    const doc = root.nodeType === 9 ? root : root.ownerDocument;
+    const win = doc.defaultView;
+    const text = css(!!win?.CSS?.supports?.("color", "light-dark(#000,#fff)"));
+    if (win && "adoptedStyleSheets" in root) {
+      try {
+        const sheet = new win.CSSStyleSheet();
+        sheet.replaceSync(text);
+        root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet];
+        return;
+      } catch {
+      }
+    }
+    const style = doc.createElement("style");
+    style.setAttribute("data-hairline-style", "");
+    style.textContent = text;
+    (root.nodeType === 9 ? doc.head ?? doc.documentElement : root).appendChild(style);
+  }
+  return __toCommonJS(kernel_exports);
+})();
+/* /hairline kernel */
+
+</script>
+<script>
+/* Shared pieces for the beam figures, built only from HL. World units: x along the beam, y across it,
+   z up. Every figure runs a loop of n phases; it opens on the finished composition (phase n), un-builds,
+   and builds again. Moving across a figure picks the phase by the pointer's x on the stage. */
+window.FIGS = [];
+window.HB = (() => {
+  const { Cam, fit, proj, facing, rings, prism, circ, ringAt, run, hull, poly, open, lerp, clamp,
+    tween, tset, tval, mk, register, pointer, disposer, reducedMotion } = HL;
+  const L = 160, B = 18, H = 26, CV = 4.5, ZS = 13;
+  const setD = (el, d) => { if (el._d !== d){ el._d = d; el.setAttribute('d', d); } };
+  const cls = (el, c) => { if (el._c !== c){ el._c = c; el.setAttribute('class', c); } };
+  const show = (el, on) => { const v = on ? '' : 'none'; if (el._v !== v){ el._v = v; el.style.display = v; } };
+  const mix = (a, b, t) => a.map((v, i) => lerp(v, b[i], t));
+  const T = () => tween(1);
+  const tw = (t, on, now, delay = 0) => { tset(t, on ? 1 : 0, now, delay); return tval(t, now); };
+  const corners = (x0, y0, z0, x1, y1, z1) => [[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]];
+  const EDGES = [[0,1],[1,2],[2,3],[3,0],[0,4],[1,5],[2,6],[3,7],[4,5],[5,6],[6,7],[7,4]];
+  const BOX = (z0, z1, m = 4) => [[-m,-m,z0],[L+m,-m,z0],[-m,B+m,z0],[L+m,B+m,z0],[-m,-m,z1],[L+m,B+m,z1]];
+  /** The first share v of a polyline of screen points, by length. */
+  function partial(pts, v){
+    if (v <= 0 || pts.length < 2) return [];
+    if (v >= 1) return pts;
+    const d = []; let tot = 0;
+    for (let i = 1; i < pts.length; i++){ const l = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); d.push(l); tot += l; }
+    let rem = v*tot; const out = [pts[0]];
+    for (let i = 0; i < d.length; i++){
+      if (rem >= d[i]){ out.push(pts[i+1]); rem -= d[i]; continue; }
+      const f = d[i] ? rem/d[i] : 0; out.push(mix(pts[i], pts[i+1], f)); break;
+    }
+    return out;
+  }
+  const line = (pts, v = 1) => { const q = partial(pts, v); return q.length > 1 ? open(q) : ''; };
+  function box(P, front, x0, y0, z0, x1, y1, z1, r = 2.4, b = 1.1){
+    const w = Math.min(x1 - x0, y1 - y0); b = Math.min(b, w*.38);
+    const [ring, inner] = rings(x0, y0, x1, y1, Math.min(r, w/2), b);
+    return prism(P, front, ring, inner, z0, z1);
+  }
+  /** A solid whose top is smaller than its foot: rule 09's two strings, written out. */
+  function taper(P, front, foot, top, inner, z0, z1){
+    return { sil: poly(hull(ringAt(P, foot, z0).concat(ringAt(P, top, z1)))), crease: open(ringAt(P, run(inner, front), z1)) };
+  }
+  const disc = (cx, cy, R) => circ(R, 16).map(q => ({ ...q, u: q.u + cx, v: q.v + cy }));
+  /** Deflected shape of a beam under two loads at the third points, 1 at midspan. */
+  function bend(x){
+    const a = L/3, f = u => u < a ? u*(3*L*a - 3*a*a - u*u) : a*(3*L*u - 3*u*u - a*a);
+    return f(clamp(Math.min(x, L - x), 0, L/2))/f(L/2);
+  }
+  function clock(n, dwell = 1000, hold = 2600){
+    let t0 = null, man = null;
+    const cyc = (n + 1)*dwell + hold;
+    return {
+      at(now){
+        if (man !== null) return man;
+        if (reducedMotion()) return n;
+        if (t0 === null) t0 = now - n*dwell;
+        return Math.min(n, Math.floor(((now - t0) % cyc)/dwell));
+      },
+      point(x){ man = clamp(Math.round((x - 50)/300*n), 0, n); },
+      leave(now){ if (man !== null) t0 = now - man*dwell; man = null; },
+    };
+  }
+  function base({ stage, svg, read }, S, pts, n, o = {}){
+    const bag = disposer(), C = Cam(45, 0.5, S);
+    fit(C, pts, 200, o.cy || 170);
+    const P = proj(C), front = facing(C), g = mk('g', {}, svg), ck = clock(n, o.dwell, o.hold);
+    return { C, P, front, g, run(tick, labels){
+      let ph = -1;
+      const R = register(stage, (dt, now) => {
+        const k = ck.at(now);
+        if (k !== ph){ ph = k; read.textContent = labels[k] || ''; }
+        tick(k, now, dt);
+        return !reducedMotion();
+      });
+      bag.add(R.unregister);
+      const pick = p => { ck.point(p[0]); R.wake(); };
+      bag.add(pointer(stage, { move: pick, down: pick, leave: () => { ck.leave(performance.now()); R.wake(); } }));
+      bag.add(() => svg.replaceChildren());
+      return { set(){}, destroy: bag.dispose };
+    } };
+  }
+  return { L, B, H, CV, ZS, setD, cls, show, mix, T, tw, corners, EDGES, BOX, partial, line, box, taper, disc, bend, base };
+})();
+
+/* 01 · dimensions */
+FIGS.push({ name: 'dimensions', means: 'Three dimension lines grow from the origin to the beam’s length, width and depth, then frame its envelope.', mount(ctx){
+  const { mk, place, seg } = HL, { L, B, H, setD, cls, show, mix, T, tw, corners, EDGES, BOX, line } = HB;
+  const f = HB.base(ctx, 2.1, BOX(0, H), 4), { P, g } = f, K = corners(0, 0, 0, L, B, H);
+  const env = mk('path', { class: 'nf dash' }, g), envT = EDGES.map(T);
+  const axes = [[L,0,0],[0,B,0],[0,0,H]].map((e, i) => {
+    const n = [8, 3, 4][i], ticks = [];
+    const el = mk('path', { class: 'nf sil' }, g);
+    for (let j = 1; j <= n; j++) ticks.push({ el: mk('circle', { r: j === n ? 1.4 : .85, class: j === n ? 'dot m' : 'dot off' }, g), f: j/n });
+    return { e, el, t: T(), ticks };
+  });
+  const o = mk('circle', { r: 1.7, class: 'dot' }, g); place(o, P(0, 0, 0));
+  return f.run((k, now) => {
+    let d = '';
+    EDGES.forEach((e, i) => {
+      const a = K[e[0]], b = K[e[1]], v = tw(envT[i], k >= 4, now, (a[0] + a[1] + a[2])*1.6);
+      if (v > .001) d += seg(P(...a), P(...mix(a, b, v)));
+    });
+    setD(env, d); cls(env, k === 4 ? 'nf dash hi' : 'nf dash');
+    axes.forEach((a, i) => {
+      const v = tw(a.t, k > i, now);
+      setD(a.el, line([P(0, 0, 0), P(...a.e.map(c => c*v))]));
+      cls(a.el, k === i + 1 ? 'nf hi' : 'nf sil');
+      a.ticks.forEach(t => { const on = v >= t.f - 1e-3; show(t.el, on); if (on) place(t.el, P(...a.e.map(c => c*t.f))); });
+    });
+    cls(o, k === 0 ? 'dot' : 'dot m');
+  }, ['origin', 'L 2100', 'B 200', 'H 300', 'envelope']);
+} });
+
+/* 02 · keypoints */
+FIGS.push({ name: 'keypoints', means: 'Eight keypoints drop onto the corners of the beam, two at a time, over a field of ground marks.', mount(ctx){
+  const { mk, place, flatDot } = HL, { L, B, H, setD, cls, show, T, tw, corners, BOX, line } = HB;
+  const f = HB.base(ctx, 2.1, BOX(0, H + 22), 4), { P, g, C } = f, K = corners(0, 0, 0, L, B, H);
+  for (let i = 0; i <= 8; i++) for (let j = 0; j <= 2; j++) place(flatDot(g, C, .5, 'dot off'), P(i*L/8, j*B/2, 0));
+  const pts = [0, 1, 3, 2, 4, 5, 7, 6].map((ix, n) => ({
+    p: K[ix], n, ph: (n >> 1) + 1, t: T(),
+    drop: mk('path', { class: 'nf dash' }, g), el: mk('circle', { r: 1.8, class: 'dot m' }, g),
+  }));
+  return f.run((k, now) => {
+    let newest = -1;
+    pts.forEach(q => {
+      const v = tw(q.t, k >= q.ph, now, (q.n & 1)*140), [x, y, z0] = q.p, z = z0 + 22*(1 - v);
+      show(q.el, v > .001); place(q.el, P(x, y, z));
+      setD(q.drop, v > .001 && z > .5 ? line([P(x, y, 0), P(x, y, z)]) : '');
+      if (k >= q.ph) newest = q.n;
+    });
+    pts.forEach(q => cls(q.el, q.n === newest || (newest < 0 && q.n === 0) ? 'dot' : 'dot m'));
+  }, ['kp 0', 'kp 2', 'kp 4', 'kp 6', 'kp 8']);
+} });
+
+/* 03 · lines */
+FIGS.push({ name: 'lines', means: 'Lines join the keypoints: the base, then the posts, then the top. The three hidden edges stay dashed.', mount(ctx){
+  const { mk, place } = HL, { L, B, H, setD, cls, mix, T, tw, corners, EDGES, BOX, line } = HB;
+  const f = HB.base(ctx, 2.1, BOX(0, H), 3), { P, g } = f, K = corners(0, 0, 0, L, B, H);
+  const hidden = new Set([0, 3, 4]);
+  const ls = EDGES.map((e, i) => ({ a: K[e[0]], b: K[e[1]], i, ph: (i >> 2) + 1, t: T(), el: mk('path', { class: 'nf sil' }, g) }));
+  const dots = K.map((p, i) => { const c = mk('circle', { r: 1.5, class: 'dot m' }, g); place(c, P(...p)); return c; });
+  return f.run((k, now) => {
+    ls.forEach(l => {
+      const v = tw(l.t, k >= l.ph, now, (l.i & 3)*60);
+      setD(l.el, line([P(...l.a), P(...mix(l.a, l.b, v))]));
+      cls(l.el, hidden.has(l.i) ? 'nf dash' : k === l.ph ? 'nf hi' : 'nf sil');
+    });
+    cls(dots[0], k === 0 ? 'dot' : 'dot m');
+  }, ['kp 8', 'base', 'posts', 'top']);
+} });
+</script>
+<script>
+/* 04 · areas */
+FIGS.push({ name: 'areas', means: 'Faces close over the wire frame one by one, back faces first, until the top seals the box.', mount(ctx){
+  const { mk, poly, seg, fillet } = HL, { L, B, H, setD, cls, show, mix, T, tw, corners, EDGES, BOX } = HB;
+  const f = HB.base(ctx, 2.1, BOX(0, H), 4), { P, g } = f, K = corners(0, 0, 0, L, B, H);
+  mk('path', { class: 'nf lo', d: EDGES.map(e => seg(P(...K[e[0]]), P(...K[e[1]]))).join('') }, g);
+  // [a, b, c, d]: the face grows from edge a–b towards d–c
+  const FACES = [[0,1,2,3,1,0],[0,1,5,4,1,150],[3,0,4,7,1,300],[3,2,6,7,2,0],[1,2,6,5,3,0],[4,5,6,7,4,0]];
+  const faces = FACES.map(([a, b, c, d, ph, dl]) => ({ a: K[a], b: K[b], c: K[c], d: K[d], ph, dl, t: T(), el: mk('path', { class: 'sil' }, g) }));
+  return f.run((k, now) => {
+    faces.forEach(q => {
+      const v = tw(q.t, k >= q.ph, now, q.dl);
+      show(q.el, v > .001);
+      if (v > .001) setD(q.el, poly(fillet([P(...q.a), P(...q.b), P(...mix(q.b, q.c, v)), P(...mix(q.a, q.d, v))], [1.6, 1.6, 1.6, 1.6])));
+      cls(q.el, k === q.ph ? 'hi' : 'sil');
+    });
+  }, ['frame', 'A 1–3', 'A 4', 'A 5', 'A 6']);
+} });
+
+/* 05 · volume */
+FIGS.push({ name: 'volume', means: 'An elevation rises as a flat area, then extrudes across the width into one solid.', mount(ctx){
+  const { mk, put, solid, poly, fillet } = HL, { L, B, H, setD, cls, show, T, tw, BOX, line, box } = HB;
+  const f = HB.base(ctx, 2.1, BOX(0, H), 3), { P, g, front } = f;
+  const guides = [[0, 0, H], [L, 0, H], [L, 0, 0]].map(([x, , z]) => mk('path', { class: 'nf dash', d: line([P(x, 0, z), P(x, B, z)]) }, g));
+  const area = mk('path', { class: 'sil' }, g), body = solid(g);
+  const ta = T(), te = T();
+  let last = -1;
+  return f.run((k, now) => {
+    const va = tw(ta, k >= 1, now), ve = tw(te, k >= 2, now, 120);
+    guides.forEach(el => show(el, k >= 1 && ve < .999));
+    show(area, va > .001 && ve <= .001);
+    if (va > .001 && ve <= .001){ const z = H*va; setD(area, poly(fillet([P(0,0,0), P(L,0,0), P(L,0,z), P(0,0,z)], [1.6,1.6,1.6,1.6]))); }
+    show(body.g, ve > .001);
+    if (ve > .001 && ve !== last){ last = ve; put(body, box(P, front, 0, 0, 0, L, Math.max(1.6, B*ve), H)); }
+    cls(body.sil, k === 3 ? 'sil hi' : 'sil');
+    cls(area, k === 1 ? 'hi' : 'sil');
+  }, ['empty', 'area', 'extrude', 'volume']);
+} });
+
+/* 06 · partition */
+FIGS.push({ name: 'partition', means: 'Cutting planes divide the solid at the cover lines and the load lines, and the 27 pieces part slightly.', mount(ctx){
+  const { mk, put, solid } = HL, { L, B, H, CV, setD, cls, show, T, tw, BOX, line, box } = HB;
+  const f = HB.base(ctx, 1.95, BOX(-8, H + 8, 12), 4), { P, g, front } = f;
+  const XS = [0, L/3, 2*L/3, L], YS = [0, CV, B - CV, B], ZS = [0, 6, H - 6, H], m = 7;
+  const cuts = [
+    ...[XS[1], XS[2]].map(c => ({ ph: 1, plane: [[c,-m,-m],[c,B+m,-m],[c,B+m,H+m],[c,-m,H+m],[c,-m,-m]], seam: [[c,0,H],[c,B,H],[c,B,0]] })),
+    ...[YS[1], YS[2]].map(c => ({ ph: 2, plane: [[-m,c,-m],[L+m,c,-m],[L+m,c,H+m],[-m,c,H+m],[-m,c,-m]], seam: [[1.5,c,H],[L,c,H],[L,c,0]] })),
+    ...[ZS[1], ZS[2]].map(c => ({ ph: 3, plane: [[-m,-m,c],[L+m,-m,c],[L+m,B+m,c],[-m,B+m,c],[-m,-m,c]], seam: [[1.5,B,c],[L,B,c],[L,1.5,c]] })),
+  ];
+  cuts.forEach((c, i) => { c.pl = mk('path', { class: 'nf dash' }, g); c.tp = tween0(); c.ts = T(); c.dl = (i & 1)*160; });
+  function tween0(){ return HL.tween(0); }
+  const whole = solid(g); put(whole, box(P, front, 0, 0, 0, L, B, H));
+  cuts.forEach(c => { c.sm = mk('path', { class: 'nf' }, g); });
+  const blocks = [];
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) for (let q = 0; q < 3; q++)
+    blocks.push({ i, j, q, t: T(), key: (XS[i] + XS[i+1] + YS[j] + YS[j+1] + ZS[q] + ZS[q+1])/2, d: Math.abs(i-1) + Math.abs(j-1) + Math.abs(q-1) });
+  blocks.sort((a, b) => a.key - b.key).forEach(b => { b.el = solid(g); b.last = -1; });
+  return f.run((k, now) => {
+    let open = 0;
+    blocks.forEach(b => {
+      const v = tw(b.t, k >= 4, now, b.d*55); open = Math.max(open, v);
+      if (v === b.last) return; b.last = v;
+      const G = 7*v, ox = (b.i - 1)*G, oy = (b.j - 1)*G, oz = (b.q - 1)*G;
+      put(b.el, box(P, front, XS[b.i] + ox, YS[b.j] + oy, ZS[b.q] + oz, XS[b.i+1] + ox, YS[b.j+1] + oy, ZS[b.q+1] + oz, 1.6, .7));
+    });
+    const split = open > .001;
+    blocks.forEach(b => { show(b.el.g, split); cls(b.el.sil, k === 4 && b.d === 0 ? 'sil hi' : 'sil'); });
+    show(whole.g, !split);
+    cuts.forEach(c => {
+      const vp = tw(c.tp, k === c.ph, now, c.dl), vs = tw(c.ts, k >= c.ph, now, c.dl + 240);
+      setD(c.pl, line(c.plane.map(p => P(...p)), vp));
+      setD(c.sm, split ? '' : line(c.seam.map(p => P(...p)), vs));
+      cls(c.sm, k === c.ph ? 'nf hi' : 'nf');
+    });
+  }, ['V 1', 'V 3', 'V 9', 'V 27', 'V 27 open']);
+} });
+</script>
+<script>
+/* 07 · reinforcement */
+FIGS.push({ name: 'reinforcement', means: 'Inside the dashed outline of the concrete, the bottom bars run in, then the top bars, then the links drop over them.', mount(ctx){
+  const { mk, seg, poly, rrect } = HL, { L, B, H, CV, setD, cls, T, tw, corners, EDGES, BOX, line } = HB;
+  const f = HB.base(ctx, 2.1, BOX(0, H + 16), 3), { P, g } = f, K = corners(0, 0, 0, L, B, H);
+  mk('path', { class: 'nf dash', d: EDGES.map(e => seg(P(...K[e[0]]), P(...K[e[1]]))).join('') }, g);
+  const LOOP = rrect(CV - 1.6, CV - 1.6, B - CV + 1.6, H - CV + 1.6, 2.4, 3);
+  const links = [];
+  for (let i = 0; i < 12; i++){ const x = 8 + i*(L - 16)/11; links.push({ x, t: T(), dl: Math.abs(x - L/2)/(L/2)*320, el: mk('path', { class: 'nf' }, g) }); }
+  const bars = [[CV, CV, 1], [B - CV, CV, 1], [CV, H - CV, 2], [B - CV, H - CV, 2]]
+    .map(([y, z, ph], i) => ({ y, z, ph, t: T(), dl: (i & 1)*120, el: mk('path', { class: 'nf sil' }, g) }));
+  return f.run((k, now) => {
+    bars.forEach(b => {
+      const v = tw(b.t, k >= b.ph, now, b.dl);
+      setD(b.el, line([P(3, b.y, b.z), P(3 + (L - 6)*v, b.y, b.z)]));
+      cls(b.el, k === b.ph ? 'nf hi' : 'nf sil');
+    });
+    links.forEach(l => {
+      const v = tw(l.t, k >= 3, now, l.dl), drop = 18*(1 - v);
+      setD(l.el, v > .001 ? poly(LOOP.map(q => P(l.x, q.u, q.v + drop))) : '');
+      cls(l.el, k === 3 ? 'nf hi' : 'nf');
+    });
+  }, ['empty', '2 × 16', '+2 × 10', 'links']);
+} });
+
+/* 08 · materials */
+FIGS.push({ name: 'materials', means: 'Aggregate spreads across the concrete from one corner, then the steel shows at the bar ends.', mount(ctx){
+  const { mk, put, solid, place, poly } = HL, { L, B, H, CV, setD, cls, show, T, tw, BOX, line, box } = HB;
+  const f = HB.base(ctx, 2.0, [...BOX(0, H), [L + 20, B, 0]], 2), { P, g, front } = f;
+  put(solid(g), box(P, front, 0, 0, 0, L, B, H));
+  let s = 7; const rnd = () => (s = (s*16807) % 2147483647)/2147483647;
+  const dots = [], add = (n, at) => { for (let i = 0; i < n; i++){ const p = at(rnd(), rnd()), big = rnd() < .22;
+    dots.push({ p, t: T(), dl: Math.hypot(p[0], B - p[1], H - p[2])/L*900, el: mk('circle', { r: big ? .9 : .55, class: big ? 'dot m' : 'dot off' }, g) }); } };
+  add(60, (a, b) => [4 + a*(L - 8), 2 + b*(B - 4), H]);
+  add(84, (a, b) => [4 + a*(L - 8), B, 2 + b*(H - 4)]);
+  add(10, (a, b) => [L, 2 + a*(B - 4), 2 + b*(H - 4)]);
+  dots.forEach(d => place(d.el, P(...d.p)));
+  const ring = (x, y, z, r) => poly(Array.from({ length: 12 }, (_, i) => { const a = i/12*Math.PI*2; return P(x, y + r*Math.cos(a), z + r*Math.sin(a)); }));
+  const bars = [[CV, CV], [B - CV, CV], [CV, H - CV], [B - CV, H - CV]].map(([y, z], i) => ({ y, z, t: T(), dl: i*90,
+    hole: mk('path', { class: 'nf' }, g), el: mk('path', { class: 'nf hi' }, g), tip: mk('path', { class: 'hi' }, g) }));
+  return f.run((k, now) => {
+    dots.forEach(d => show(d.el, tw(d.t, k >= 1, now, d.dl) > .5));
+    bars.forEach(b => {
+      const v = tw(b.t, k >= 2, now, b.dl), x = L + 16*v;
+      setD(b.hole, v > .001 ? ring(L, b.y, b.z, 1.4) : '');
+      setD(b.el, line([P(L, b.y, b.z), P(x, b.y, b.z)]));
+      setD(b.tip, v > .001 ? ring(x, b.y, b.z, 1.4) : '');
+      cls(b.el, k === 2 ? 'nf hi' : 'nf sil'); cls(b.tip, k === 2 ? 'hi' : 'sil');
+    });
+  }, ['solid', 'concrete', 'steel']);
+} });
+
+/* 09 · mesh */
+FIGS.push({ name: 'mesh', means: 'Element lines sweep along the beam, then across it, and the nodes settle on the front face.', mount(ctx){
+  const { mk, put, solid, place, poly } = HL, { L, B, H, setD, cls, show, T, tw, BOX, line, box } = HB;
+  const f = HB.base(ctx, 2.1, BOX(0, H), 3), { P, g, front } = f;
+  put(solid(g), box(P, front, 0, 0, 0, L, B, H));
+  const X = Array.from({ length: 13 }, (_, i) => i*L/12), Z = [0, H/4, H/2, 3*H/4, H];
+  const lines = [];
+  for (let i = 1; i < 12; i++) lines.push({ ph: 1, dl: i*45, pts: [[X[i], .8, H], [X[i], B, H], [X[i], B, .8]] });
+  [H/4, H/2, 3*H/4].forEach((z, i) => lines.push({ ph: 2, dl: i*70, pts: [[1.8, B, z], [L, B, z], [L, .8, z]] }));
+  [B/3, 2*B/3].forEach((y, i) => lines.push({ ph: 2, dl: 210 + i*70, pts: [[1.8, y, H], [L, y, H], [L, y, .8]] }));
+  lines.forEach(l => { l.t = T(); l.el = mk('path', { class: 'nf' }, g); l.sp = l.pts.map(p => P(...p)); });
+  const cell = mk('path', { class: 'nf hi', d: poly([P(X[6], B, 0), P(X[7], B, 0), P(X[7], B, Z[1]), P(X[6], B, Z[1])]) }, g), tc = T();
+  const nodes = [];
+  X.forEach((x, i) => Z.forEach((z, j) => { const el = mk('circle', { r: .8, class: 'dot off' }, g); place(el, P(x, B, z)); nodes.push({ el, t: T(), dl: (i + j)*28 }); }));
+  return f.run((k, now) => {
+    lines.forEach(l => { setD(l.el, line(l.sp, tw(l.t, k >= l.ph, now, l.dl))); cls(l.el, k === l.ph ? 'nf sil' : 'nf'); });
+    nodes.forEach(n => show(n.el, tw(n.t, k >= 3, now, n.dl) > .5));
+    show(cell, tw(tc, k >= 3, now, 520) > .5);
+  }, ['solid', 'x 12', 'y 3 · z 4', '144 elements']);
+} });
+</script>
+<script>
+/* The bench under the beam, shared by 10–12: a plinth, a tapered pin bearing and a roller bearing on pucks. */
+HB.bearings = (g, P, front) => {
+  const { put, solid, rings, prism, rrect } = HL, { L, B, ZS, box, taper, disc } = HB;
+  const [pr, pi] = rings(-16, -9, L + 16, B + 9, 8, 2);
+  put(solid(g), prism(P, front, pr, pi, -3, 0));
+  const xp = 9, xr = L - 9;
+  const pin = solid(g), pucks = [2.6, 9, 15.4].map(y => ({ y, el: solid(g) })), pad = solid(g);
+  return (vp, vr) => {
+    pin.g.style.display = vp > .01 ? '' : 'none';
+    if (vp > .01) put(pin, taper(P, front, rrect(xp - 9, -2, xp + 9, B + 2, 2.4, 4), rrect(xp - 2.6, -2, xp + 2.6, B + 2, 1.2, 4),
+      rrect(xp - 1.8, -1.2, xp + 1.8, B + 1.2, .6, 4), 0, ZS*vp));
+    const on = vr > .01;
+    pucks.forEach(p => { p.el.g.style.display = on ? '' : 'none'; if (on) put(p.el, prism(P, front, disc(xr, p.y, 2.6), disc(xr, p.y, 1.8), 0, 5*vr)); });
+    pad.g.style.display = on ? '' : 'none';
+    if (on) put(pad, box(P, front, xr - 8, -2, 5*vr, xr + 8, B + 2, 5*vr + (ZS - 5)*vr, 2, .8));
+    return { pin, pad };
+  };
+};
+/* Load pads and their weights at the third points; base(x) gives the beam's top at x. */
+HB.weights = (g, P, front) => {
+  const { put, solid, prism } = HL, { L, B, box, disc } = HB;
+  return [L/3, 2*L/3].map(x => ({ x, pad: solid(g), discs: [0, 1, 2, 3].map(n => ({ n, el: solid(g) })) }));
+};
+HB.drawWeights = (P, front, sets, base, vPad, vDisc) => {
+  const { put, prism } = HL, { B, box, disc } = HB;
+  sets.forEach(s => {
+    const z0 = base(s.x), vp = vPad(s);
+    s.pad.g.style.display = vp > .01 ? '' : 'none';
+    if (vp > .01) put(s.pad, box(P, front, s.x - 7, -2, z0 + 20*(1 - vp), s.x + 7, B + 2, z0 + 3 + 20*(1 - vp), 2, .8));
+    s.discs.forEach(d => {
+      const v = vDisc(s, d), z = z0 + 3 + d.n*3.9 + 24*(1 - v);
+      d.el.g.style.display = v > .01 ? '' : 'none';
+      if (v > .01) put(d.el, prism(P, front, disc(s.x, B/2, 6.5), disc(s.x, B/2, 5.6), z, z + 3.6));
+    });
+  });
+};
+
+/* 10 · supports */
+FIGS.push({ name: 'supports', means: 'A pin and a roller rise from the base, and the beam lowers onto them along its drop lines.', mount(ctx){
+  const { mk, put, solid } = HL, { L, B, H, ZS, setD, cls, show, T, tw, line, box } = HB;
+  const f = HB.base(ctx, 1.85, [[-16,-9,-3],[L+16,B+9,-3],[L+16,-9,0],[-16,B+9,0],[0,0,ZS+H+34],[L,B,ZS+H]], 3), { P, g, front } = f;
+  const draw = HB.bearings(g, P, front);
+  const drops = [9, L - 9].map(x => ({ x, el: mk('path', { class: 'nf dash' }, g) }));
+  const beam = solid(g), tp = T(), tr = T(), tb = T();
+  let last = -1;
+  return f.run((k, now) => {
+    const vp = tw(tp, k >= 1, now), vr = tw(tr, k >= 2, now), vb = tw(tb, k >= 3, now), off = 34*(1 - vb);
+    const s = draw(vp, vr);
+    cls(s.pin.sil, k === 1 ? 'sil hi' : 'sil'); cls(s.pad.sil, k === 2 ? 'sil hi' : 'sil');
+    drops.forEach(d => setD(d.el, off > .3 && k >= 2 ? line([P(d.x, B, ZS), P(d.x, B, ZS + off)]) : ''));
+    if (off !== last){ last = off; put(beam, box(P, front, 0, 0, ZS + off, L, B, ZS + H + off)); }
+    cls(beam.sil, k === 3 ? 'sil hi' : 'sil');
+  }, ['base', 'pin', 'roller', 'seated']);
+} });
+
+/* 11 · loads */
+FIGS.push({ name: 'loads', means: 'Pads land at the third points, then weights stack on them in two steps.', mount(ctx){
+  const { put, solid } = HL, { L, B, H, ZS, cls, T, tw, box } = HB;
+  const f = HB.base(ctx, 1.85, [[-16,-9,-3],[L+16,B+9,-3],[L+16,-9,0],[-16,B+9,0],[0,0,ZS+H+44],[L,B,ZS+H+20]], 3), { P, g, front } = f;
+  HB.bearings(g, P, front)(1, 1);
+  put(solid(g), box(P, front, 0, 0, ZS, L, B, ZS + H));
+  const sets = HB.weights(g, P, front);
+  sets.forEach(s => { s.t = T(); s.discs.forEach(d => { d.t = T(); }); });
+  return f.run((k, now) => {
+    HB.drawWeights(P, front, sets, () => ZS + H,
+      s => tw(s.t, k >= 1, now),
+      (s, d) => tw(d.t, k >= (d.n < 2 ? 2 : 3), now, (d.n & 1)*130));
+    sets.forEach(s => { cls(s.pad.sil, k === 1 ? 'sil hi' : 'sil'); s.discs.forEach(d => cls(d.el.sil, k >= 2 && d.n === (k === 2 ? 1 : 3) ? 'sil hi' : 'sil')); });
+  }, ['beam', 'pads', 'P 50', 'P 100']);
+} });
+
+/* 12 · cracking */
+FIGS.push({ name: 'cracking', means: 'The loaded beam bends in steps, and cracks open up from its soffit, first under the load, then out towards the supports.', mount(ctx){
+  const { mk, poly, open, clamp, tween, tset, tval } = HL, { L, B, H, ZS, setD, cls, bend } = HB;
+  const f = HB.base(ctx, 1.85, [[-16,-9,-3],[L+16,B+9,-3],[L+16,-9,0],[-16,B+9,0],[0,0,ZS+H+20],[L,B,ZS+H]], 4, { dwell: 1250 }), { P, g, front } = f;
+  HB.bearings(g, P, front)(1, 1);
+  const sil = mk('path', { class: 'sil' }, g), crease = mk('path', { class: 'nf' }, g);
+  const CR = [];
+  [-24, -16, -8, 0, 8, 16, 24].forEach(o => CR.push({ x: L/2 + o, on: .26 + Math.abs(o)/24*.14, h: .74 - Math.abs(o)/24*.18, lean: 0 }));
+  [[L/3 - 13, .5, .6], [L/3 - 27, .68, .5], [2*L/3 + 13, .5, -.6], [2*L/3 + 27, .68, -.5]].forEach(([x, on, lean]) => CR.push({ x, on, h: .55, lean }));
+  CR.forEach((c, i) => { c.el = mk('path', { class: 'nf hi' }, g); c.j = i % 2 ? 1 : -1; });
+  const sets = HB.weights(g, P, front), lam = tween(1, 900), N = 32, D = 9;
+  let drawn = -1;
+  return f.run((k, now) => {
+    tset(lam, k/4, now); const l = tval(lam, now);
+    if (l === drawn) return; drawn = l;
+    const d = x => -D*l*bend(x), xs = Array.from({ length: N + 1 }, (_, i) => i*L/N);
+    setD(sil, poly([...xs.map(x => P(x, 0, ZS + H + d(x))), P(L, 0, ZS), P(L, B, ZS), ...xs.slice().reverse().map(x => P(x, B, ZS + d(x))), P(0, B, ZS + H)]));
+    setD(crease, open([...xs.slice(1, -1).map(x => P(x, B - 1, ZS + H + d(x))), P(L - 1, B - 1, ZS + H), P(L - 1, 1, ZS + H)]));
+    CR.forEach(c => {
+      const gr = clamp((l - c.on)/(1 - c.on)*1.7, 0, 1), h = c.h*H*gr;
+      setD(c.el, gr > .01 ? open([0, 1, 2, 3, 4].map(i => { const x = c.x + c.lean*h*i/4 + (i % 2 ? c.j*1.1 : 0); return P(x, B, ZS + d(x) + h*i/4); })) : '');
+    });
+    HB.drawWeights(P, front, sets, x => ZS + H + d(x), () => 1, () => 1);
+  }, ['P 0', 'P 25', 'P 50', 'P 75', 'P 100']);
+} });
+
+/* Mount every figure in its own plate. */
+(() => {
+  HL.inject(document);
+  const grid = document.getElementById('grid');
+  FIGS.forEach((fg, i) => {
+    const tile = document.createElement('figure'), name = document.createElement('span'), out = document.createElement('span'), host = document.createElement('div');
+    tile.className = 'tile'; name.className = 'tag name'; out.className = 'tag read';
+    name.textContent = String(i + 1).padStart(2, '0') + '  ' + fg.name;
+    host.setAttribute('data-hairline', fg.name); host.setAttribute('role', 'img'); host.setAttribute('aria-label', fg.means);
+    tile.append(name, out, host); grid.append(tile);
+    const svg = HL.mk('svg', { viewBox: '0 0 400 320', 'aria-hidden': 'true' }, host);
+    let text = '';
+    const read = { get textContent(){ return text; }, set textContent(v){ text = v == null ? '' : String(v); out.textContent = text; } };
+    try { fg.mount({ stage: host, svg, read }); } catch (e) { console.error(fg.name, e); }
+  });
+})();
+</script>

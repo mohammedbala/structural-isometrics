@@ -1,7 +1,7 @@
 # structural-isometrics
 
-Animated, isometric explainers for structural modeling.
+Animated, isometric line studies of structural modeling.
 
-- [`apdl-concrete-beam/index.html`](apdl-concrete-beam/index.html): a step-by-step build of a reinforced concrete beam in ANSYS Mechanical APDL. It covers parameters, SOLID65/LINK180 element types, concrete and steel material models, keypoints to volumes, partitioning with VSBW, rebar lines, attributes, mapped meshing, NUMMRG, supports, four-point loads, the nonlinear solution, and PLNSOL/PLCRACK/POST26 results. The page also assembles the complete input file.
+- [`concrete-hairline/index.html`](concrete-hairline/index.html): twelve looping black-and-white figures of a reinforced concrete beam model being built: dimensions, keypoints, lines, areas, volume, partition, reinforcement, materials, mesh, supports, loads and cracking. Move across a figure to step through it.
 
-The page is written as an artifact body (no `<html>`/`<head>` wrapper). Opened directly in a browser it still renders, in quirks mode.
+The figures are drawn on the [hairline](https://github.com/lucasmarkes/hairline) kernel by Lucas Marques (MIT), inlined unchanged. The page is written as an artifact body (no `<html>`/`<head>` wrapper); opened directly in a browser it still renders.
