@@ -1,0 +1,1601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Structural Isometrics</title>
+<meta name="description" content="Four concrete models drawn as black-and-white isometric line animations: a beam, a turbine foundation, a pump foundation and a building substructure.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&display=swap">
+<style>
+/* Layout: a header with the index, then the four sequences in a two-column grid that drops to one column.
+   Each sequence is a 5:4 plate with its stage rail underneath. Black and white only: white on black in
+   dark, black on white in light, following the system unless the switch says otherwise. */
+:root{
+  color-scheme:light;
+  --ground:#ffffff; --ink:#000000; --muted:#6c6c6c; --line:#e4e4e4;
+  --hairline-plate:#ffffff; --hairline-hi:#000000; --hairline-edge:#6a6a6a; --hairline-mid:#adadad; --hairline-lo:#dedede; --hairline-stroke:0.9;
+  --f-sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#000000; --ink:#ffffff; --muted:#8c8c8c; --line:#1e1e1e;
+    --hairline-plate:#000000; --hairline-hi:#ffffff; --hairline-edge:#8e8e8e; --hairline-mid:#4c4c4c; --hairline-lo:#262626;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#000000; --ink:#ffffff; --muted:#8c8c8c; --line:#1e1e1e;
+  --hairline-plate:#000000; --hairline-hi:#ffffff; --hairline-edge:#8e8e8e; --hairline-mid:#4c4c4c; --hairline-lo:#262626;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ground);color:var(--ink);font:13px/1.5 var(--f-sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:clamp(16px,3vw,40px);padding-block:40px 64px;display:grid;gap:40px}
+.wrap > *{min-width:0}
+.top{display:grid;gap:18px}
+.title{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+h1{margin:0;font:300 clamp(30px,4vw,48px)/1.02 var(--f-sans);letter-spacing:-.025em}
+.top p{margin:0;max-width:62ch;color:var(--muted);font-size:14px;text-wrap:pretty}
+.toc{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0;padding:14px 0 0;border-top:1px solid var(--line);list-style:none;font:11.5px/1.3 var(--f-mono)}
+.toc a{display:inline-flex;gap:8px;color:var(--ink);text-decoration:none}
+.toc a span{color:var(--muted)}
+.toc a:hover span,.toc a:focus-visible span{color:var(--ink)}
+.switch{height:30px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);font:11px/1 var(--f-mono);cursor:pointer}
+.switch:hover{border-color:var(--muted)}
+.seqs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,540px),1fr));gap:56px 28px}
+.seq{display:grid;gap:14px;align-content:start;min-width:0;scroll-margin-top:24px}
+@supports (grid-template-rows:subgrid){.seq{grid-row:span 3;grid-template-rows:subgrid;row-gap:14px}.seq-head{align-self:end}}
+.seq > *{min-width:0}
+.seq-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
+.seq-head .num{font:11px/1 var(--f-mono);color:var(--muted)}
+.seq-head h2{margin:0;font:400 22px/1.15 var(--f-sans);letter-spacing:-.01em}
+.seq-head p{grid-column:2;margin:0;color:var(--muted);font-size:13.5px;text-wrap:pretty}
+.plate{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--ground)}
+.tag{position:absolute;top:14px;z-index:1;font:11px/1 var(--f-mono);letter-spacing:.02em;color:var(--muted);pointer-events:none}
+.tag-name{left:16px}
+.tag-read{right:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.rail{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:14px 8px}
+.rail button{width:100%;display:grid;gap:7px;padding:0;border:0;background:none;color:var(--muted);cursor:pointer;text-align:left;font:11px/1.2 var(--f-mono);letter-spacing:.01em}
+.rail button::before{content:"";display:block;height:1px;background:var(--line);transition:background-color .3s}
+.rail button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rail button:hover{color:var(--ink)}
+.rail button.done::before{background:var(--muted)}
+.rail button[aria-current="step"]{color:var(--ink)}
+.rail button[aria-current="step"]::before{background:var(--ink)}
+.rail button:focus-visible,.switch:focus-visible,.toc a:focus-visible{outline:1.5px solid var(--ink);outline-offset:3px}
+footer{padding-top:16px;border-top:1px solid var(--line);font:11px/1.7 var(--f-mono);color:var(--muted)}
+footer a{color:inherit}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.rail button::before{transition:none}}
+</style>
+<script>try{const t=localStorage.getItem('si-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="title">
+      <h1>Structural isometrics</h1>
+      <button class="switch" id="theme" type="button" aria-label="Switch between the light and the dark theme"></button>
+    </div>
+    <p>Four concrete models drawn in lines, each built stage by stage in a loop. Move across a drawing to scrub it, or pick a stage under it. Deflections, cracks and mode shapes are sketches, not analysis results.</p>
+    <ol class="toc">
+      <li><a href="#beam"><span>01</span>Concrete beam</a></li>
+      <li><a href="#turbine"><span>02</span>Turbine foundation</a></li>
+      <li><a href="#pump"><span>03</span>Pump foundation</a></li>
+      <li><a href="#substructure"><span>04</span>Building substructure</a></li>
+    </ol>
+  </header>
+
+  <main class="seqs">
+    <section class="seq" id="beam" data-sequence="beam" data-dwell="1050" data-hold="3400" aria-labelledby="beam-h">
+      <div class="seq-head"><span class="num">01</span><h2 id="beam-h">Concrete beam</h2><p>From its dimensions to its first cracks, on one simply supported beam.</p></div>
+      <div class="plate">
+        <span class="tag tag-name"></span><span class="tag tag-read"></span>
+        <div class="stage" data-hairline="concrete-beam" role="img" aria-label="A concrete beam is drawn in lines: dimensions, keypoints, edges, an area, a volume, partitions, materials, a mesh, supports, loads, and finally bending and cracks."></div>
+      </div>
+      <ol class="rail" aria-label="Stages of the concrete beam"></ol>
+    </section>
+
+    <section class="seq" id="turbine" data-sequence="turbine" data-dwell="1100" data-hold="3800" aria-labelledby="turbine-h">
+      <div class="seq-head"><span class="num">02</span><h2 id="turbine-h">Turbine foundation</h2><p>A tabletop turbine-generator foundation, from its column grid to its first two vibration modes.</p></div>
+      <div class="plate">
+        <span class="tag tag-name"></span><span class="tag tag-read"></span>
+        <div class="stage" data-hairline="tg-foundation" role="img" aria-label="A tabletop turbine-generator foundation is drawn in lines: a column grid, keypoints, a frame, the raft, columns and a beam-grid table top, materials, a mesh, soil springs, the machine with its unbalance, and two vibration modes."></div>
+      </div>
+      <ol class="rail" aria-label="Stages of the turbine foundation"></ol>
+    </section>
+
+    <section class="seq" id="pump" data-sequence="pump" data-dwell="1100" data-hold="3800" aria-labelledby="pump-h">
+      <div class="seq-head"><span class="num">03</span><h2 id="pump-h">Pump foundation</h2><p>A pump pedestal on piles, from its outline to rocking and torsion.</p></div>
+      <div class="plate">
+        <span class="tag tag-name"></span><span class="tag tag-read"></span>
+        <div class="stage" data-hairline="pump-foundation" role="img" aria-label="A pump pedestal foundation is drawn in lines: outlines, keypoints, edges, the footing area, the footing, anchor bolts and the pedestal poured around them, grout, a steel baseplate and nuts, materials, a mesh, piles, the pump and motor, and two vibration modes."></div>
+      </div>
+      <ol class="rail" aria-label="Stages of the pump foundation"></ol>
+    </section>
+
+    <section class="seq" id="substructure" data-sequence="substructure" data-dwell="1150" data-hold="3600" aria-labelledby="substructure-h">
+      <div class="seq-head"><span class="num">04</span><h2 id="substructure-h">Building substructure</h2><p>Walls and slabs on grade for four rooms at different levels; the main slab sits a foot above grade. Heights exaggerated.</p></div>
+      <div class="plate">
+        <span class="tag tag-name"></span><span class="tag tag-read"></span>
+        <div class="stage" data-hairline="building-substructure" role="img" aria-label="An industrial building substructure is drawn in lines against the grade datum: slab outlines at four floor levels, then walls, then slabs on grade with the main slab one foot above grade and a depressed pit, then materials and a mesh."></div>
+      </div>
+      <ol class="rail" aria-label="Stages of the building substructure"></ol>
+    </section>
+  </main>
+
+  <footer>Drawn on the <a href="https://github.com/lucasmarkes/hairline">hairline</a> kernel by Lucas Marques, MIT licence. Source: <a href="https://github.com/mohammedbala/structural-isometrics">mohammedbala/structural-isometrics</a>.</footer>
+</div>
+<script>
+/* hairline kernel sha256:8e2abcbdf63c7755195ee942c39e9c8ea6a539d1147e986dd1c153559121f075 */
+/*
+ * HL: everything a figure may call. Read this index; the code under it is the
+ * package's src/core, unchanged, and a figure should not need to read it.
+ *
+ * Every figure is drawn in a 400 × 320 viewBox. World space is x/y on the
+ * ground and z up. Plates are filled with the ground colour and painted back
+ * to front, so a nearer one covers a farther one: append in that order. At
+ * the default camera, Cam(45, 0.5, S), +x runs down to the right and +y down
+ * to the left, so the corner with the largest x and y is nearest the viewer:
+ * append by ascending x + y, from the far corner (smallest x and y) to it.
+ *
+ * Camera
+ *   Cam(azDeg, k, S)                       a camera: azimuth in degrees, k = sin(elevation) (0.5 is the 2:1 view), S = scale
+ *   fit(C, points, cx, cy)                 centres the box of [x, y, z] points on (cx, cy); call it once, before proj
+ *                                          it only centres, it never scales: choose S by trying values, with the most extreme pose in points.
+ *                                          The six figures use S 1.42 to 2.12; the boxes they fit come out 230 to 310 wide and 180 to 245 tall
+ *   proj(C)                                returns P(x, y, z), which gives [sx, sy]
+ *   unproj(C, sx, sy, z)                   the world [x, y] under a screen point, on the plane at height z
+ *   facing(C)                              returns front(sample): whether a ring sample faces the camera
+ * Rounded solids
+ *   rrect(u0, v0, u1, v1, r, n)            a rounded rectangle, as a ring of samples {u, v, nu, nv}
+ *   circ(R, n)                             a circle, as a ring
+ *   rings(x0, y0, x1, y1, r, b)            [ring, inner]: a rounded footprint and its crease ring, inset by b
+ *                                          r, the corner radius, is cut to half the shorter side. b, the crease's inset in world units
+ *                                          (0.6 to 2.2 in the figures), must stay under half the shorter side or the crease turns inside out
+ *   prism(P, front, ring, inner, z0, z1)   {sil, crease}: a solid standing from z0 to z1, as two path strings
+ *   ringAt(P, ring, z)                     the ring's points, projected at height z
+ *   run(ring, keep)                        the one cyclic run of samples that pass keep
+ *   hull(points)                           the convex hull of screen points
+ *   extremes(P, ring)                      [left, right, nearest] samples: where dashed drops fall from
+ *   fillet(points, radii, n)               rounds every vertex of a closed polygon; returns the new points
+ *                                          radii is an array, one radius per vertex, each cut to half its shorter edge; a single number gives NaN.
+ *                                          n is the steps round each corner, default 4: each vertex becomes n + 1 points
+ *   ghost(P, front, ring, z0, depth)       a reflection's path {d, y0, y1}; reflect() draws it for you
+ * Paths and numbers
+ *   poly(points)                           a closed path string
+ *   open(points)                           an open polyline string
+ *   seg(a, b)                              one segment between two screen points [sx, sy], as its own subpath; project world points with P first
+ *   clamp(v, a, b)
+ *   lerp(a, b, t)
+ *   rad(deg)
+ *   r2(n)                                  two decimals
+ * The continuous clock: one spring per moving number
+ *   spring(x, opts)                        at rest on x; write .t to retarget; opts {k, c, m, eps}, default k 100, c 18, m 1
+ *   stepS(sp, dt)                          advances by dt seconds; returns whether it is still moving
+ * The discrete clock: a 700ms tween on (.32, .72, 0, 1)
+ *   tween(v, dur)                          at rest on v; dur defaults to 700 (ms)
+ *   tset(tw, to, now, delay)               retargets from where it is, after delay ms: the stagger
+ *                                          the same target again does nothing, so calling it on every pointer move is safe
+ *   tval(tw, now)                          its value at now
+ *   tdone(tw, now)                         whether it has landed
+ *   bezier(x1, y1, x2, y2)                 a CSS cubic-bezier, as a function of progress
+ *   EASE_LIFT                              the lift curve itself
+ *   reducedMotion()                        true when the reader asked for less motion; springs and tweens already land at once
+ *   setReducedMotion(on)                   the loop's business, not a figure's
+ * Drawing
+ *   mk(tag, attrs, parent)                 one svg element: the only way a figure makes a node
+ *   solid(parent)                          {g, sil, cr}: a group holding a silhouette path and a crease path
+ *   put(solid, paths)                      writes prism()'s {sil, crease} into solid()'s {sil, cr}: sil into sil, crease into cr
+ *   flatDot(parent, C, r, cls)             a dot lying on the ground plane; cls is "dot", "dot m" or "dot off"
+ *   place(el, point)                       moves a dot or a circle to [sx, sy]
+ *   reflect(svg, parent, P, front, ring, z0, depth)   a fading mirror under a solid
+ *   fade(svg, y0, y1, a0)                  a vertical fade, as a mask; returns the value for a mask attribute
+ * Life
+ *   register(stage, tick)                  joins the one frame loop; tick(dt in seconds, now in ms) returns true to ask for another frame; gives {wake, unregister}
+ *   pointer(stage, handlers)               {move(point), down(point), leave()}, points in viewBox units; returns its disposer
+ *   disposer()                             {add, on, dispose}: collects tear-down, so destroy is bag.dispose
+ * The bench's business, not a figure's
+ *   css(lightDark)
+ *   inject(root)
+ *
+ * Classes, on path, polygon, ellipse and line. They are the whole palette; a
+ * figure sets no colour, width or fill of its own.
+ *     (none)   filled with the ground colour, medium stroke
+ *     sil      the silhouette's stroke        hi    the bright stroke: the only highlight
+ *     lo       the dim stroke                 nf    no fill        fo   fill only, no stroke
+ *     dash     a dashed guide
+ *     dot      a bright dot                   dot m   a medium dot     dot off   a dim dot
+ */
+var HL = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // packages/hairline/src/core/kernel.ts
+  var kernel_exports = {};
+  __export(kernel_exports, {
+    Cam: () => Cam,
+    EASE_LIFT: () => EASE_LIFT,
+    bezier: () => bezier,
+    circ: () => circ,
+    clamp: () => clamp,
+    css: () => css,
+    disposer: () => disposer,
+    extremes: () => extremes,
+    facing: () => facing,
+    fade: () => fade,
+    fillet: () => fillet,
+    fit: () => fit,
+    flatDot: () => flatDot,
+    ghost: () => ghost,
+    hull: () => hull,
+    inject: () => inject,
+    lerp: () => lerp,
+    mk: () => mk,
+    open: () => open,
+    place: () => place,
+    pointer: () => pointer,
+    poly: () => poly,
+    prism: () => prism,
+    proj: () => proj,
+    put: () => put,
+    r2: () => r2,
+    rad: () => rad,
+    reducedMotion: () => reducedMotion,
+    reflect: () => reflect,
+    register: () => register,
+    ringAt: () => ringAt,
+    rings: () => rings,
+    rrect: () => rrect,
+    run: () => run,
+    seg: () => seg,
+    setReducedMotion: () => setReducedMotion,
+    solid: () => solid,
+    spring: () => spring,
+    stepS: () => stepS,
+    tdone: () => tdone,
+    tset: () => tset,
+    tval: () => tval,
+    tween: () => tween,
+    unproj: () => unproj
+  });
+
+  // packages/hairline/src/core/iso.ts
+  var clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  var lerp = (a, b, t) => a + (b - a) * t;
+  var rad = (d) => d * Math.PI / 180;
+  var r2 = (n) => Math.round(n * 100) / 100;
+  var poly = (pts) => "M" + pts.map((p) => r2(p[0]) + " " + r2(p[1])).join("L") + "Z";
+  var seg = (a, b) => `M${r2(a[0])} ${r2(a[1])}L${r2(b[0])} ${r2(b[1])}`;
+  var open = (pts) => pts.length < 2 ? "" : "M" + pts.map((p) => r2(p[0]) + " " + r2(p[1])).join("L");
+  var Cam = (azDeg, k, S) => ({ az: rad(azDeg), k, S, ox: 0, oy: 0 });
+  function proj(C) {
+    const c = Math.cos(C.az), s = Math.sin(C.az), zf = Math.sqrt(1 - C.k * C.k);
+    return (x, y, z) => {
+      const X = x * c - y * s, Y = x * s + y * c;
+      return [C.ox + C.S * X, C.oy + C.S * (Y * C.k - z * zf)];
+    };
+  }
+  function unproj(C, sx, sy, z) {
+    const c = Math.cos(C.az), s = Math.sin(C.az), zf = Math.sqrt(1 - C.k * C.k);
+    const X = (sx - C.ox) / C.S, Y = ((sy - C.oy) / C.S + z * zf) / C.k;
+    return [X * c + Y * s, -X * s + Y * c];
+  }
+  function fit(C, pts, cx, cy) {
+    C.ox = 0;
+    C.oy = 0;
+    const P = proj(C);
+    let a = 1e9, b = -1e9, c = 1e9, d = -1e9;
+    for (const p of pts) {
+      const q = P(p[0], p[1], p[2]);
+      a = Math.min(a, q[0]);
+      b = Math.max(b, q[0]);
+      c = Math.min(c, q[1]);
+      d = Math.max(d, q[1]);
+    }
+    C.ox = cx - (a + b) / 2;
+    C.oy = cy - (c + d) / 2;
+  }
+  function rrect(u0, v0, u1, v1, r, n = 4) {
+    r = Math.max(0, Math.min(r, (u1 - u0) / 2, (v1 - v0) / 2));
+    const out = [];
+    for (const [cu, cv, a0] of [[u1 - r, v1 - r, 0], [u0 + r, v1 - r, 90], [u0 + r, v0 + r, 180], [u1 - r, v0 + r, 270]])
+      for (let k = 0; k <= n; k++) {
+        const a = rad(a0 + 90 * k / n), ca = Math.cos(a), sa = Math.sin(a);
+        out.push({ u: cu + r * ca, v: cv + r * sa, nu: ca, nv: sa });
+      }
+    return out;
+  }
+  function circ(R, n = 96) {
+    const out = [];
+    for (let k = 0; k < n; k++) {
+      const a = k / n * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a);
+      out.push({ u: R * ca, v: R * sa, nu: ca, nv: sa });
+    }
+    return out;
+  }
+  function hull(input) {
+    const pts = input.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const x = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], up = [];
+    for (const p of pts) {
+      while (lo.length > 1 && x(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop();
+      lo.push(p);
+    }
+    for (let i = pts.length - 1; i >= 0; i--) {
+      const p = pts[i];
+      while (up.length > 1 && x(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop();
+      up.push(p);
+    }
+    lo.pop();
+    up.pop();
+    return lo.concat(up);
+  }
+  var ringAt = (P, ring, z) => ring.map((q) => P(q.u, q.v, z));
+  var facing = (C) => {
+    const s = Math.sin(C.az), c = Math.cos(C.az);
+    return (q) => q.nu * s + q.nv * c >= -1e-6;
+  };
+  function run(ring, keep) {
+    const n = ring.length;
+    let s = -1;
+    for (let i = 0; i < n; i++) if (keep(ring[i]) && !keep(ring[(i + n - 1) % n])) {
+      s = i;
+      break;
+    }
+    if (s < 0) return keep(ring[0]) ? ring.slice() : [];
+    const out = [];
+    for (let k = 0; k < n && keep(ring[(s + k) % n]); k++) out.push(ring[(s + k) % n]);
+    return out;
+  }
+  function prism(P, front, ring, inner, z0, z1) {
+    return {
+      sil: poly(hull(ringAt(P, ring, z1).concat(ringAt(P, ring, z0)))),
+      crease: inner ? open(ringAt(P, run(inner, front), z1)) : ""
+    };
+  }
+  var rings = (x0, y0, x1, y1, r, b) => [
+    rrect(x0, y0, x1, y1, r),
+    rrect(x0 + b, y0 + b, x1 - b, y1 - b, Math.max(0.3, r - b))
+  ];
+  function extremes(P, ring) {
+    const pr = ring.map((q) => P(q.u, q.v, 0));
+    let a = 0, b = 0, c = 0;
+    pr.forEach((p, k) => {
+      if (p[0] < pr[a][0]) a = k;
+      if (p[0] > pr[b][0]) b = k;
+      if (p[1] > pr[c][1]) c = k;
+    });
+    return [ring[a], ring[b], ring[c]];
+  }
+  function fillet(pts, rs, n = 4) {
+    const m = pts.length, out = [];
+    for (let i = 0; i < m; i++) {
+      const a = pts[(i + m - 1) % m], p = pts[i], b = pts[(i + 1) % m];
+      const la = Math.hypot(a[0] - p[0], a[1] - p[1]), lb = Math.hypot(b[0] - p[0], b[1] - p[1]);
+      const t = Math.min(rs[i], la / 2, lb / 2);
+      const p1 = [p[0] + (a[0] - p[0]) / la * t, p[1] + (a[1] - p[1]) / la * t];
+      const p2 = [p[0] + (b[0] - p[0]) / lb * t, p[1] + (b[1] - p[1]) / lb * t];
+      for (let k = 0; k <= n; k++) {
+        const s = k / n, w = 1 - s;
+        out.push([w * w * p1[0] + 2 * w * s * p[0] + s * s * p2[0], w * w * p1[1] + 2 * w * s * p[1] + s * s * p2[1]]);
+      }
+    }
+    return out;
+  }
+  function ghost(P, front, ring, z0, depth) {
+    const f = run(ring, front), lowP = ringAt(P, f, z0 - depth);
+    return {
+      d: open(lowP) + [f[0], f[f.length - 1]].map((q) => seg(P(q.u, q.v, z0), P(q.u, q.v, z0 - depth))).join(""),
+      y0: Math.min(...ringAt(P, f, z0).map((p) => p[1])),
+      y1: Math.max(...lowP.map((p) => p[1])) + 2
+    };
+  }
+
+  // packages/hairline/src/core/motion.ts
+  var reduced = false;
+  var setReducedMotion = (on) => {
+    reduced = on;
+  };
+  var reducedMotion = () => reduced;
+  function spring(x, o = {}) {
+    return { x, v: 0, t: x, k: o.k ?? 100, c: o.c ?? 18, m: o.m ?? 1, eps: o.eps ?? 0.01 };
+  }
+  function stepS(sp, dt) {
+    if (reduced) {
+      sp.x = sp.t;
+      sp.v = 0;
+      return false;
+    }
+    const n = Math.max(1, Math.ceil(dt * 240)), h = dt / n;
+    for (let i = 0; i < n; i++) {
+      const a = (-sp.k * (sp.x - sp.t) - sp.c * sp.v) / sp.m;
+      sp.v += a * h;
+      sp.x += sp.v * h;
+    }
+    if (Math.abs(sp.x - sp.t) < sp.eps && Math.abs(sp.v) < sp.eps * 10) {
+      sp.x = sp.t;
+      sp.v = 0;
+      return false;
+    }
+    return true;
+  }
+  function bezier(x1, y1, x2, y2) {
+    const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+    const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+    const X = (u) => ((ax * u + bx) * u + cx) * u;
+    const Y = (u) => ((ay * u + by) * u + cy) * u;
+    const dX = (u) => (3 * ax * u + 2 * bx) * u + cx;
+    return (t) => {
+      if (t <= 0) return 0;
+      if (t >= 1) return 1;
+      let u = t;
+      for (let i = 0; i < 8; i++) {
+        const e = X(u) - t;
+        if (Math.abs(e) < 1e-5) break;
+        const d = dX(u);
+        if (Math.abs(d) < 1e-6) break;
+        u -= e / d;
+      }
+      if (!(u >= 0 && u <= 1) || Math.abs(X(u) - t) > 1e-4) {
+        let lo = 0, hi = 1;
+        u = t;
+        for (let i = 0; i < 24; i++) {
+          if (X(u) < t) lo = u;
+          else hi = u;
+          u = (lo + hi) / 2;
+        }
+      }
+      return Y(u);
+    };
+  }
+  var EASE_LIFT = bezier(0.32, 0.72, 0, 1);
+  var tween = (v, dur = 700) => ({ from: v, to: v, t0: -1e9, dur });
+  var tval = (tw, now) => {
+    const p = clamp((now - tw.t0) / tw.dur, 0, 1);
+    return tw.from + (tw.to - tw.from) * (reduced ? 1 : EASE_LIFT(p));
+  };
+  var tset = (tw, to, now, delay) => {
+    if (tw.to === to) return;
+    tw.from = tval(tw, now);
+    tw.to = to;
+    tw.t0 = now + delay;
+  };
+  var tdone = (tw, now) => reduced || now >= tw.t0 + tw.dur;
+
+  // packages/hairline/src/core/stage.ts
+  var NS = "http://www.w3.org/2000/svg";
+  function mk(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    if (attrs) for (const k in attrs) e.setAttribute(k, String(attrs[k]));
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function solid(parent) {
+    const g = mk("g", {}, parent);
+    return { g, sil: mk("path", { class: "sil" }, g), cr: mk("path", { class: "nf lo" }, g) };
+  }
+  var put = (el, s) => {
+    el.sil.setAttribute("d", s.sil);
+    el.cr.setAttribute("d", s.crease);
+  };
+  var flatDot = (parent, C, r, cls) => mk("ellipse", { rx: r2(r * C.S), ry: r2(r * C.S * C.k), class: cls }, parent);
+  var place = (el, q) => {
+    el.setAttribute("cx", String(r2(q[0])));
+    el.setAttribute("cy", String(r2(q[1])));
+  };
+  var fid = 0;
+  function fade(svg, y0, y1, a0 = 0.7) {
+    const id = "hl-fd" + ++fid, defs = mk("defs", {}, svg);
+    const lg = mk("linearGradient", { id: id + "g", gradientUnits: "userSpaceOnUse", x1: 0, y1: r2(y0), x2: 0, y2: r2(y1) }, defs);
+    mk("stop", { offset: 0, "stop-color": "#fff", "stop-opacity": a0 }, lg);
+    mk("stop", { offset: 1, "stop-color": "#fff", "stop-opacity": 0 }, lg);
+    const m = mk("mask", { id, maskUnits: "userSpaceOnUse", x: 0, y: 0, width: 400, height: 320 }, defs);
+    mk("rect", { x: 0, y: 0, width: 400, height: 320, fill: `url(#${id}g)` }, m);
+    return `url(#${id})`;
+  }
+  function reflect(svg, parent, P, front, ring, z0, depth) {
+    const r = ghost(P, front, ring, z0, depth);
+    const gh = mk("g", { class: "ghost", mask: fade(svg, r.y0, r.y1) }, parent);
+    mk("path", { d: r.d }, gh);
+  }
+  var boards = [];
+  var byStage = /* @__PURE__ */ new Map();
+  var raf = 0;
+  var last = 0;
+  var io = null;
+  var rm = null;
+  function frame(now) {
+    const dt = Math.min(0.05, Math.max(0, (now - last) / 1e3));
+    last = now;
+    let any = false;
+    for (const b of boards.slice()) if (b.vis && b.awake) {
+      b.awake = !!b.tick(dt, now);
+      any = any || b.awake;
+    }
+    raf = any ? requestAnimationFrame(frame) : 0;
+  }
+  function wake(b) {
+    b.awake = true;
+    if (!raf) {
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
+  }
+  var onMotion = () => {
+    setReducedMotion(!!rm?.matches);
+    boards.forEach(wake);
+  };
+  function start() {
+    if (io) return;
+    io = new IntersectionObserver((es) => {
+      for (const e of es) {
+        const b = byStage.get(e.target);
+        if (!b) continue;
+        b.vis = e.isIntersecting;
+        if (b.vis) wake(b);
+      }
+    }, { rootMargin: "80px" });
+    rm = matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(rm.matches);
+    rm.addEventListener("change", onMotion);
+  }
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    io?.disconnect();
+    io = null;
+    rm?.removeEventListener("change", onMotion);
+    rm = null;
+  }
+  function register(stage, tick) {
+    start();
+    const b = { stage, tick, vis: false, awake: true };
+    boards.push(b);
+    byStage.set(stage, b);
+    io.observe(stage);
+    tick(0, performance.now());
+    let gone = false;
+    return {
+      wake: () => {
+        if (!gone) wake(b);
+      },
+      unregister: () => {
+        if (gone) return;
+        gone = true;
+        boards = boards.filter((x) => x !== b);
+        if (byStage.get(stage) === b) {
+          byStage.delete(stage);
+          io?.unobserve(stage);
+        }
+        if (!boards.length) stop();
+      }
+    };
+  }
+  function pointer(stage, on) {
+    let tm = 0;
+    const pt = (e) => {
+      const r = stage.getBoundingClientRect();
+      return [(e.clientX - r.left) / r.width * 400, (e.clientY - r.top) / r.height * 320];
+    };
+    const move = (e) => {
+      clearTimeout(tm);
+      on.move(pt(e), e);
+    };
+    const down = (e) => {
+      clearTimeout(tm);
+      if (e.pointerType !== "mouse") stage.releasePointerCapture?.(e.pointerId);
+      if (on.down) on.down(pt(e), e);
+      else on.move(pt(e), e);
+    };
+    const leave = (e) => {
+      clearTimeout(tm);
+      tm = window.setTimeout(() => on.leave(e), e.pointerType === "mouse" ? 0 : 1400);
+    };
+    stage.addEventListener("pointermove", move);
+    stage.addEventListener("pointerdown", down);
+    stage.addEventListener("pointerleave", leave);
+    return () => {
+      clearTimeout(tm);
+      stage.removeEventListener("pointermove", move);
+      stage.removeEventListener("pointerdown", down);
+      stage.removeEventListener("pointerleave", leave);
+    };
+  }
+  function disposer() {
+    let fns = [];
+    return {
+      add: (fn) => {
+        fns.push(fn);
+      },
+      on: (target, type, fn, opts) => {
+        const h = fn;
+        target.addEventListener(type, h, opts);
+        fns.push(() => target.removeEventListener(type, h, opts));
+      },
+      dispose: () => {
+        const run2 = fns;
+        fns = [];
+        for (let i = run2.length - 1; i >= 0; i--) run2[i]();
+      }
+    };
+  }
+
+  // packages/hairline/src/core/styles.ts
+  var LIGHT = { plate: "#ffffff", hi: "#232327", edge: "#a4a4ac", mid: "#c3c3c9", lo: "#e0e0e4" };
+  var DARK = { plate: "#08090a", hi: "#d0d6e0", edge: "#5b5d64", mid: "#3e3e44", lo: "#29292d" };
+  var KEYS = ["plate", "hi", "edge", "mid", "lo"];
+  var vars = (p) => KEYS.map((k) => `--hl-${k}:var(--hairline-${k},${p[k]});`).join("");
+  var EASE = "cubic-bezier(0.5,0,0.1,1)";
+  var SVG = ":where([data-hairline]>svg)";
+  function css(lightDark) {
+    const both = Object.fromEntries(KEYS.map((k) => [k, `light-dark(${LIGHT[k]},${DARK[k]})`]));
+    return [
+      // the box, and the palette: light unless something below says otherwise
+      `:where([data-hairline]){display:block;position:relative;aspect-ratio:5/4;touch-action:pan-y;user-select:none;-webkit-user-select:none;--hl-sw:var(--hairline-stroke,0.9);${vars(LIGHT)}}`,
+      // the page's color-scheme
+      lightDark ? `:where([data-hairline]){${vars(both)}}` : "",
+      // an ancestor that says dark
+      `:where(.dark,[data-theme="dark"]) :where([data-hairline]){${vars(DARK)}}`,
+      // the figure's own theme option
+      `:where([data-hairline][data-hairline-theme="light"]){${vars(LIGHT)}}`,
+      `:where([data-hairline][data-hairline-theme="dark"]){${vars(DARK)}}`,
+      `:where([data-hairline]:focus-visible){outline:1.5px solid var(--hl-hi);outline-offset:2px}`,
+      `${SVG}{position:absolute;inset:0;width:100%;height:100%;display:block}`,
+      // Riffle's live region: read, not seen
+      `:where([data-hairline]>[data-hairline-live]){position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}`,
+      // the drawing: plates are filled with the plate colour and painted back to front
+      `${SVG} :where(path,polygon,ellipse,line){fill:var(--hl-plate);stroke:var(--hl-mid);stroke-width:var(--hl-sw);vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round;transition:stroke 260ms ${EASE}}`,
+      `${SVG} :where(.nf){fill:none}`,
+      `${SVG} :where(.fo){stroke:none}`,
+      `${SVG} :where(.sil){stroke:var(--hl-edge)}`,
+      `${SVG} :where(.hi){stroke:var(--hl-hi)}`,
+      `${SVG} :where(.lo){stroke:var(--hl-lo)}`,
+      `${SVG} :where(.dash){stroke-dasharray:1 3}`,
+      `${SVG} :where(.dot){stroke:none;fill:var(--hl-hi);transition:fill 260ms ${EASE}}`,
+      `${SVG} :where(.dot.m){fill:var(--hl-edge)}`,
+      `${SVG} :where(.dot.off){fill:var(--hl-lo)}`,
+      `${SVG} :where(.ghost path){fill:none;stroke:var(--hl-mid)}`
+    ].join("");
+  }
+  var done = /* @__PURE__ */ new WeakSet();
+  function inject(root) {
+    if (done.has(root)) return;
+    done.add(root);
+    const doc = root.nodeType === 9 ? root : root.ownerDocument;
+    const win = doc.defaultView;
+    const text = css(!!win?.CSS?.supports?.("color", "light-dark(#000,#fff)"));
+    if (win && "adoptedStyleSheets" in root) {
+      try {
+        const sheet = new win.CSSStyleSheet();
+        sheet.replaceSync(text);
+        root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet];
+        return;
+      } catch {
+      }
+    }
+    const style = doc.createElement("style");
+    style.setAttribute("data-hairline-style", "");
+    style.textContent = text;
+    (root.nodeType === 9 ? doc.head ?? doc.documentElement : root).appendChild(style);
+  }
+  return __toCommonJS(kernel_exports);
+})();
+/* /hairline kernel */
+</script>
+<script>
+/* One beam, eleven stages, 23 phases. Every part has a gate, the phases in which it is present, and a
+   700ms tween that follows the gate with a stagger by distance. The loop opens on the finished beam,
+   un-builds, and builds again. World units: x along the beam, y across it, z up. */
+const BEAM = (() => {
+  const { Cam, fit, proj, facing, rings, prism, rrect, circ, ringAt, run, hull, poly, open, seg, fillet,
+    lerp, clamp, tween, tset, tval, mk, solid, put, place, flatDot } = HL;
+  const L = 160, B = 18, H = 26, CV = 4.5, Z0 = 13, DEF = 9, N = 23;
+  const STAGES = [['dimensions',1],['keypoints',4],['lines',6],['area',7],['volume',8],['partition',9],
+    ['materials',12],['mesh',13],['supports',15],['loads',17],['cracking',20]];
+  const DETAIL = ['ready','L 2100','B 200 · H 300','envelope','kp 4','kp 8','lines 12','A1','V1','cuts 6','V 27','V 27',
+    'concrete','x 12','144 elements','base','pin · roller','pads','P 50','P 100',
+    'step 1/4','step 2/4','step 3/4','step 4/4'];
+  const setD = (el, d) => { if (el._d !== d){ el._d = d; el.setAttribute('d', d); } };
+  const cls = (el, c) => { if (el._c !== c){ el._c = c; el.setAttribute('class', c); } };
+  const show = (el, on) => { const v = on ? '' : 'none'; if (el._v !== v){ el._v = v; el.style.display = v; } };
+  const mix = (a, b, t) => a.map((v, i) => lerp(v, b[i], t));
+  function partial(pts, v){
+    if (v <= 0 || pts.length < 2) return [];
+    if (v >= 1) return pts;
+    const d = []; let tot = 0;
+    for (let i = 1; i < pts.length; i++){ const l = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); d.push(l); tot += l; }
+    let rem = v*tot; const out = [pts[0]];
+    for (let i = 0; i < d.length; i++){
+      if (rem >= d[i]){ out.push(pts[i+1]); rem -= d[i]; continue; }
+      out.push(mix(pts[i], pts[i+1], d[i] ? rem/d[i] : 0)); break;
+    }
+    return out;
+  }
+  const line = (pts, v = 1) => { const q = partial(pts, v); return q.length > 1 ? open(q) : ''; };
+  function box(P, front, x0, y0, z0, x1, y1, z1, r = 2.4, b = 1.1){
+    const w = Math.min(x1 - x0, y1 - y0), [ring, inner] = rings(x0, y0, x1, y1, Math.min(r, w/2), Math.min(b, w*.38));
+    return prism(P, front, ring, inner, z0, z1);
+  }
+  const disc = (cx, cy, R) => circ(R, 16).map(q => ({ ...q, u: q.u + cx, v: q.v + cy }));
+  function bend(x){
+    const a = L/3, f = u => u < a ? u*(3*L*a - 3*a*a - u*u) : a*(3*L*u - 3*u*u - a*a);
+    return f(clamp(Math.min(x, L - x), 0, L/2))/f(L/2);
+  }
+  const corners = (x0, y0, z0, x1, y1, z1) => [[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]];
+  const EDGES = [[0,1],[1,2],[2,3],[3,0],[0,4],[1,5],[2,6],[3,7],[4,5],[5,6],[6,7],[7,4]];
+
+  /* the phase and the time, read by every gate */
+  const S = { k: N, now: 0 };
+  const G = (gate, dl = 0) => ({ gate, dl, t: tween(gate(N) ? 1 : 0) });
+  const val = e => { tset(e.t, e.gate(S.k) ? 1 : 0, S.now, e.dl); return tval(e.t, S.now); };
+  const from = (a, b = Infinity) => k => k >= a && k < b;
+
+  function build(svg){
+    const C = Cam(45, 0.5, 2.12);
+    fit(C, [[-16,-9,-3],[L+16,B+9,-3],[L+16,-9,0],[-16,B+9,0],[0,0,Z0+H+24],[L,B,Z0+H+24]], 200, 162);
+    const P = proj(C), front = facing(C), g = mk('g', {}, svg), M = { P, front, C };
+    const K = corners(0, 0, Z0, L, B, Z0 + H);
+
+    for (let i = 0; i <= 8; i++) for (let j = 0; j <= 2; j++) place(flatDot(g, C, .5, 'dot off'), P(i*L/8, j*B/2, 0));
+    M.plinth = { el: solid(g), e: G(from(15)) };
+    M.pin = solid(g); M.pucks = [2.6, 9, 15.4].map(y => ({ y, el: solid(g) })); M.pad = solid(g); M.sup = G(from(16));
+
+    const O = [0, 0, Z0];
+    M.O = O;
+    M.axes = [[L,0,0,1,8],[0,B,0,2,3],[0,0,H,2,4]].map(([x, y, z, ph, n], i) => {
+      const el = mk('path', { class: 'nf sil' }, g), ticks = [];
+      for (let j = 1; j <= n; j++){
+        const c = mk('circle', { r: j === n ? 1.4 : .85, class: j === n ? 'dot m' : 'dot off' }, g);
+        place(c, P(O[0] + x*j/n, O[1] + y*j/n, O[2] + z*j/n)); ticks.push({ el: c, f: j/n });
+      }
+      return { e: [x, y, z], ph, el, ticks, s: G(from(ph, 6), i*120) };
+    });
+    M.origin = mk('circle', { r: 1.7, class: 'dot' }, g); place(M.origin, P(...O));
+
+    M.env = mk('path', { class: 'nf dash' }, g);
+    M.envE = EDGES.map(e => ({ a: K[e[0]], b: K[e[1]], s: G(from(3, 9), (K[e[0]][0] + K[e[0]][1] + K[e[0]][2] - Z0)*1.6) }));
+
+    const m = 7, z0 = Z0, z1 = Z0 + H;
+    M.cuts = [
+      ...[L/3, 2*L/3].map(c => ({ plane: [[c,-m,z0-m],[c,B+m,z0-m],[c,B+m,z1+m],[c,-m,z1+m],[c,-m,z0-m]], seam: [[c,0,z1],[c,B,z1],[c,B,z0]] })),
+      ...[CV, B - CV].map(c => ({ plane: [[-m,c,z0-m],[L+m,c,z0-m],[L+m,c,z1+m],[-m,c,z1+m],[-m,c,z0-m]], seam: [[1.5,c,z1],[L,c,z1],[L,c,z0]] })),
+      ...[z0 + 6, z1 - 6].map(c => ({ plane: [[-m,-m,c],[L+m,-m,c],[L+m,B+m,c],[-m,B+m,c],[-m,-m,c]], seam: [[1.5,B,c],[L,B,c],[L,1.5,c]] })),
+    ];
+    M.cuts.forEach((c, i) => {
+      const dl = (i >> 1)*360 + (i & 1)*120;
+      c.planeP = c.plane.map(p => P(...p)); c.seamP = c.seam.map(p => P(...p));
+      c.pl = mk('path', { class: 'nf dash' }, g); c.p = G(k => k === 9, dl); c.s = G(from(9, 12), dl + 260);
+    });
+
+    M.area = mk('path', { class: 'sil' }, g); M.areaE = G(from(7, 9));
+    const hidden = new Set([0, 3, 4]);
+    M.wire = EDGES.map((e, i) => ({ a: K[e[0]], b: K[e[1]], hid: hidden.has(i), el: mk('path', { class: 'nf sil' }, g), s: G(from(6, 9), (i >> 2)*260 + (i & 3)*60) }));
+
+    M.ext = solid(g); M.extE = G(from(8));
+    M.beam = solid(g);
+    const XS = [0, L/3, 2*L/3, L], YS = [0, CV, B - CV, B], ZS = [Z0, Z0 + 6, Z0 + H - 6, Z0 + H];
+    M.blocks = [];
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) for (let q = 0; q < 3; q++)
+      M.blocks.push({ b: [XS[i], YS[j], ZS[q], XS[i+1], YS[j+1], ZS[q+1]], o: [i - 1, j - 1, q - 1], key: XS[i] + XS[i+1] + YS[j] + YS[j+1] + ZS[q] + ZS[q+1],
+        s: G(k => k === 10, (Math.abs(i - 1) + Math.abs(j - 1) + Math.abs(q - 1))*55) });
+    M.blocks.sort((a, b) => a.key - b.key).forEach(b => { b.el = solid(g); });
+    M.cuts.forEach(c => { c.sm = mk('path', { class: 'nf' }, g); });
+
+    let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647)/2147483647;
+    M.agg = [];
+    const add = (n, at) => { for (let i = 0; i < n; i++){ const p = at(rnd(), rnd()), big = rnd() < .22;
+      const el = mk('circle', { r: big ? .9 : .55, class: big ? 'dot m' : 'dot off' }, g); place(el, P(...p));
+      M.agg.push({ el, s: G(from(12, 13), Math.hypot(p[0], B - p[1], Z0 + H - p[2])/L*900) }); } };
+    add(60, (a, b) => [4 + a*(L - 8), 2 + b*(B - 4), Z0 + H]);
+    add(84, (a, b) => [4 + a*(L - 8), B, Z0 + 2 + b*(H - 4)]);
+    add(10, (a, b) => [L, 2 + a*(B - 4), Z0 + 2 + b*(H - 4)]);
+
+    const X13 = Array.from({ length: 13 }, (_, i) => i*L/12), ZN = [0, H/4, H/2, 3*H/4, H];
+    M.mesh = [];
+    for (let i = 1; i < 12; i++) M.mesh.push({ w: [[X13[i], .8, Z0 + H], [X13[i], B, Z0 + H], [X13[i], B, Z0 + .8]], ph: 13, s: G(from(13), i*45) });
+    [H/4, H/2, 3*H/4].forEach((z, i) => M.mesh.push({ w: [...X13.map(x => [Math.max(1.8, x), B, Z0 + z]), [L, .8, Z0 + z]], ph: 14, s: G(from(14), i*70) }));
+    [B/3, 2*B/3].forEach((y, i) => M.mesh.push({ w: [...X13.map(x => [Math.max(1.8, x), y, Z0 + H]), [L, y, Z0 + .8]], ph: 14, s: G(from(14), 210 + i*70) }));
+    M.mesh.forEach(l => { l.el = mk('path', { class: 'nf' }, g); });
+    M.nodes = [];
+    X13.forEach((x, i) => ZN.forEach((z, j) => M.nodes.push({ x, z: Z0 + z, el: mk('circle', { r: .8, class: 'dot off' }, g), s: G(from(14), 300 + (i + j)*28) })));
+
+    M.cracks = [];
+    [-24, -16, -8, 0, 8, 16, 24].forEach(o => M.cracks.push({ x: L/2 + o, on: .26 + Math.abs(o)/24*.14, h: .74 - Math.abs(o)/24*.18, lean: 0 }));
+    [[L/3 - 13, .5, .6], [L/3 - 27, .68, .5], [2*L/3 + 13, .5, -.6], [2*L/3 + 27, .68, -.5]].forEach(([x, on, lean]) => M.cracks.push({ x, on, h: .55, lean }));
+    M.cracks.forEach((c, i) => { c.el = mk('path', { class: 'nf hi' }, g); c.j = i % 2 ? 1 : -1; });
+
+    M.kps = [0, 1, 3, 2, 4, 5, 7, 6].map((ix, n) => ({ p: K[ix], n, ph: n < 4 ? 4 : 5,
+      drop: mk('path', { class: 'nf dash' }, g), el: mk('circle', { r: 1.8, class: 'dot m' }, g), s: G(from(n < 4 ? 4 : 5, 9), (n & 3)*110) }));
+
+    M.weights = [L/3, 2*L/3].map(x => ({ x, pad: solid(g), ps: G(from(17)), discs: [0, 1, 2, 3].map(n => ({ n, el: solid(g), s: G(from(n < 2 ? 18 : 19), (n & 1)*130) })) }));
+    M.lam = tween(1, 900);
+    return M;
+  }
+  return { L, B, H, CV, Z0, DEF, N, STAGES, DETAIL, S, setD, cls, show, mix, line, box, disc, bend, val, build,
+    HL: { rings, prism, rrect, ringAt, run, hull, poly, open, seg, fillet, clamp, tset, tval, put, place } };
+})();
+</script>
+<script>
+/* Drawing: every frame reads each part's gate and writes only the paths whose values changed. */
+(() => {
+  const { rings, prism, rrect, ringAt, run, hull, poly, open, seg, fillet, clamp, tset, tval, put, place } = HL;
+  const { L, B, H, CV, Z0, DEF, S, setD, cls, show, mix, line, box, disc, bend, val } = BEAM;
+  const XS = Array.from({ length: 33 }, (_, i) => i*L/32);
+  const taper = (P, front, foot, top, inner, z0, z1) =>
+    ({ sil: poly(hull(ringAt(P, foot, z0).concat(ringAt(P, top, z1)))), crease: open(ringAt(P, run(inner, front), z1)) });
+  /* The beam as one outline, raised by zo and bent by d(x): silhouette with rounded corners, and its top crease. */
+  function beamPaths(M, zo, d){
+    const { P } = M, top = x => Z0 + zo + H + d(x), bot = x => Z0 + zo + d(x);
+    const pts = [...XS.map(x => P(x, 0, top(x))), P(L, 0, bot(L)), P(L, B, bot(L)), ...XS.slice(0, -1).reverse().map(x => P(x, B, bot(x))), P(0, B, top(0))];
+    const r = pts.map(() => 0), R = 2.4*M.C.S;
+    [0, 32, 33, 34, 66, 67].forEach(i => { r[i] = R; });
+    return { sil: poly(fillet(pts, r, 3)), crease: open([...XS.slice(1, -1).map(x => P(x, B - 1.1, top(x))), P(L - 1.1, B - 1.1, top(L)), P(L - 1.1, 1.1, top(L))]) };
+  }
+
+  BEAM.draw = (M) => {
+    const { P, front } = M, k = S.k;
+
+    const vpl = val(M.plinth.e); show(M.plinth.el.g, vpl > .02);
+    if (vpl > .02 && vpl !== M.plinth.last){
+      M.plinth.last = vpl;
+      const hw = (L/2 + 16)*vpl, hh = (B/2 + 9)*vpl, [r1, r2] = rings(L/2 - hw, B/2 - hh, L/2 + hw, B/2 + hh, 8, Math.min(2, hh*.4));
+      put(M.plinth.el, prism(P, front, r1, r2, -3, 0));
+    }
+    cls(M.plinth.el.sil, k === 15 ? 'sil hi' : 'sil');
+
+    const vs = val(M.sup), son = vs > .01, xp = 9, xr = L - 9;
+    [M.pin.g, M.pad.g, ...M.pucks.map(p => p.el.g)].forEach(el => show(el, son));
+    if (son && vs !== M.supLast){
+      M.supLast = vs;
+      put(M.pin, taper(P, front, rrect(xp - 9, -2, xp + 9, B + 2, 2.4, 4), rrect(xp - 2.6, -2, xp + 2.6, B + 2, 1.2, 4), rrect(xp - 1.8, -1.2, xp + 1.8, B + 1.2, .6, 4), 0, Z0*vs));
+      M.pucks.forEach(p => put(p.el, prism(P, front, disc(xr, p.y, 2.6), disc(xr, p.y, 1.8), 0, 5*vs)));
+      put(M.pad, box(P, front, xr - 8, -2, 5*vs, xr + 8, B + 2, 5*vs + (Z0 - 5)*vs, 2, .8));
+    }
+    cls(M.pin.sil, k === 16 ? 'sil hi' : 'sil'); cls(M.pad.sil, k === 16 ? 'sil hi' : 'sil');
+
+    M.axes.forEach(a => {
+      const v = val(a.s), O = M.O;
+      setD(a.el, line([P(...O), P(O[0] + a.e[0]*v, O[1] + a.e[1]*v, O[2] + a.e[2]*v)]));
+      cls(a.el, k === a.ph ? 'nf hi' : 'nf sil');
+      a.ticks.forEach(t => show(t.el, v >= t.f - 1e-3));
+    });
+    show(M.origin, k < 6); cls(M.origin, k === 0 ? 'dot' : 'dot m');
+
+    let env = '';
+    M.envE.forEach(e => { const v = val(e.s); if (v > .001) env += seg(P(...e.a), P(...mix(e.a, e.b, v))); });
+    setD(M.env, env); cls(M.env, k === 3 ? 'nf dash hi' : 'nf dash');
+    M.cuts.forEach(c => setD(c.pl, line(c.planeP, val(c.p))));
+
+    const va = val(M.areaE), ve = val(M.extE);
+    show(M.area, va > .001 && ve < .02 && k < 9);
+    if (va > .001){ const z = Z0 + H*va; setD(M.area, poly(fillet([P(0, 0, Z0), P(L, 0, Z0), P(L, 0, z), P(0, 0, z)], [1.6, 1.6, 1.6, 1.6]))); }
+    cls(M.area, k === 7 ? 'hi' : 'sil');
+    M.wire.forEach(w => { const v = val(w.s); setD(w.el, line([P(...w.a), P(...mix(w.a, w.b, v))])); cls(w.el, w.hid ? 'nf dash' : k === 6 ? 'nf hi' : 'nf sil'); });
+
+    tset(M.lam, k >= 20 ? (k - 19)/4 : 0, S.now, 0);
+    const lam = tval(M.lam, S.now), dfn = x => -DEF*lam*bend(x), Pd = (x, y, z) => P(x, y, z + dfn(x));
+    let gap = 0; M.blocks.forEach(b => { b.v = val(b.s); gap = Math.max(gap, b.v); });
+    const split = gap > .001 && k >= 9;
+    show(M.ext.g, k < 9 && ve > .001);
+    if (k < 9 && ve > .001 && ve !== M.extLast){ M.extLast = ve; put(M.ext, box(P, front, 0, 0, Z0, L, Math.max(1.6, B*ve), Z0 + H)); }
+    cls(M.ext.sil, k === 8 ? 'sil hi' : 'sil');
+    const whole = k >= 9 && !split;
+    show(M.beam.g, whole);
+    if (whole){ const key = lam.toFixed(4); if (key !== M.beamKey){ M.beamKey = key; put(M.beam, beamPaths(M, 0, dfn)); } }
+    M.blocks.forEach(b => {
+      show(b.el.g, split);
+      if (split && b.v !== b.last){ b.last = b.v; const o = b.o.map(c => c*7*b.v);
+        put(b.el, box(P, front, b.b[0] + o[0], b.b[1] + o[1], b.b[2] + o[2], b.b[3] + o[0], b.b[4] + o[1], b.b[5] + o[2], 1.6, .7)); }
+      cls(b.el.sil, k === 10 && !b.o.some(Boolean) ? 'sil hi' : 'sil');
+    });
+    M.cuts.forEach(c => { const v = val(c.s); setD(c.sm, split ? '' : line(c.seamP, v)); cls(c.sm, k === 9 ? 'nf hi' : 'nf'); });
+
+    M.agg.forEach(a => show(a.el, val(a.s) > .5));
+    M.mesh.forEach(l => {
+      const v = val(l.s), key = v + ':' + lam;
+      if (key !== l.key){ l.key = key; setD(l.el, v > .001 ? line(l.w.map(p => Pd(...p)), v) : ''); }
+      cls(l.el, k === l.ph ? 'nf sil' : 'nf');
+    });
+    M.nodes.forEach(n => { const on = val(n.s) > .5; show(n.el, on); if (on && n.lam !== lam){ n.lam = lam; place(n.el, Pd(n.x, B, n.z)); } });
+    M.cracks.forEach(c => {
+      const gr = clamp((lam - c.on)/(1 - c.on)*1.7, 0, 1), h = c.h*H*gr;
+      setD(c.el, gr > .01 ? open([0, 1, 2, 3, 4].map(i => { const x = c.x + c.lean*h*i/4 + (i % 2 ? c.j*1.1 : 0); return Pd(x, B, Z0 + h*i/4); })) : '');
+    });
+
+    let newest = -1;
+    M.kps.forEach(q => {
+      const v = val(q.s), [x, y, z0] = q.p, z = z0 + 22*(1 - v);
+      show(q.el, v > .001); place(q.el, P(x, y, z));
+      setD(q.drop, v > .001 && v < .999 ? line([P(x, y, 0), P(x, y, z)]) : '');
+      if (k >= q.ph && k < 9) newest = q.n;
+    });
+    M.kps.forEach(q => cls(q.el, q.n === newest ? 'dot' : 'dot m'));
+
+    M.weights.forEach(s => {
+      const z0 = Z0 + H + dfn(s.x), vp = val(s.ps);
+      show(s.pad.g, vp > .01);
+      if (vp > .01) put(s.pad, box(P, front, s.x - 7, -2, z0 + 20*(1 - vp), s.x + 7, B + 2, z0 + 3 + 20*(1 - vp), 2, .8));
+      cls(s.pad.sil, k === 17 ? 'sil hi' : 'sil');
+      s.discs.forEach(d => {
+        const v = val(d.s), z = z0 + 3 + d.n*3.9 + 24*(1 - v);
+        show(d.el.g, v > .01);
+        if (v > .01) put(d.el, prism(P, front, disc(s.x, B/2, 6.5), disc(s.x, B/2, 5.6), z, z + 3.6));
+        cls(d.el.sil, (k === 18 && d.n === 1) || (k === 19 && d.n === 3) ? 'sil hi' : 'sil');
+      });
+    });
+  };
+})();
+</script>
+<script>
+/* A tabletop turbine-generator foundation: a raft on soil springs, eight columns in two rows, a table
+   top built as a grid of beams, sole plates, and the machine on top. Ten stages, 21 phases, on the same
+   gate-and-tween scheme as the beam. Everything above the raft is drawn through Pw, which adds the
+   vibration mode's sideways offset in proportion to height. */
+const TG = (() => {
+  const { Cam, fit, proj, facing, rings, prism, circ, ringAt, run, poly, open, lerp, clamp, tween, tset, tval, mk, solid, put, place, flatDot } = HL;
+  const LX = 180, WY = 60, ZR = 10, ZD0 = 60, ZD1 = 72, ZG = -12, ZM = 73.2, ZSH = 82.2, N = 21;
+  const XC = [15, 65, 115, 165], YC = [8, 52], CW = 6;
+  const STAGES = [['grid',1],['keypoints',3],['frame',5],['raft plan',7],['volumes',8],['materials',11],['mesh',13],['soil springs',15],['machine',17],['modes',20]];
+  const DETAIL = ['ready','axes 1–4','rows A–B','kp 8','kp 16','columns','deck lines','raft plan','raft','columns 8','table top','concrete','sole plates',
+    'raft · columns','table top','ground','k springs','T-G set','shaft','unbalance','mode 1','mode 2'];
+  const setD = (el, d) => { if (el._d !== d){ el._d = d; el.setAttribute('d', d); } };
+  const cls = (el, c) => { if (el._c !== c){ el._c = c; el.setAttribute('class', c); } };
+  const show = (el, on) => { const v = on ? '' : 'none'; if (el._v !== v){ el._v = v; el.style.display = v; } };
+  const mix = (a, b, t) => a.map((v, i) => lerp(v, b[i], t));
+  function partial(pts, v){
+    if (v <= 0 || pts.length < 2) return [];
+    if (v >= 1) return pts;
+    const d = []; let tot = 0;
+    for (let i = 1; i < pts.length; i++){ const l = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); d.push(l); tot += l; }
+    let rem = v*tot; const out = [pts[0]];
+    for (let i = 0; i < d.length; i++){
+      if (rem >= d[i]){ out.push(pts[i+1]); rem -= d[i]; continue; }
+      out.push(mix(pts[i], pts[i+1], d[i] ? rem/d[i] : 0)); break;
+    }
+    return out;
+  }
+  const line = (pts, v = 1) => { const q = partial(pts, v); return q.length > 1 ? open(q) : ''; };
+  const ringsOf = (b, r, k) => { const w = Math.min(b[2] - b[0], b[3] - b[1]); return rings(b[0], b[1], b[2], b[3], Math.min(r, w/2), Math.min(k, w*.38)); };
+  const disc = (cx, cy, R) => circ(R, 20).map(q => ({ ...q, u: q.u + cx, v: q.v + cy }));
+
+  const S = { k: N, now: 0, off: () => 0 };
+  const G = (gate, dl = 0) => ({ gate, dl, t: tween(gate(N) ? 1 : 0) });
+  const val = e => { tset(e.t, e.gate(S.k) ? 1 : 0, S.now, e.dl); return tval(e.t, S.now); };
+  const from = (a, b = Infinity) => k => k >= a && k < b;
+
+  function build(svg){
+    const C = Cam(45, 0.5, 1.45);
+    fit(C, [[-10,-10,ZG-3],[LX+10,WY+10,ZG-3],[LX+10,-10,ZG-3],[-10,WY+10,ZG-3],[0,0,ZD1+30],[LX,WY,ZD1+30]], 200, 162);
+    const P = proj(C), front = facing(C), g = mk('g', {}, svg);
+    const fz = z => clamp((z - ZR)/(ZD0 - ZR), 0, 1);
+    const Pw = (x, y, z) => P(x, y + S.off(x)*fz(z), z);
+    const M = { P, Pw, front, C };
+    let seed = 11; const rnd = () => (seed = (seed*16807) % 2147483647)/2147483647;
+    const dots = (parent, n, at, gate) => Array.from({ length: n }, () => { const p = at(rnd(), rnd()), big = rnd() < .22;
+      return { p, el: mk('circle', { r: big ? .85 : .5, class: big ? 'dot m' : 'dot off' }, parent), s: G(gate, Math.hypot(p[0], WY - p[1], ZD1 - p[2])/LX*800) }; });
+
+    for (let i = 0; i <= 9; i++) for (let j = 0; j <= 3; j++) place(flatDot(g, C, .5, 'dot off'), P(i*LX/9, j*WY/3, ZG));
+    M.ground = { el: solid(g), s: G(from(15)) };
+    M.springs = [];
+    for (let i = 0; i < 7; i++) for (const y of [6, 30, 54]){
+      const x = 15 + i*25, w = [];
+      for (let n = 0; n <= 8; n++) w.push([x + (n === 0 || n === 8 ? 0 : n % 2 ? 2.4 : -2.4), y, ZG + (0 - ZG)*n/8]);
+      M.springs.push({ w, el: mk('path', { class: 'nf' }, g), s: G(from(16), i*55 + y*3) });
+    }
+
+    M.rarea = mk('path', { class: 'sil' }, g); M.rareaS = G(from(7, 9));
+    M.raft = solid(g); M.raftS = G(from(8)); M.raftR = ringsOf([0, 0, LX, WY], 3, 1.4);
+    M.rmesh = [];
+    for (let x = 15; x < LX; x += 15) M.rmesh.push({ w: [[x, .8, ZR], [x, WY, ZR], [x, WY, .8]], s: G(from(13), x*2.5) });
+    [15, 30, 45].forEach((y, i) => M.rmesh.push({ w: [[.8, y, ZR], [LX, y, ZR], [LX, y, .8]], s: G(from(13), 160 + i*70) }));
+    M.rmesh.forEach(l => { l.el = mk('path', { class: 'nf' }, g); });
+    M.ragg = dots(g, 40, (a, b) => [3 + a*(LX - 6), WY, 1.5 + b*(ZR - 3)], from(11, 13))
+      .concat(dots(g, 10, (a, b) => [LX, 3 + a*(WY - 6), 1.5 + b*(ZR - 3)], from(11, 13)));
+
+    M.gridX = XC.map((x, i) => ({ w: [[x, -12, ZR], [x, WY + 12, ZR]], el: mk('path', { class: 'nf dash' }, g), s: G(from(1, 9), i*110) }));
+    M.gridY = YC.map((y, j) => ({ w: [[-12, y, ZR], [LX + 12, y, ZR]], el: mk('path', { class: 'nf dash' }, g), s: G(from(2, 9), j*160) }));
+    M.gdots = [];
+    XC.forEach(x => YC.forEach(y => { const el = mk('circle', { r: 1.2, class: 'dot m' }, g); place(el, P(x, y, ZR)); M.gdots.push({ el, s: G(from(2, 9), 260 + x*2 + y*3) }); }));
+
+    M.cols = [];
+    XC.forEach((x, i) => YC.forEach((y, j) => M.cols.push({ x, y, i, j })));
+    M.cols.sort((a, b) => (a.x + a.y) - (b.x + b.y)).forEach(c => {
+      [c.ring, c.inner] = ringsOf([c.x - CW, c.y - CW, c.x + CW, c.y + CW], 1.8, .8);
+      c.el = solid(g); c.mesh = mk('path', { class: 'nf' }, c.el.g);
+      c.s = G(from(9), (c.i + c.j)*90); c.ms = G(from(13), 300 + (c.i + c.j)*60);
+      c.agg = c.j === 1 ? dots(c.el.g, 9, (a, b) => [c.x - CW*.75 + a*CW*1.5, c.y + CW, ZR + 3 + b*(ZD0 - ZR - 6)], from(11, 13)) : [];
+    });
+
+    const top = n => 4 + n*(LX - 8)/12;
+    M.deck = [
+      { b: [4, 0, LX - 4, 16], dl: 0, lines: [...Array.from({ length: 11 }, (_, n) => [[top(n + 1), .8, ZD1], [top(n + 1), 16, ZD1]]), [[5, 8, ZD1], [LX - 5, 8, ZD1]]] },
+      ...XC.map((x, i) => ({ b: [x - 7, 16, x + 7, 44], dl: 140 + i*110, lines: [[[x, 16, ZD1], [x, 44, ZD1]]] })),
+      { b: [4, 44, LX - 4, WY], dl: 620, lines: [...Array.from({ length: 11 }, (_, n) => [[top(n + 1), 44, ZD1], [top(n + 1), WY, ZD1], [top(n + 1), WY, ZD0 + .8]]), [[5, 52, ZD1], [LX - 5, 52, ZD1]]] },
+    ];
+    M.deck.forEach((d, n) => {
+      [d.ring, d.inner] = ringsOf(d.b, 1.6, .8);
+      d.el = solid(g); d.mesh = mk('path', { class: 'nf' }, d.el.g);
+      d.s = G(from(10), d.dl); d.ms = G(from(14), d.dl*.6);
+      d.agg = n === M.deck.length - 1 ? dots(d.el.g, 34, (a, b) => [6 + a*(LX - 12), WY, ZD0 + 1.5 + b*(ZD1 - ZD0 - 3)], from(11, 13)) : [];
+    });
+
+    M.bodies = [{ b: [26, 10, 54, 50], h: 16, r: 7 }, { b: [66, 4, 114, 56], h: 26, r: 6, ribs: [80, 90, 100] }, { b: [124, 10, 160, 50], h: 20, r: 12 }];
+    M.plates = [];
+    M.bodies.forEach((bd, i) => [bd.b[0] + 4, bd.b[2] - 4].forEach(x => [bd.b[1] + 4, bd.b[3] - 4].forEach(y =>
+      M.plates.push({ x, y: clamp(y, 8, 52), s: G(from(12), i*150 + (y > 30 ? 80 : 0)) }))));
+    M.plates.sort((a, b) => (a.x + a.y) - (b.x + b.y)).forEach(p => { [p.ring, p.inner] = ringsOf([p.x - 4, p.y - 4, p.x + 4, p.y + 4], 1, .5); p.el = solid(g); });
+    M.bodies.forEach((bd, i) => {
+      [bd.ring, bd.inner] = ringsOf(bd.b, bd.r, 1.6);
+      bd.el = solid(g); bd.rib = bd.ribs ? mk('path', { class: 'nf lo' }, bd.el.g) : null;
+      bd.s = G(from(17), i*170);
+    });
+    M.shaft = [[6, 26], [54, 66], [114, 124], [160, 176]].map(([a, b], i) => ({ w: [[a, 30, ZSH], [b, 30, ZSH]], el: mk('path', { class: 'nf sil' }, g), s: G(from(18), i*90) }));
+    M.orbits = [16, 60, 119, 168].map((x, i) => ({ x, el: mk('path', { class: 'nf dash' }, g), dot: mk('circle', { r: 1.3, class: 'dot' }, g), s: G(from(19), i*90), ph: i*1.3 }));
+
+    M.sticks = [
+      ...M.cols.map(c => ({ w: [[c.x, c.y, ZR], [c.x, c.y, 66]], s: G(from(5, 9), (c.i + c.j)*70) })),
+      ...YC.map((y, j) => ({ w: [[XC[0], y, 66], [XC[3], y, 66]], s: G(from(6, 10), j*160) })),
+      ...XC.map((x, i) => ({ w: [[x, YC[0], 66], [x, YC[1], 66]], s: G(from(6, 10), 300 + i*90) })),
+    ];
+    M.sticks.forEach(s => { s.el = mk('path', { class: 'nf sil' }, g); });
+    M.kps = [];
+    M.cols.forEach(c => [[ZR, 3, 9], [66, 4, 10]].forEach(([z, a, b]) =>
+      M.kps.push({ p: [c.x, c.y, z], ph: a, s: G(from(a, b), (c.i + c.j)*70), drop: mk('path', { class: 'nf dash' }, g), el: mk('circle', { r: 1.6, class: 'dot m' }, g) })));
+    M.m1 = tween(0); M.m2 = tween(1);
+    return M;
+  }
+  return { LX, WY, ZR, ZD0, ZD1, ZG, ZM, ZSH, N, CW, STAGES, DETAIL, S, setD, cls, show, mix, line, disc, val, build };
+})();
+</script>
+<script>
+/* Drawing. In the last stage the table top sways (mode 1) and then twists (mode 2): S.off gives the
+   sideways offset at each x, and Pw applies it in proportion to height, so columns lean and the table moves. */
+(() => {
+  const { prism, rings, ringAt, run, poly, open, fillet, tset, tval, place, reducedMotion } = HL;
+  const { LX, WY, ZR, ZD0, ZD1, ZG, ZM, ZSH, S, setD, cls, show, line, val } = TG;
+  const putc = (el, s) => {
+    if (el._s !== s.sil){ el._s = s.sil; el.sil.setAttribute('d', s.sil); }
+    if (el._k !== s.crease){ el._k = s.crease; el.cr.setAttribute('d', s.crease); }
+  };
+  const OMEGA = 2*Math.PI/1.3;
+
+  TG.draw = M => {
+    const { P, Pw, front } = M, k = S.k;
+    tset(M.m1, k === 20 ? 1 : 0, S.now, 0); tset(M.m2, k === 21 ? 1 : 0, S.now, 0);
+    const a1 = tval(M.m1, S.now), a2 = tval(M.m2, S.now), osc = reducedMotion() ? 1 : Math.sin(S.now/1000*OMEGA);
+    S.off = x => (4.5*a1 + 5*a2*(x - LX/2)/(LX/2))*osc;
+
+    const vg = val(M.ground.s); show(M.ground.el.g, vg > .02);
+    if (vg > .02){
+      const hw = (LX/2 + 14)*vg, hh = (WY/2 + 12)*vg, [r1, r2] = rings(LX/2 - hw, WY/2 - hh, LX/2 + hw, WY/2 + hh, 8, Math.min(2, hh*.4));
+      putc(M.ground.el, prism(P, front, r1, r2, ZG - 3, ZG));
+    }
+    cls(M.ground.el.sil, k === 15 ? 'sil hi' : 'sil');
+    M.springs.forEach(s => { setD(s.el, line(s.w.map(p => P(...p)), val(s.s))); cls(s.el, k === 16 ? 'nf hi' : 'nf'); });
+
+    const va = val(M.rareaS), vr = val(M.raftS);
+    show(M.rarea, va > .001 && vr < .02);
+    if (va > .001) setD(M.rarea, poly(fillet([P(0, 0, 0), P(LX, 0, 0), P(LX, WY*va, 0), P(0, WY*va, 0)], [2, 2, 2, 2])));
+    cls(M.rarea, k === 7 ? 'hi' : 'sil');
+    show(M.raft.g, vr > .001);
+    if (vr > .001) putc(M.raft, prism(P, front, M.raftR[0], M.raftR[1], 0, Math.max(.6, ZR*vr)));
+    cls(M.raft.sil, k === 8 ? 'sil hi' : 'sil');
+    M.rmesh.forEach(l => setD(l.el, line(l.w.map(p => P(...p)), val(l.s))));
+    M.ragg.forEach(d => { const on = val(d.s) > .5; show(d.el, on); if (on && !d.at){ d.at = 1; place(d.el, P(...d.p)); } });
+
+    M.gridX.concat(M.gridY).forEach((l, i) => { setD(l.el, line(l.w.map(p => P(...p)), val(l.s))); cls(l.el, (k === 1 && i < 4) || (k === 2 && i >= 4) ? 'nf dash hi' : 'nf dash'); });
+    M.gdots.forEach(d => show(d.el, val(d.s) > .5));
+
+    M.cols.forEach(c => {
+      const v = val(c.s), on = v > .001; show(c.el.g, on);
+      if (on){
+        const z1 = ZR + (ZD0 - ZR)*v, vm = val(c.ms);
+        putc(c.el, prism(Pw, front, c.ring, c.inner, ZR, z1));
+        let d = '';
+        if (vm > .001) [20, 30, 40, 50].forEach((z, n) => { if (z < z1 && vm > n*.22) d += open(ringAt(Pw, run(c.ring, front), z)); });
+        setD(c.mesh, d);
+        c.agg.forEach(a => { const o = val(a.s) > .5 && a.p[2] < z1; show(a.el, o); if (o) place(a.el, Pw(...a.p)); });
+      }
+      cls(c.el.sil, k === 9 ? 'sil hi' : 'sil');
+    });
+    M.deck.forEach(d => {
+      const v = val(d.s), on = v > .001; show(d.el.g, on);
+      if (on){
+        putc(d.el, prism(Pw, front, d.ring, d.inner, ZD0, ZD0 + (ZD1 - ZD0)*Math.max(v, .06)));
+        const vm = val(d.ms);
+        setD(d.mesh, vm > .001 && v > .99 ? d.lines.map(w => line(w.map(p => Pw(...p)), vm)).join('') : '');
+        d.agg.forEach(a => { const o = val(a.s) > .5; show(a.el, o); if (o) place(a.el, Pw(...a.p)); });
+      }
+      cls(d.el.sil, k === 10 ? 'sil hi' : 'sil');
+    });
+    M.plates.forEach(p => {
+      const v = val(p.s), on = v > .001; show(p.el.g, on);
+      if (on){ const dz = 14*(1 - v); putc(p.el, prism(Pw, front, p.ring, p.inner, ZD1 + dz, ZD1 + 1.2 + dz)); }
+      cls(p.el.sil, k === 12 ? 'sil hi' : 'sil');
+    });
+    M.bodies.forEach(bd => {
+      const v = val(bd.s), on = v > .001; show(bd.el.g, on);
+      if (on){
+        const z0 = ZM + 24*(1 - v);
+        putc(bd.el, prism(Pw, front, bd.ring, bd.inner, z0, z0 + bd.h));
+        if (bd.rib) setD(bd.rib, bd.ribs.map(x => line([Pw(x, bd.b[1] + 3, z0 + bd.h), Pw(x, bd.b[3] - 3, z0 + bd.h)])).join(''));
+      }
+      cls(bd.el.sil, k === 17 ? 'sil hi' : 'sil');
+    });
+    M.shaft.forEach(s => { setD(s.el, line(s.w.map(p => Pw(...p)), val(s.s))); cls(s.el, k === 18 ? 'nf hi' : 'nf sil'); });
+    const th = reducedMotion() ? .8 : S.now/1000*2*Math.PI*.9;
+    M.orbits.forEach(o => {
+      const v = val(o.s), R = 3.6*v;
+      setD(o.el, v > .001 ? poly(Array.from({ length: 16 }, (_, i) => { const a = i/16*Math.PI*2; return Pw(o.x, 30 + R*Math.cos(a), ZSH + R*Math.sin(a)); })) : '');
+      show(o.dot, v > .5);
+      if (v > .5) place(o.dot, Pw(o.x, 30 + R*Math.cos(th + o.ph), ZSH + R*Math.sin(th + o.ph)));
+    });
+
+    M.sticks.forEach((s, i) => { setD(s.el, line(s.w.map(p => P(...p)), val(s.s))); cls(s.el, k === (i < 8 ? 5 : 6) ? 'nf hi' : 'nf sil'); });
+    let newest = -1;
+    M.kps.forEach((q, n) => {
+      const v = val(q.s), [x, y, z0] = q.p, z = z0 + 20*(1 - v);
+      show(q.el, v > .001); place(q.el, P(x, y, z));
+      setD(q.drop, v > .001 && v < .999 ? line([P(x, y, ZG), P(x, y, z)]) : '');
+      if (k === q.ph) newest = n;
+    });
+    M.kps.forEach((q, n) => cls(q.el, n === newest ? 'dot' : 'dot m'));
+  };
+})();
+</script>
+<script>
+/* A pump pedestal foundation: a pile-supported footing, a pedestal poured around cast-in anchor bolts,
+   a grout pad, a steel baseplate with nuts, and an end-suction pump coupled to a motor. Eleven stages,
+   21 phases, on the same gate-and-tween scheme as the beam. Everything is drawn through Pw, which applies
+   the vibration mode: rocking about the long axis, then twisting about the vertical. */
+const PP = (() => {
+  const { Cam, fit, proj, facing, rings, circ, lerp, clamp, tween, tset, tval, mk, solid, place, flatDot } = HL;
+  const FX = 120, FY = 80, FZ = 14, PX0 = 20, PX1 = 100, PY0 = 18, PY1 = 62, PZ = 44, ZT = -26, ZB = 49, AX = 63.5, N = 21;
+  const XC = 60, YC = 40;
+  const STAGES = [['outline',1],['keypoints',3],['lines',5],['area',6],['volumes',7],['baseplate',10],['materials',13],['mesh',14],['piles',16],['pump set',17],['modes',20]];
+  const DETAIL = ['ready','footing 6.0 × 4.0 m','pedestal 4.0 × 2.2 m','kp 8','kp 16','lines 24','A1','footing','anchor bolts 6','pedestal','grout','baseplate','nuts',
+    'concrete','footing','pedestal','piles 6','pump','motor','running','rocking','torsion'];
+  const setD = (el, d) => { if (el._d !== d){ el._d = d; el.setAttribute('d', d); } };
+  const cls = (el, c) => { if (el._c !== c){ el._c = c; el.setAttribute('class', c); } };
+  const show = (el, on) => { const v = on ? '' : 'none'; if (el._v !== v){ el._v = v; el.style.display = v; } };
+  const mix = (a, b, t) => a.map((v, i) => lerp(v, b[i], t));
+  function partial(pts, v){
+    if (v <= 0 || pts.length < 2) return [];
+    if (v >= 1) return pts;
+    const d = []; let tot = 0;
+    for (let i = 1; i < pts.length; i++){ const l = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); d.push(l); tot += l; }
+    let rem = v*tot; const out = [pts[0]];
+    for (let i = 0; i < d.length; i++){
+      if (rem >= d[i]){ out.push(pts[i+1]); rem -= d[i]; continue; }
+      out.push(mix(pts[i], pts[i+1], d[i] ? rem/d[i] : 0)); break;
+    }
+    return out;
+  }
+  const line = (pts, v = 1) => { const q = partial(pts, v); return q.length > 1 ? HL.open(q) : ''; };
+  const ringsOf = (b, r, k) => { const w = Math.min(b[2] - b[0], b[3] - b[1]); return rings(b[0], b[1], b[2], b[3], Math.min(r, w/2), Math.min(k, w*.38)); };
+  const disc = (cx, cy, R) => circ(R, 20).map(q => ({ ...q, u: q.u + cx, v: q.v + cy }));
+  const corners = (x0, y0, z0, x1, y1, z1) => [[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]];
+  const EDGES = [[0,1],[1,2],[2,3],[3,0],[0,4],[1,5],[2,6],[3,7],[4,5],[5,6],[6,7],[7,4]];
+
+  const S = { k: N, now: 0, th1: 0, th2: 0 };
+  const G = (gate, dl = 0) => ({ gate, dl, t: tween(gate(N) ? 1 : 0) });
+  const val = e => { tset(e.t, e.gate(S.k) ? 1 : 0, S.now, e.dl); return tval(e.t, S.now); };
+  const from = (a, b = Infinity) => k => k >= a && k < b;
+
+  /* The mode's small rotation, applied in full above the pile heads and fading to nothing at the pile tips. */
+  function W(x, y, z){
+    if (!S.th1 && !S.th2) return [x, y, z];
+    const f = z >= 0 ? 1 : clamp((z - ZT)/(-ZT), 0, 1);
+    const y1 = y + S.th1*z, z1 = z - S.th1*(y - YC), x2 = x - S.th2*(y1 - YC), y2 = y1 + S.th2*(x - XC);
+    return [lerp(x, x2, f), lerp(y, y2, f), lerp(z, z1, f)];
+  }
+
+  function build(svg){
+    const C = Cam(45, 0.5, 1.6);
+    fit(C, [[-4,-4,ZT],[FX+4,FY+4,ZT],[FX+4,-4,ZT],[-4,FY+4,ZT],[0,0,92],[FX,FY,FZ],[FX,0,FZ]], 200, 166);
+    const P = proj(C), front = facing(C), g = mk('g', {}, svg), Pw = (x, y, z) => P(...W(x, y, z));
+    const M = { P, Pw, front, C };
+    let seed = 5; const rnd = () => (seed = (seed*16807) % 2147483647)/2147483647;
+    const dots = (n, at) => Array.from({ length: n }, () => { const p = at(rnd(), rnd()), big = rnd() < .22;
+      const el = mk('circle', { r: big ? .9 : .55, class: big ? 'dot m' : 'dot off' }, g); place(el, P(...p));
+      return { el, s: G(from(13, 14), Math.hypot(p[0], FY - p[1], PZ - p[2])/FX*800) }; });
+    const Kf = corners(0, 0, 0, FX, FY, FZ), Kp = corners(PX0, PY0, FZ, PX1, PY1, PZ);
+
+    for (let i = 0; i <= 6; i++) for (let j = 0; j <= 4; j++) place(flatDot(g, C, .5, 'dot off'), P(i*FX/6, j*FY/4, ZT));
+    M.piles = [];
+    [20, 60, 100].forEach((x, i) => [18, 62].forEach((y, j) => M.piles.push({ x, y, i, j })));
+    M.piles.sort((a, b) => (a.x + a.y) - (b.x + b.y)).forEach(p => { p.ring = disc(p.x, p.y, 5); p.inner = disc(p.x, p.y, 4.2); p.el = solid(g); p.s = G(from(16), (p.i + p.j)*110); });
+
+    M.area = mk('path', { class: 'sil' }, g); M.areaS = G(from(6, 8));
+    M.foot = solid(g); M.footS = G(from(7)); M.footR = ringsOf([0, 0, FX, FY], 3, 1.4);
+    M.fmesh = [];
+    for (let x = 10; x < FX; x += 10) M.fmesh.push({ w: [[x, .8, FZ], [x, FY, FZ], [x, FY, .8]], s: G(from(14), x*3) });
+    for (let y = 10; y < FY; y += 10) M.fmesh.push({ w: [[.8, y, FZ], [FX, y, FZ], [FX, y, .8]], s: G(from(14), 200 + y*3) });
+    M.fmesh.push({ w: [[.8, FY, FZ/2], [FX, FY, FZ/2], [FX, .8, FZ/2]], s: G(from(14), 520) });
+    M.fmesh.forEach(l => { l.el = mk('path', { class: 'nf' }, g); });
+    M.agg = dots(46, (a, b) => [3 + a*(FX - 6), FY, 1.5 + b*(FZ - 3)]).concat(dots(30, (a, b) => [FX, 3 + a*(FY - 6), 1.5 + b*(FZ - 3)]));
+
+    M.outline = [
+      { w: [[0, 0, 0], [FX, 0, 0], [FX, FY, 0], [0, FY, 0], [0, 0, 0]], s: G(from(1, 7)), ph: 1 },
+      { w: [[PX0, PY0, FZ], [PX1, PY0, FZ], [PX1, PY1, FZ], [PX0, PY1, FZ], [PX0, PY0, FZ]], s: G(from(2, 9)), ph: 2 },
+    ];
+    M.outline.forEach(o => { o.el = mk('path', { class: 'nf dash' }, g); });
+
+    M.bolts = [];
+    [28, 60, 92].forEach((x, i) => [26, 54].forEach((y, j) => M.bolts.push({ x, y, s: G(from(8), (i + j)*90) })));
+    M.bolts.forEach(b => { b.low = mk('path', { class: 'nf sil' }, g); });
+    M.ped = solid(g); M.pedS = G(from(9)); M.pedR = ringsOf([PX0, PY0, PX1, PY1], 3, 1.2);
+    M.pmesh = [];
+    for (let x = 30; x < PX1; x += 10) M.pmesh.push({ w: [[x, PY1, PZ], [x, PY1, FZ + .8]], s: G(from(15), (x - 30)*4) });
+    for (let y = 26; y < PY1; y += 9) M.pmesh.push({ w: [[PX1, y, PZ], [PX1, y, FZ + .8]], s: G(from(15), 300 + (y - 26)*5) });
+    [24, 34].forEach((z, i) => M.pmesh.push({ w: [[PX0 + 1.2, PY1, z], [PX1, PY1, z], [PX1, PY0 + 1.2, z]], s: G(from(15), 420 + i*90) }));
+    M.pmesh.forEach(l => { l.el = mk('path', { class: 'nf' }, g); });
+    M.agg = M.agg.concat(dots(40, (a, b) => [PX0 + 3 + a*(PX1 - PX0 - 6), PY1, FZ + 2 + b*(PZ - FZ - 4)]), dots(18, (a, b) => [PX1, PY0 + 3 + a*(PY1 - PY0 - 6), FZ + 2 + b*(PZ - FZ - 4)]));
+    M.bolts.forEach(b => { b.up = mk('path', { class: 'nf sil' }, g); });
+
+    M.grout = solid(g); M.groutS = G(from(10)); M.groutR = ringsOf([26, 22, 94, 58], 2, .8);
+    M.plate = solid(g); M.plateS = G(from(11)); M.plateR = ringsOf([24, 20, 96, 60], 2, .8);
+    M.bolts.slice().sort((a, b) => (a.x + a.y) - (b.x + b.y)).forEach(b => { b.nut = solid(g); b.ns = G(from(12), (b.x + b.y)*3); b.ring = disc(b.x, b.y, 2.3); b.inner = disc(b.x, b.y, 1.5); });
+    M.bolts.forEach(b => { b.tip = mk('path', { class: 'nf sil' }, g); });
+
+    const pump = G(from(17)), motor = G(from(18)), coup = G(from(19));
+    M.mach = [
+      { kind: 'cyl', x0: 16, x1: 19, y: YC, z: AX, R: 8, s: pump, dz: 0 },
+      { kind: 'cyl', x0: 19, x1: 30, y: YC, z: AX, R: 6, s: pump, dz: 0 },
+      { kind: 'box', b: [31, 33, 43, 47], z0: ZB, z1: ZB + 4, s: pump },
+      { kind: 'cyl', x0: 30, x1: 44, y: YC, z: AX, R: 13, s: pump, mark: true },
+      { kind: 'vcyl', x: 37, y: YC, z0: AX + 11, z1: AX + 21, R: 5, s: pump },
+      { kind: 'vcyl', x: 37, y: YC, z0: AX + 21, z1: AX + 23, R: 7.5, s: pump },
+      { kind: 'cyl', x0: 44, x1: 56, y: YC, z: AX, R: 4, s: coup },
+      { kind: 'box', b: [60, 30, 88, 50], z0: ZB, z1: ZB + 4, s: motor },
+      { kind: 'cyl', x0: 56, x1: 92, y: YC, z: AX + .5, R: 14, s: motor, fins: [.15, .6, 1.05, 1.5] },
+      { kind: 'cyl', x0: 92, x1: 97, y: YC, z: AX + .5, R: 12, s: motor },
+    ];
+    M.mach.forEach(m => {
+      m.el = solid(g);
+      if (m.kind === 'box') [m.ring, m.inner] = ringsOf(m.b, 1.4, .7);
+      if (m.kind === 'vcyl'){ m.ring = disc(m.x, m.y, m.R); m.inner = disc(m.x, m.y, m.R - .8); }
+      if (m.fins) m.fin = mk('path', { class: 'nf lo' }, m.el.g);
+    });
+    M.orbits = [{ x: 48, R: 7, ph: 0 }, { x: 99.5, R: 6, ph: 1.7 }].map(o => ({ ...o, el: mk('path', { class: 'nf dash' }, g), dot: mk('circle', { r: 1.4, class: 'dot' }, g), s: G(from(19), o.ph*120) }));
+    M.mach[7].el.g.before(M.orbits[0].el, M.orbits[0].dot); // the pump-side orbit sits behind the motor
+
+    const hidden = new Set([0, 3, 4]);
+    M.wire = [
+      ...EDGES.map((e, i) => ({ a: Kf[e[0]], b: Kf[e[1]], hid: hidden.has(i), s: G(from(5, 7), (i >> 2)*200 + (i & 3)*50) })),
+      ...EDGES.map((e, i) => ({ a: Kp[e[0]], b: Kp[e[1]], hid: hidden.has(i), s: G(from(5, 9), 500 + (i >> 2)*200 + (i & 3)*50) })),
+    ];
+    M.wire.forEach(w => { w.el = mk('path', { class: 'nf sil' }, g); });
+    M.kps = [
+      ...Kf.map((p, n) => ({ p, ph: 3, s: G(from(3, 7), (n & 3)*90 + (n >> 2)*200) })),
+      ...Kp.map((p, n) => ({ p, ph: 4, s: G(from(4, 9), (n & 3)*90 + (n >> 2)*200) })),
+    ];
+    M.kps.forEach(q => { q.drop = mk('path', { class: 'nf dash' }, g); q.el = mk('circle', { r: 1.6, class: 'dot m' }, g); });
+    M.m1 = tween(0); M.m2 = tween(1);
+    return M;
+  }
+  return { FX, FY, FZ, PX0, PX1, PY0, PY1, PZ, ZT, ZB, AX, N, STAGES, DETAIL, S, setD, cls, show, mix, line, val, build };
+})();
+</script>
+<script>
+/* Drawing. Horizontal cylinders (volute, nozzle, coupling, motor) are the hull of two rings, with the near
+   end cap as their crease; the rest are HL prisms. */
+(() => {
+  const { prism, hull, poly, open, fillet, tset, tval, place, reducedMotion } = HL;
+  const { FX, FY, FZ, PZ, ZT, ZB, AX, S, setD, cls, show, mix, line, val } = PP;
+  const putc = (el, s) => {
+    if (el._s !== s.sil){ el._s = s.sil; el.sil.setAttribute('d', s.sil); }
+    if (el._k !== s.crease){ el._k = s.crease; el.cr.setAttribute('d', s.crease); }
+  };
+  const cyl = (Pw, x0, x1, yc, zc, R) => {
+    const ring = x => Array.from({ length: 24 }, (_, i) => { const a = i/24*2*Math.PI; return Pw(x, yc + R*Math.cos(a), zc + R*Math.sin(a)); });
+    const a = ring(x0), b = ring(x1);
+    return { sil: poly(hull(a.concat(b))), crease: poly(b) };
+  };
+  const PH = [17, 17, 17, 17, 17, 17, 19, 18, 18, 18], OMEGA = 2*Math.PI/1.1;
+
+  PP.draw = M => {
+    const { P, Pw, front } = M, k = S.k;
+    tset(M.m1, k === 20 ? 1 : 0, S.now, 0); tset(M.m2, k === 21 ? 1 : 0, S.now, 0);
+    const a1 = tval(M.m1, S.now), a2 = tval(M.m2, S.now), osc = reducedMotion() ? 1 : Math.sin(S.now/1000*OMEGA);
+    S.th1 = .05*a1*osc; S.th2 = .05*a2*osc;
+
+    M.piles.forEach(p => { const v = val(p.s), on = v > .001; show(p.el.g, on); if (on) putc(p.el, prism(Pw, front, p.ring, p.inner, ZT*v, 0)); cls(p.el.sil, k === 16 ? 'sil hi' : 'sil'); });
+
+    const va = val(M.areaS), vf = val(M.footS);
+    show(M.area, va > .001 && vf < .02);
+    if (va > .001) setD(M.area, poly(fillet([P(0, 0, 0), P(FX, 0, 0), P(FX, FY*va, 0), P(0, FY*va, 0)], [2, 2, 2, 2])));
+    cls(M.area, k === 6 ? 'hi' : 'sil');
+    show(M.foot.g, vf > .001);
+    if (vf > .001) putc(M.foot, prism(Pw, front, M.footR[0], M.footR[1], 0, Math.max(.6, FZ*vf)));
+    cls(M.foot.sil, k === 7 ? 'sil hi' : 'sil');
+    M.fmesh.forEach(l => setD(l.el, line(l.w.map(p => Pw(...p)), val(l.s))));
+    M.agg.forEach(d => show(d.el, val(d.s) > .5));
+    M.outline.forEach(o => { setD(o.el, line(o.w.map(p => P(...p)), val(o.s))); cls(o.el, k === o.ph ? 'nf dash hi' : 'nf dash'); });
+
+    M.bolts.forEach(b => {
+      b.v = val(b.s); const dz = 30*(1 - b.v);
+      setD(b.low, b.v > .001 ? open([Pw(b.x + 3, b.y, 18 + dz), Pw(b.x, b.y, 18 + dz), Pw(b.x, b.y, PZ + dz)]) : '');
+      cls(b.low, k === 8 ? 'nf hi' : 'nf sil');
+    });
+    const vp = val(M.pedS), ztop = vp > .001 ? FZ + (PZ - FZ)*vp : 18;
+    show(M.ped.g, vp > .001);
+    if (vp > .001) putc(M.ped, prism(Pw, front, M.pedR[0], M.pedR[1], FZ, ztop));
+    cls(M.ped.sil, k === 9 ? 'sil hi' : 'sil');
+    M.pmesh.forEach(l => setD(l.el, line(l.w.map(p => Pw(...p)), val(l.s))));
+    M.bolts.forEach(b => {
+      const dz = 30*(1 - b.v);
+      setD(b.up, b.v > .001 ? line([Pw(b.x, b.y, Math.max(ztop, 18 + dz)), Pw(b.x, b.y, 53.5 + dz)]) : '');
+      cls(b.up, k === 8 ? 'nf hi' : 'nf sil');
+    });
+
+    const vg = val(M.groutS), vpl = val(M.plateS);
+    show(M.grout.g, vg > .001);
+    if (vg > .001){ const dz = 16*(1 - vg); putc(M.grout, prism(Pw, front, M.groutR[0], M.groutR[1], PZ + dz, PZ + 2 + dz)); }
+    cls(M.grout.sil, k === 10 ? 'sil hi' : 'sil');
+    show(M.plate.g, vpl > .001);
+    if (vpl > .001){ const dz = 20*(1 - vpl); putc(M.plate, prism(Pw, front, M.plateR[0], M.plateR[1], PZ + 2 + dz, ZB + dz)); }
+    cls(M.plate.sil, k === 11 ? 'sil hi' : 'sil');
+    M.bolts.forEach(b => {
+      const v = val(b.ns), on = v > .001; show(b.nut.g, on);
+      if (on){ const dz = 12*(1 - v); putc(b.nut, prism(Pw, front, b.ring, b.inner, ZB + dz, ZB + 2.5 + dz)); }
+      cls(b.nut.sil, k === 12 ? 'sil hi' : 'sil');
+      const z0 = v > .99 ? ZB + 2.5 : vpl > .99 ? ZB : vg > .99 ? PZ + 2 : null;
+      setD(b.tip, b.v > .99 && z0 !== null ? line([Pw(b.x, b.y, z0), Pw(b.x, b.y, 53.5)]) : '');
+      cls(b.tip, k === 12 ? 'nf hi' : 'nf sil');
+    });
+
+    M.mach.forEach((m, i) => {
+      const v = val(m.s), on = v > .001; show(m.el.g, on);
+      if (on){
+        const dz = 22*(1 - v);
+        if (m.kind === 'cyl') putc(m.el, cyl(Pw, m.x0, m.x1, m.y, m.z + dz, m.R));
+        else putc(m.el, prism(Pw, front, m.ring, m.inner, m.z0 + dz, m.z1 + dz));
+        if (m.fin) setD(m.fin, m.fins.map(a => { const y = m.y + m.R*Math.cos(a), z = m.z + dz + m.R*Math.sin(a); return line([Pw(m.x0 + 2, y, z), Pw(m.x1 - 2, y, z)]); }).join(''));
+      }
+      cls(m.el.sil, k === PH[i] ? 'sil hi' : 'sil');
+    });
+    const th = reducedMotion() ? .8 : S.now/1000*2*Math.PI*1.1;
+    M.orbits.forEach(o => {
+      const v = val(o.s), R = o.R*v;
+      setD(o.el, v > .001 ? poly(Array.from({ length: 18 }, (_, i) => { const a = i/18*2*Math.PI; return Pw(o.x, 40 + R*Math.cos(a), AX + R*Math.sin(a)); })) : '');
+      show(o.dot, v > .5);
+      if (v > .5) place(o.dot, Pw(o.x, 40 + R*Math.cos(th + o.ph), AX + R*Math.sin(th + o.ph)));
+    });
+
+    M.wire.forEach((w, i) => { const v = val(w.s); setD(w.el, line([P(...w.a), P(...mix(w.a, w.b, v))])); cls(w.el, w.hid ? 'nf dash' : k === 5 ? 'nf hi' : 'nf sil'); });
+    let newest = -1;
+    M.kps.forEach((q, n) => {
+      const v = val(q.s), [x, y, z0] = q.p, z = z0 + 20*(1 - v);
+      show(q.el, v > .001); place(q.el, P(x, y, z));
+      setD(q.drop, v > .001 && v < .999 ? line([P(x, y, ZT), P(x, y, z)]) : '');
+      if (k === q.ph) newest = n;
+    });
+    M.kps.forEach((q, n) => cls(q.el, n === newest ? 'dot' : 'dot m'));
+  };
+})();
+</script>
+<script>
+/* An industrial building substructure: walls and slabs on grade, no footings. Rooms: production hall at
+   +1'-0" (one foot above grade), loading dock at +4'-0", office at +1'-6", and a process pit at -3'-0"
+   inside the hall with its own walls and floor slab. Heights are drawn at 5 units per foot against a
+   160 x 100 plan. Five stages, 10 phases; the grade outline stays on screen throughout. */
+const BS = (() => {
+  const { Cam, fit, proj, facing, rings, lerp, tween, tset, tval, mk, solid, place, flatDot, open, prism } = HL;
+  const FT = 5, TS = 2.5, ZW = -17.5, N = 10;
+  const FF = { hall: FT, dock: 4*FT, office: 1.5*FT, pit: -3*FT };
+  const STAGES = [['slabs',1],['walls',3],['slab on grade',5],['materials',8],['mesh',9]];
+  const DETAIL = ['grade ±0′-0″','slab outlines 4','FF +1′ +4′ +1.5′ −3′','walls','pit walls','hall +1′-0″','dock +4′ · office +1′-6″',
+    'pit −3′-0″','concrete','slabs','walls'];
+  const setD = (el, d) => { if (el._d !== d){ el._d = d; el.setAttribute('d', d); } };
+  const cls = (el, c) => { if (el._c !== c){ el._c = c; el.setAttribute('class', c); } };
+  const show = (el, on) => { const v = on ? '' : 'none'; if (el._v !== v){ el._v = v; el.style.display = v; } };
+  const mix = (a, b, t) => a.map((v, i) => lerp(v, b[i], t));
+  function partial(pts, v){
+    if (v <= 0 || pts.length < 2) return [];
+    if (v >= 1) return pts;
+    const d = []; let tot = 0;
+    for (let i = 1; i < pts.length; i++){ const l = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); d.push(l); tot += l; }
+    let rem = v*tot; const out = [pts[0]];
+    for (let i = 0; i < d.length; i++){
+      if (rem >= d[i]){ out.push(pts[i+1]); rem -= d[i]; continue; }
+      out.push(mix(pts[i], pts[i+1], d[i] ? rem/d[i] : 0)); break;
+    }
+    return out;
+  }
+  const line = (pts, v = 1) => { const q = partial(pts, v); return q.length > 1 ? open(q) : ''; };
+  const ringsOf = (b, r, k) => { const w = Math.min(b[2] - b[0], b[3] - b[1]); return rings(b[0], b[1], b[2], b[3], Math.min(r, w/2), Math.min(k, w*.38)); };
+  const putc = (el, s) => {
+    if (el._s !== s.sil){ el._s = s.sil; el.sil.setAttribute('d', s.sil); }
+    if (el._k !== s.crease){ el._k = s.crease; el.cr.setAttribute('d', s.crease); }
+  };
+
+  const S = { k: N, now: 0 };
+  const G = (gate, dl = 0) => ({ gate, dl, t: tween(gate(N) ? 1 : 0) });
+  const val = e => { tset(e.t, e.gate(S.k) ? 1 : 0, S.now, e.dl); return tval(e.t, S.now); };
+  const from = (a, b = Infinity) => k => k >= a && k < b;
+  const ctr = b => (b[0] + b[2] + b[1] + b[3])/2;
+
+  function build(svg){
+    const C = Cam(45, 0.5, 1.75);
+    fit(C, [[-8,-8,0],[168,108,0],[168,-8,0],[-8,108,0],[100,0,FF.dock],[160,0,FF.dock],[160,100,ZW],[0,100,ZW]], 200, 164);
+    const P = proj(C), front = facing(C), g = mk('g', {}, svg), M = { P, front, C };
+    const paths = (arr, c) => arr.forEach(l => { l.el = mk('path', { class: c }, g); });
+    const groundDots = keep => { for (let i = 0; i <= 11; i++) for (let j = 0; j <= 7; j++){ const x = -8 + i*16, y = -8 + j*116/7;
+      if (keep(x, y)) place(flatDot(g, C, .5, 'dot off'), P(x, y, 0)); } };
+    const outside = (x, y) => x < 0 || y < 0 || x > 160 || y > 100;
+
+    groundDots((x, y) => outside(x, y) && (x < 0 || y < 0));
+    M.gradeBack = [{ w: [[-8, 108, 0], [-8, -8, 0], [168, -8, 0]], s: G(from(0)) }]; paths(M.gradeBack, 'nf dash');
+
+    M.boxes = [];
+    const box = (b, z0, z1, o) => {
+      const it = { b, z0, z1, mode: o.mode || 'drop', s: G(o.gate, o.dl || 0), ph: o.ph, key: o.key ?? ctr(b) };
+      [it.ring, it.inner] = ringsOf(b, 1.2, .6); return it;
+    };
+    const add = list => list.forEach(it => { it.el = solid(g); M.boxes.push(it); });
+
+    add([box([25, 62, 55, 88], FF.pit - TS, FF.pit, { gate: from(7), ph: 7 })]);
+    const walls = [
+      [[0, 0, 98.5, 3], FF.hall], [[98.5, 0, 160, 3], FF.dock], [[0, 3, 3, 97], FF.hall], [[0, 97, 98.5, 100], FF.hall],
+      [[98.5, 97, 160, 100], FF.office], [[157, 3, 160, 61.5], FF.dock], [[157, 61.5, 160, 97], FF.office],
+      [[98.5, 3, 101.5, 61.5], FF.dock], [[98.5, 61.5, 101.5, 97], FF.office], [[101.5, 58.5, 157, 61.5], FF.dock],
+    ].map(([b, ff]) => box(b, ZW, ff - TS, { gate: from(3), dl: ctr(b)*2.2, ph: 3, mode: 'rise' }));
+    [[22, 59, 58, 62], [22, 62, 25, 88], [55, 62, 58, 88], [22, 88, 58, 91]].forEach((b, i) =>
+      walls.push(box(b, FF.pit - TS, FF.hall - TS, { gate: from(4), dl: i*110, ph: 4, mode: 'rise' })));
+    add(walls.sort((a, b) => a.key - b.key));
+    add([box([98.5, 0, 160, 61.5], FF.dock - TS, FF.dock, { gate: from(6), ph: 6 })]);
+    add([[0, 0, 98.5, 62], [0, 62, 25, 88], [55, 62, 98.5, 88], [0, 88, 98.5, 100]].map((b, i) => box(b, FF.hall - TS, FF.hall, { gate: from(5), dl: i*110, ph: 5 })));
+    add([box([98.5, 61.5, 160, 100], FF.office - TS, FF.office, { gate: from(6), dl: 200, ph: 6 })]);
+
+    M.mesh = [];
+    const meshRect = (b, z, dl) => {
+      for (let x = Math.ceil((b[0] + 1)/12.5)*12.5; x < b[2] - 1; x += 12.5) M.mesh.push({ w: [[x, b[1] + .8, z], [x, b[3] - .2, z]], ph: 9, s: G(from(9), dl + x*2.4) });
+      for (let y = Math.ceil((b[1] + 1)/12.5)*12.5; y < b[3] - 1; y += 12.5) M.mesh.push({ w: [[b[0] + .8, y, z], [b[2] - .2, y, z]], ph: 9, s: G(from(9), dl + 220 + y*2.4) });
+    };
+    meshRect([98.5, 0, 160, 61.5], FF.dock, 0); meshRect([25, 62, 55, 88], FF.pit, 100);
+    [[0, 0, 98.5, 62], [0, 62, 25, 88], [55, 62, 98.5, 88], [0, 88, 98.5, 100]].forEach(b => meshRect(b, FF.hall, 60));
+    meshRect([98.5, 61.5, 160, 100], FF.office, 160);
+    for (let x = 12.5; x < 160; x += 12.5) M.mesh.push({ w: [[x, 100, (x < 98.5 ? FF.hall : FF.office) - TS], [x, 100, ZW + .6]], ph: 10, s: G(from(10), x*3) });
+    for (let y = 12.5; y < 100; y += 12.5) M.mesh.push({ w: [[160, y, (y < 61.5 ? FF.dock : FF.office) - TS], [160, y, ZW + .6]], ph: 10, s: G(from(10), 480 + y*3) });
+    [-10, -2.5].forEach((z, i) => M.mesh.push({ w: [[1.2, 100, z], [160, 100, z], [160, 1.2, z]], ph: 10, s: G(from(10), 300 + i*120) }));
+    paths(M.mesh, 'nf');
+
+    let seed = 3; const rnd = () => (seed = (seed*16807) % 2147483647)/2147483647;
+    M.agg = [];
+    const dots = (n, at) => { for (let i = 0; i < n; i++){ const p = at(rnd(), rnd()), big = rnd() < .22;
+      const el = mk('circle', { r: big ? .85 : .5, class: big ? 'dot m' : 'dot off' }, g); place(el, P(...p));
+      M.agg.push({ el, s: G(from(8, 9), Math.hypot(p[0], 100 - p[1])*4) }); } };
+    dots(70, (a, b) => [2 + a*156, 100, ZW + 1 + b*(FF.hall - TS - ZW - 2)]);
+    dots(44, (a, b) => [160, 2 + a*96, ZW + 1 + b*(FF.office - TS - ZW - 2)]);
+    dots(16, (a, b) => [102 + a*54, 61.5, FF.office + 1 + b*(FF.dock - FF.office - 2)]);
+
+    M.gradeWall = [{ w: [[0, 100, 0], [160, 100, 0], [160, 0, 0]], s: G(from(3)) }]; paths(M.gradeWall, 'nf sil');
+    M.gradeFront = [{ w: [[-8, 108, 0], [168, 108, 0], [168, -8, 0]], s: G(from(0)) }]; paths(M.gradeFront, 'nf dash');
+    groundDots((x, y) => outside(x, y) && !(x < 0 || y < 0));
+    const rect = (b, z) => [[b[0], b[1], z], [b[2], b[1], z], [b[2], b[3], z], [b[0], b[3], z], [b[0], b[1], z]];
+    M.rooms = [[[0, 0, 98.5, 100], FF.hall], [[98.5, 0, 160, 61.5], FF.dock], [[98.5, 61.5, 160, 100], FF.office], [[25, 62, 55, 88], FF.pit]]
+      .map(([b, z], i) => ({ w: rect(b, z), s: G(from(1, 5), i*140) }));
+    paths(M.rooms, 'nf sil');
+    M.marks = [[166, 0, FF.dock], [166, 100, FF.office], [55, 88, FF.pit]].map(([x, y, z], i) => ({ x, y, z, s: G(from(2, 5), 150 + i*150),
+      el: mk('path', { class: 'nf dash' }, g), dot: mk('circle', { r: 1.5, class: 'dot m' }, g) }));
+    M.foot1 = { s: G(from(2)), el: mk('path', { class: 'nf sil' }, g), dot: mk('circle', { r: 1.5, class: 'dot' }, g) };
+    return M;
+  }
+
+  function draw(M){
+    const { P, front } = M, k = S.k;
+    const guide = (l, hiAt, base) => { setD(l.el, line(l.w.map(p => P(...p)), val(l.s))); cls(l.el, k === hiAt ? base + ' hi' : base); };
+    M.gradeBack.forEach(l => guide(l, -1, 'nf dash'));
+    M.boxes.forEach(it => {
+      const v = val(it.s), on = v > .001; show(it.el.g, on);
+      if (on){
+        let z0 = it.z0, z1 = it.z1;
+        if (it.mode === 'rise') z1 = z0 + Math.max(.3, (z1 - z0)*v);
+        else { const dz = 12*(1 - v); z0 += dz; z1 += dz; }
+        putc(it.el, prism(P, front, it.ring, it.inner, z0, z1));
+      }
+      cls(it.el.sil, k === it.ph ? 'sil hi' : 'sil');
+    });
+    M.mesh.forEach(l => { setD(l.el, line(l.w.map(p => P(...p)), val(l.s))); cls(l.el, k === l.ph ? 'nf sil' : 'nf'); });
+    M.agg.forEach(d => show(d.el, val(d.s) > .5));
+    M.gradeWall.forEach(l => guide(l, 5, 'nf sil'));
+    M.gradeFront.forEach(l => guide(l, -1, 'nf dash'));
+    M.rooms.forEach(l => guide(l, 1, 'nf sil'));
+    M.marks.forEach(m => {
+      const v = val(m.s), zt = m.z*v;
+      setD(m.el, v > .001 ? open([P(m.x, m.y, 0), P(m.x, m.y, zt)]) : '');
+      show(m.dot, v > .5); place(m.dot, P(m.x, m.y, zt)); cls(m.dot, k === 2 ? 'dot' : 'dot m');
+    });
+    /* the one-foot step from grade to the hall slab, at the front-left corner */
+    const f = M.foot1, v1 = val(f.s), z1 = FF.hall*v1;
+    setD(f.el, v1 > .001 ? open([P(-1, 100, 0), P(-5, 100, 0), P(-5, 100, z1), P(-1, 100, z1)]) : '');
+    show(f.dot, v1 > .5); place(f.dot, P(-5, 100, z1));
+    cls(f.el, k === 2 || k === 5 ? 'nf hi' : 'nf sil');
+  }
+  return { N, STAGES, DETAIL, S, build, draw };
+})();
+</script>
+<script>
+/* One playback for every sequence on the page. Each section keeps its own clock: the loop opens on the
+   finished model, un-builds and builds again; moving across the drawing scrubs it by the pointer's x;
+   the rail jumps to a stage. All figures share the kernel's single frame loop, which sleeps offscreen. */
+(() => {
+  const { register, pointer, reducedMotion, mk, inject, clamp } = HL;
+  inject(document);
+  const FIGS = { beam: BEAM, turbine: TG, pump: PP, substructure: BS };
+
+  function mount(fig, root, DW, HOLD){
+    const { N, STAGES, DETAIL, S } = fig;
+    const stage = root.querySelector('.stage'), rail = root.querySelector('.rail');
+    const nameEl = root.querySelector('.tag-name'), readEl = root.querySelector('.tag-read');
+    const svg = mk('svg', { viewBox: '0 0 400 320', 'aria-hidden': 'true' }, stage);
+    const M = fig.build(svg), CYC = (N + 1)*DW + HOLD;
+    let t0 = null, man = null, shown = -1, R = null;
+    const at = now => {
+      if (man !== null) return man;
+      if (reducedMotion()) return N;
+      if (t0 === null) t0 = now - N*DW;
+      return Math.min(N, Math.floor(((now - t0) % CYC)/DW));
+    };
+    const stageOf = k => STAGES.reduce((s, [, k0], i) => (k >= k0 ? i : s), -1);
+    const btns = STAGES.map(([name, k0], i) => {
+      const li = document.createElement('li'), b = document.createElement('button'), s = document.createElement('span');
+      b.type = 'button'; s.textContent = String(i + 1).padStart(2, '0') + ' ' + name; b.append(s);
+      b.addEventListener('click', () => { if (reducedMotion()) man = k0; else { man = null; t0 = performance.now() - k0*DW; } R && R.wake(); });
+      li.append(b); rail.append(li); return b;
+    });
+    function ui(k){
+      if (k === shown) return; shown = k;
+      const s = stageOf(k);
+      nameEl.textContent = s < 0 ? '00  start' : String(s + 1).padStart(2, '0') + '  ' + STAGES[s][0];
+      readEl.textContent = DETAIL[k];
+      btns.forEach((b, i) => { if (i === s) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); b.classList.toggle('done', i < s); });
+    }
+    R = register(stage, (dt, now) => { S.now = now; S.k = at(now); ui(S.k); fig.draw(M); return !reducedMotion(); });
+    const pick = p => { man = clamp(Math.round((p[0] - 24)/352*N), 0, N); R.wake(); };
+    pointer(stage, { move: pick, down: pick, leave: () => { if (man !== null && !reducedMotion()) t0 = performance.now() - man*DW; man = null; R.wake(); } });
+  }
+
+  document.querySelectorAll('[data-sequence]').forEach(root => {
+    const fig = FIGS[root.dataset.sequence];
+    if (!fig) return;
+    try { mount(fig, root, Number(root.dataset.dwell) || 1100, Number(root.dataset.hold) || 3600); }
+    catch (e) { console.error(root.dataset.sequence, e); }
+  });
+
+  /* light or dark: the system's until the switch is pressed, then the switch's, remembered on this device */
+  const doc = document.documentElement, btn = document.getElementById('theme');
+  const dark = () => (doc.dataset.theme ? doc.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches);
+  const label = () => { btn.textContent = dark() ? 'dark' : 'light'; };
+  try { const saved = localStorage.getItem('si-theme'); if (saved === 'light' || saved === 'dark') doc.dataset.theme = saved; } catch (e) {}
+  btn.addEventListener('click', () => {
+    doc.dataset.theme = dark() ? 'light' : 'dark'; label();
+    try { localStorage.setItem('si-theme', doc.dataset.theme); } catch (e) {}
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+  label();
+})();
+</script>
+</body>
+</html>
