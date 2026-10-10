@@ -1,0 +1,1102 @@
+<title>Wide Flange Limit States</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&display=swap">
+<style>
+/* Layout: a header with the index, then the four sequences in a two-column grid that drops to one column.
+   Each sequence is a 5:4 plate with its stage rail underneath. Black and white only: white on black in
+   dark, black on white in light, following the system unless the switch says otherwise. */
+:root{
+  color-scheme:light;
+  --ground:#ffffff; --ink:#000000; --muted:#6c6c6c; --line:#e4e4e4;
+  --hairline-plate:#ffffff; --hairline-hi:#000000; --hairline-edge:#6a6a6a; --hairline-mid:#adadad; --hairline-lo:#dedede; --hairline-stroke:0.9;
+  --f-sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#000000; --ink:#ffffff; --muted:#8c8c8c; --line:#1e1e1e;
+    --hairline-plate:#000000; --hairline-hi:#ffffff; --hairline-edge:#8e8e8e; --hairline-mid:#4c4c4c; --hairline-lo:#262626;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#000000; --ink:#ffffff; --muted:#8c8c8c; --line:#1e1e1e;
+  --hairline-plate:#000000; --hairline-hi:#ffffff; --hairline-edge:#8e8e8e; --hairline-mid:#4c4c4c; --hairline-lo:#262626;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ground);color:var(--ink);font:13px/1.5 var(--f-sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:clamp(16px,3vw,40px);padding-block:40px 64px;display:grid;gap:40px}
+.wrap > *{min-width:0}
+.top{display:grid;gap:18px}
+.title{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+h1{margin:0;font:300 clamp(30px,4vw,48px)/1.02 var(--f-sans);letter-spacing:-.025em}
+.top p{margin:0;max-width:62ch;color:var(--muted);font-size:14px;text-wrap:pretty}
+.toc{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0;padding:14px 0 0;border-top:1px solid var(--line);list-style:none;font:11.5px/1.3 var(--f-mono)}
+.toc a{display:inline-flex;gap:8px;color:var(--ink);text-decoration:none}
+.toc a span{color:var(--muted)}
+.toc a:hover span,.toc a:focus-visible span{color:var(--ink)}
+.switch{height:30px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);font:11px/1 var(--f-mono);cursor:pointer}
+.switch:hover{border-color:var(--muted)}
+.seqs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,540px),1fr));gap:56px 28px}
+.seq{display:grid;gap:14px;align-content:start;min-width:0;scroll-margin-top:24px}
+@supports (grid-template-rows:subgrid){.seq{grid-row:span 3;grid-template-rows:subgrid;row-gap:14px}.seq-head{align-self:end}}
+@media (min-width:1200px){.seq:last-child:nth-child(odd){grid-column:1 / -1;justify-self:center;width:calc(50% - 14px)}}
+.seq > *{min-width:0}
+.seq-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
+.seq-head .num{font:11px/1 var(--f-mono);color:var(--muted)}
+.seq-head h2{margin:0;font:400 22px/1.15 var(--f-sans);letter-spacing:-.01em}
+.seq-head p{grid-column:2;margin:0;color:var(--muted);font-size:13.5px;text-wrap:pretty}
+.plate{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--ground)}
+.tag{position:absolute;top:14px;z-index:1;font:11px/1 var(--f-mono);letter-spacing:.02em;color:var(--muted);pointer-events:none}
+.tag-name{left:16px}
+.tag-read{right:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.rail{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:14px 8px}
+.rail button{width:100%;display:grid;gap:7px;padding:0;border:0;background:none;color:var(--muted);cursor:pointer;text-align:left;font:11px/1.2 var(--f-mono);letter-spacing:.01em}
+.rail button::before{content:"";display:block;height:1px;background:var(--line);transition:background-color .3s}
+.rail button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rail button:hover{color:var(--ink)}
+.rail button.done::before{background:var(--muted)}
+.rail button[aria-current="step"]{color:var(--ink)}
+.rail button[aria-current="step"]::before{background:var(--ink)}
+.rail button:focus-visible,.switch:focus-visible,.toc a:focus-visible{outline:1.5px solid var(--ink);outline-offset:3px}
+.group{display:grid;gap:28px;padding-top:28px;border-top:1px solid var(--line)}
+.group-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;align-items:baseline}
+.group-head .num{font:11px/1 var(--f-mono);color:var(--muted)}
+.group-head h2{margin:0;font:300 clamp(24px,2.8vw,32px)/1.1 var(--f-sans);letter-spacing:-.02em;text-wrap:balance}
+.group-head p{grid-column:2;margin:0;max-width:68ch;color:var(--muted);font-size:14px;text-wrap:pretty}
+footer{padding-top:16px;border-top:1px solid var(--line);font:11px/1.7 var(--f-mono);color:var(--muted)}
+footer a{color:inherit}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.rail button::before{transition:none}}
+</style>
+<div class="wrap">
+  <header class="top">
+    <div class="title"><h1>Wide flange limit states</h1></div>
+    <p>Flanges and webs with concentrated forces, AISC 360 Section J10. Each figure loops on its own; move across a drawing to scrub it, or pick a stage under it.</p>
+  </header>
+
+  <section class="group" style="border-top:0;padding-top:0" aria-labelledby="j10-h">
+    <div class="group-head"><span class="num">J10</span><h2 id="j10-h">Flanges and webs with concentrated forces</h2><p>AISC 360 Section J10: the six local limit states of a wide-flange member under a concentrated force. Each figure builds the member, its load path and its load, then lets the mechanism develop. Displacements are exaggerated.</p></div>
+    <div class="seqs">
+      <section class="seq" id="flb" data-sequence="flb" data-dwell="1300" data-hold="3400" aria-labelledby="flb-h">
+        <div class="seq-head"><span class="num">06</span><h2 id="flb-h">Flange local bending</h2><p>J10.1 · A plate welded across the flange pulls on it; the flange bends about the web and yield lines form.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="flb" role="img" aria-label="A wide-flange beam is drawn in lines, a plate welded across its top flange is pulled upward, and the flange bends about the web with its tips lifting, forming yield lines."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of flange local bending"></ol>
+      </section>
+      <section class="seq" id="wly" data-sequence="wly" data-dwell="1300" data-hold="3400" aria-labelledby="wly-h">
+        <div class="seq-head"><span class="num">07</span><h2 id="wly-h">Web local yielding</h2><p>J10.2 · The reaction at a bearing support spreads through the flange at 2.5 : 1 and yields the web at the fillet toe over N + 5k.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="wly" role="img" aria-label="A wide-flange beam is drawn in lines on a bearing support with weights at both ends; dashed lines show the reaction spreading at 2.5 to 1, and a band of the web yields at the toe of the fillet."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of web local yielding"></ol>
+      </section>
+      <section class="seq" id="wlc" data-sequence="wlc" data-dwell="1300" data-hold="3400" aria-labelledby="wlc-h">
+        <div class="seq-head"><span class="num">08</span><h2 id="wlc-h">Web local crippling</h2><p>J10.3 · Over a bearing support the web wrinkles just above the flange, and the beam settles into it.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="wlc" role="img" aria-label="A wide-flange beam is drawn in lines on a bearing support with weights at both ends; the web wrinkles just above the bottom flange over the support."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of web local crippling"></ol>
+      </section>
+      <section class="seq" id="wsb" data-sequence="wsb" data-dwell="1300" data-hold="3400" aria-labelledby="wsb-h">
+        <div class="seq-head"><span class="num">09</span><h2 id="wsb-h">Web sidesway buckling</h2><p>J10.4 · With the flanges free to move sideways, the loaded flange swings out and the web bends under it.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="wsb" role="img" aria-label="A wide-flange beam is drawn in lines with a bearing plate and weights on its top flange; the loaded compression flange moves sideways relative to the bottom flange and the web bends."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of web sidesway buckling"></ol>
+      </section>
+      <section class="seq" id="wcb" data-sequence="wcb" data-dwell="1300" data-hold="3400" aria-labelledby="wcb-h">
+        <div class="seq-head"><span class="num">10</span><h2 id="wcb-h">Web compression buckling</h2><p>J10.5 · Equal loads on both flanges at one section bow the web out across its depth.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="wcb" role="img" aria-label="A wide-flange beam is drawn in lines, loaded from above and bearing on a support below at the same section; the web bows out across its depth like a column."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of web compression buckling"></ol>
+      </section>
+      <section class="seq" id="pz" data-sequence="pz" data-dwell="1300" data-hold="3400" aria-labelledby="pz-h">
+        <div class="seq-head"><span class="num">11</span><h2 id="pz-h">Web panel-zone shear</h2><p>J10.6 · An unbalanced beam moment shears the column web between the continuity plates.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="pz" role="img" aria-label="A wide-flange column is drawn in lines with beams framing into both flanges and continuity plates; an unbalanced moment shears the panel zone into a parallelogram and the beams turn with it."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of web panel-zone shear"></ol>
+      </section>
+    </div>
+  </section>
+  <footer>Drawn on the <a href="https://github.com/lucasmarkes/hairline">hairline</a> kernel by Lucas Marques, MIT licence.</footer>
+</div>
+<script>
+/* hairline kernel sha256:8e2abcbdf63c7755195ee942c39e9c8ea6a539d1147e986dd1c153559121f075 */
+/*
+ * HL: everything a figure may call. Read this index; the code under it is the
+ * package's src/core, unchanged, and a figure should not need to read it.
+ *
+ * Every figure is drawn in a 400 × 320 viewBox. World space is x/y on the
+ * ground and z up. Plates are filled with the ground colour and painted back
+ * to front, so a nearer one covers a farther one: append in that order. At
+ * the default camera, Cam(45, 0.5, S), +x runs down to the right and +y down
+ * to the left, so the corner with the largest x and y is nearest the viewer:
+ * append by ascending x + y, from the far corner (smallest x and y) to it.
+ *
+ * Camera
+ *   Cam(azDeg, k, S)                       a camera: azimuth in degrees, k = sin(elevation) (0.5 is the 2:1 view), S = scale
+ *   fit(C, points, cx, cy)                 centres the box of [x, y, z] points on (cx, cy); call it once, before proj
+ *                                          it only centres, it never scales: choose S by trying values, with the most extreme pose in points.
+ *                                          The six figures use S 1.42 to 2.12; the boxes they fit come out 230 to 310 wide and 180 to 245 tall
+ *   proj(C)                                returns P(x, y, z), which gives [sx, sy]
+ *   unproj(C, sx, sy, z)                   the world [x, y] under a screen point, on the plane at height z
+ *   facing(C)                              returns front(sample): whether a ring sample faces the camera
+ * Rounded solids
+ *   rrect(u0, v0, u1, v1, r, n)            a rounded rectangle, as a ring of samples {u, v, nu, nv}
+ *   circ(R, n)                             a circle, as a ring
+ *   rings(x0, y0, x1, y1, r, b)            [ring, inner]: a rounded footprint and its crease ring, inset by b
+ *                                          r, the corner radius, is cut to half the shorter side. b, the crease's inset in world units
+ *                                          (0.6 to 2.2 in the figures), must stay under half the shorter side or the crease turns inside out
+ *   prism(P, front, ring, inner, z0, z1)   {sil, crease}: a solid standing from z0 to z1, as two path strings
+ *   ringAt(P, ring, z)                     the ring's points, projected at height z
+ *   run(ring, keep)                        the one cyclic run of samples that pass keep
+ *   hull(points)                           the convex hull of screen points
+ *   extremes(P, ring)                      [left, right, nearest] samples: where dashed drops fall from
+ *   fillet(points, radii, n)               rounds every vertex of a closed polygon; returns the new points
+ *                                          radii is an array, one radius per vertex, each cut to half its shorter edge; a single number gives NaN.
+ *                                          n is the steps round each corner, default 4: each vertex becomes n + 1 points
+ *   ghost(P, front, ring, z0, depth)       a reflection's path {d, y0, y1}; reflect() draws it for you
+ * Paths and numbers
+ *   poly(points)                           a closed path string
+ *   open(points)                           an open polyline string
+ *   seg(a, b)                              one segment between two screen points [sx, sy], as its own subpath; project world points with P first
+ *   clamp(v, a, b)
+ *   lerp(a, b, t)
+ *   rad(deg)
+ *   r2(n)                                  two decimals
+ * The continuous clock: one spring per moving number
+ *   spring(x, opts)                        at rest on x; write .t to retarget; opts {k, c, m, eps}, default k 100, c 18, m 1
+ *   stepS(sp, dt)                          advances by dt seconds; returns whether it is still moving
+ * The discrete clock: a 700ms tween on (.32, .72, 0, 1)
+ *   tween(v, dur)                          at rest on v; dur defaults to 700 (ms)
+ *   tset(tw, to, now, delay)               retargets from where it is, after delay ms: the stagger
+ *                                          the same target again does nothing, so calling it on every pointer move is safe
+ *   tval(tw, now)                          its value at now
+ *   tdone(tw, now)                         whether it has landed
+ *   bezier(x1, y1, x2, y2)                 a CSS cubic-bezier, as a function of progress
+ *   EASE_LIFT                              the lift curve itself
+ *   reducedMotion()                        true when the reader asked for less motion; springs and tweens already land at once
+ *   setReducedMotion(on)                   the loop's business, not a figure's
+ * Drawing
+ *   mk(tag, attrs, parent)                 one svg element: the only way a figure makes a node
+ *   solid(parent)                          {g, sil, cr}: a group holding a silhouette path and a crease path
+ *   put(solid, paths)                      writes prism()'s {sil, crease} into solid()'s {sil, cr}: sil into sil, crease into cr
+ *   flatDot(parent, C, r, cls)             a dot lying on the ground plane; cls is "dot", "dot m" or "dot off"
+ *   place(el, point)                       moves a dot or a circle to [sx, sy]
+ *   reflect(svg, parent, P, front, ring, z0, depth)   a fading mirror under a solid
+ *   fade(svg, y0, y1, a0)                  a vertical fade, as a mask; returns the value for a mask attribute
+ * Life
+ *   register(stage, tick)                  joins the one frame loop; tick(dt in seconds, now in ms) returns true to ask for another frame; gives {wake, unregister}
+ *   pointer(stage, handlers)               {move(point), down(point), leave()}, points in viewBox units; returns its disposer
+ *   disposer()                             {add, on, dispose}: collects tear-down, so destroy is bag.dispose
+ * The bench's business, not a figure's
+ *   css(lightDark)
+ *   inject(root)
+ *
+ * Classes, on path, polygon, ellipse and line. They are the whole palette; a
+ * figure sets no colour, width or fill of its own.
+ *     (none)   filled with the ground colour, medium stroke
+ *     sil      the silhouette's stroke        hi    the bright stroke: the only highlight
+ *     lo       the dim stroke                 nf    no fill        fo   fill only, no stroke
+ *     dash     a dashed guide
+ *     dot      a bright dot                   dot m   a medium dot     dot off   a dim dot
+ */
+var HL = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // packages/hairline/src/core/kernel.ts
+  var kernel_exports = {};
+  __export(kernel_exports, {
+    Cam: () => Cam,
+    EASE_LIFT: () => EASE_LIFT,
+    bezier: () => bezier,
+    circ: () => circ,
+    clamp: () => clamp,
+    css: () => css,
+    disposer: () => disposer,
+    extremes: () => extremes,
+    facing: () => facing,
+    fade: () => fade,
+    fillet: () => fillet,
+    fit: () => fit,
+    flatDot: () => flatDot,
+    ghost: () => ghost,
+    hull: () => hull,
+    inject: () => inject,
+    lerp: () => lerp,
+    mk: () => mk,
+    open: () => open,
+    place: () => place,
+    pointer: () => pointer,
+    poly: () => poly,
+    prism: () => prism,
+    proj: () => proj,
+    put: () => put,
+    r2: () => r2,
+    rad: () => rad,
+    reducedMotion: () => reducedMotion,
+    reflect: () => reflect,
+    register: () => register,
+    ringAt: () => ringAt,
+    rings: () => rings,
+    rrect: () => rrect,
+    run: () => run,
+    seg: () => seg,
+    setReducedMotion: () => setReducedMotion,
+    solid: () => solid,
+    spring: () => spring,
+    stepS: () => stepS,
+    tdone: () => tdone,
+    tset: () => tset,
+    tval: () => tval,
+    tween: () => tween,
+    unproj: () => unproj
+  });
+
+  // packages/hairline/src/core/iso.ts
+  var clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  var lerp = (a, b, t) => a + (b - a) * t;
+  var rad = (d) => d * Math.PI / 180;
+  var r2 = (n) => Math.round(n * 100) / 100;
+  var poly = (pts) => "M" + pts.map((p) => r2(p[0]) + " " + r2(p[1])).join("L") + "Z";
+  var seg = (a, b) => `M${r2(a[0])} ${r2(a[1])}L${r2(b[0])} ${r2(b[1])}`;
+  var open = (pts) => pts.length < 2 ? "" : "M" + pts.map((p) => r2(p[0]) + " " + r2(p[1])).join("L");
+  var Cam = (azDeg, k, S) => ({ az: rad(azDeg), k, S, ox: 0, oy: 0 });
+  function proj(C) {
+    const c = Math.cos(C.az), s = Math.sin(C.az), zf = Math.sqrt(1 - C.k * C.k);
+    return (x, y, z) => {
+      const X = x * c - y * s, Y = x * s + y * c;
+      return [C.ox + C.S * X, C.oy + C.S * (Y * C.k - z * zf)];
+    };
+  }
+  function unproj(C, sx, sy, z) {
+    const c = Math.cos(C.az), s = Math.sin(C.az), zf = Math.sqrt(1 - C.k * C.k);
+    const X = (sx - C.ox) / C.S, Y = ((sy - C.oy) / C.S + z * zf) / C.k;
+    return [X * c + Y * s, -X * s + Y * c];
+  }
+  function fit(C, pts, cx, cy) {
+    C.ox = 0;
+    C.oy = 0;
+    const P = proj(C);
+    let a = 1e9, b = -1e9, c = 1e9, d = -1e9;
+    for (const p of pts) {
+      const q = P(p[0], p[1], p[2]);
+      a = Math.min(a, q[0]);
+      b = Math.max(b, q[0]);
+      c = Math.min(c, q[1]);
+      d = Math.max(d, q[1]);
+    }
+    C.ox = cx - (a + b) / 2;
+    C.oy = cy - (c + d) / 2;
+  }
+  function rrect(u0, v0, u1, v1, r, n = 4) {
+    r = Math.max(0, Math.min(r, (u1 - u0) / 2, (v1 - v0) / 2));
+    const out = [];
+    for (const [cu, cv, a0] of [[u1 - r, v1 - r, 0], [u0 + r, v1 - r, 90], [u0 + r, v0 + r, 180], [u1 - r, v0 + r, 270]])
+      for (let k = 0; k <= n; k++) {
+        const a = rad(a0 + 90 * k / n), ca = Math.cos(a), sa = Math.sin(a);
+        out.push({ u: cu + r * ca, v: cv + r * sa, nu: ca, nv: sa });
+      }
+    return out;
+  }
+  function circ(R, n = 96) {
+    const out = [];
+    for (let k = 0; k < n; k++) {
+      const a = k / n * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a);
+      out.push({ u: R * ca, v: R * sa, nu: ca, nv: sa });
+    }
+    return out;
+  }
+  function hull(input) {
+    const pts = input.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const x = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], up = [];
+    for (const p of pts) {
+      while (lo.length > 1 && x(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop();
+      lo.push(p);
+    }
+    for (let i = pts.length - 1; i >= 0; i--) {
+      const p = pts[i];
+      while (up.length > 1 && x(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop();
+      up.push(p);
+    }
+    lo.pop();
+    up.pop();
+    return lo.concat(up);
+  }
+  var ringAt = (P, ring, z) => ring.map((q) => P(q.u, q.v, z));
+  var facing = (C) => {
+    const s = Math.sin(C.az), c = Math.cos(C.az);
+    return (q) => q.nu * s + q.nv * c >= -1e-6;
+  };
+  function run(ring, keep) {
+    const n = ring.length;
+    let s = -1;
+    for (let i = 0; i < n; i++) if (keep(ring[i]) && !keep(ring[(i + n - 1) % n])) {
+      s = i;
+      break;
+    }
+    if (s < 0) return keep(ring[0]) ? ring.slice() : [];
+    const out = [];
+    for (let k = 0; k < n && keep(ring[(s + k) % n]); k++) out.push(ring[(s + k) % n]);
+    return out;
+  }
+  function prism(P, front, ring, inner, z0, z1) {
+    return {
+      sil: poly(hull(ringAt(P, ring, z1).concat(ringAt(P, ring, z0)))),
+      crease: inner ? open(ringAt(P, run(inner, front), z1)) : ""
+    };
+  }
+  var rings = (x0, y0, x1, y1, r, b) => [
+    rrect(x0, y0, x1, y1, r),
+    rrect(x0 + b, y0 + b, x1 - b, y1 - b, Math.max(0.3, r - b))
+  ];
+  function extremes(P, ring) {
+    const pr = ring.map((q) => P(q.u, q.v, 0));
+    let a = 0, b = 0, c = 0;
+    pr.forEach((p, k) => {
+      if (p[0] < pr[a][0]) a = k;
+      if (p[0] > pr[b][0]) b = k;
+      if (p[1] > pr[c][1]) c = k;
+    });
+    return [ring[a], ring[b], ring[c]];
+  }
+  function fillet(pts, rs, n = 4) {
+    const m = pts.length, out = [];
+    for (let i = 0; i < m; i++) {
+      const a = pts[(i + m - 1) % m], p = pts[i], b = pts[(i + 1) % m];
+      const la = Math.hypot(a[0] - p[0], a[1] - p[1]), lb = Math.hypot(b[0] - p[0], b[1] - p[1]);
+      const t = Math.min(rs[i], la / 2, lb / 2);
+      const p1 = [p[0] + (a[0] - p[0]) / la * t, p[1] + (a[1] - p[1]) / la * t];
+      const p2 = [p[0] + (b[0] - p[0]) / lb * t, p[1] + (b[1] - p[1]) / lb * t];
+      for (let k = 0; k <= n; k++) {
+        const s = k / n, w = 1 - s;
+        out.push([w * w * p1[0] + 2 * w * s * p[0] + s * s * p2[0], w * w * p1[1] + 2 * w * s * p[1] + s * s * p2[1]]);
+      }
+    }
+    return out;
+  }
+  function ghost(P, front, ring, z0, depth) {
+    const f = run(ring, front), lowP = ringAt(P, f, z0 - depth);
+    return {
+      d: open(lowP) + [f[0], f[f.length - 1]].map((q) => seg(P(q.u, q.v, z0), P(q.u, q.v, z0 - depth))).join(""),
+      y0: Math.min(...ringAt(P, f, z0).map((p) => p[1])),
+      y1: Math.max(...lowP.map((p) => p[1])) + 2
+    };
+  }
+
+  // packages/hairline/src/core/motion.ts
+  var reduced = false;
+  var setReducedMotion = (on) => {
+    reduced = on;
+  };
+  var reducedMotion = () => reduced;
+  function spring(x, o = {}) {
+    return { x, v: 0, t: x, k: o.k ?? 100, c: o.c ?? 18, m: o.m ?? 1, eps: o.eps ?? 0.01 };
+  }
+  function stepS(sp, dt) {
+    if (reduced) {
+      sp.x = sp.t;
+      sp.v = 0;
+      return false;
+    }
+    const n = Math.max(1, Math.ceil(dt * 240)), h = dt / n;
+    for (let i = 0; i < n; i++) {
+      const a = (-sp.k * (sp.x - sp.t) - sp.c * sp.v) / sp.m;
+      sp.v += a * h;
+      sp.x += sp.v * h;
+    }
+    if (Math.abs(sp.x - sp.t) < sp.eps && Math.abs(sp.v) < sp.eps * 10) {
+      sp.x = sp.t;
+      sp.v = 0;
+      return false;
+    }
+    return true;
+  }
+  function bezier(x1, y1, x2, y2) {
+    const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+    const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+    const X = (u) => ((ax * u + bx) * u + cx) * u;
+    const Y = (u) => ((ay * u + by) * u + cy) * u;
+    const dX = (u) => (3 * ax * u + 2 * bx) * u + cx;
+    return (t) => {
+      if (t <= 0) return 0;
+      if (t >= 1) return 1;
+      let u = t;
+      for (let i = 0; i < 8; i++) {
+        const e = X(u) - t;
+        if (Math.abs(e) < 1e-5) break;
+        const d = dX(u);
+        if (Math.abs(d) < 1e-6) break;
+        u -= e / d;
+      }
+      if (!(u >= 0 && u <= 1) || Math.abs(X(u) - t) > 1e-4) {
+        let lo = 0, hi = 1;
+        u = t;
+        for (let i = 0; i < 24; i++) {
+          if (X(u) < t) lo = u;
+          else hi = u;
+          u = (lo + hi) / 2;
+        }
+      }
+      return Y(u);
+    };
+  }
+  var EASE_LIFT = bezier(0.32, 0.72, 0, 1);
+  var tween = (v, dur = 700) => ({ from: v, to: v, t0: -1e9, dur });
+  var tval = (tw, now) => {
+    const p = clamp((now - tw.t0) / tw.dur, 0, 1);
+    return tw.from + (tw.to - tw.from) * (reduced ? 1 : EASE_LIFT(p));
+  };
+  var tset = (tw, to, now, delay) => {
+    if (tw.to === to) return;
+    tw.from = tval(tw, now);
+    tw.to = to;
+    tw.t0 = now + delay;
+  };
+  var tdone = (tw, now) => reduced || now >= tw.t0 + tw.dur;
+
+  // packages/hairline/src/core/stage.ts
+  var NS = "http://www.w3.org/2000/svg";
+  function mk(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    if (attrs) for (const k in attrs) e.setAttribute(k, String(attrs[k]));
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function solid(parent) {
+    const g = mk("g", {}, parent);
+    return { g, sil: mk("path", { class: "sil" }, g), cr: mk("path", { class: "nf lo" }, g) };
+  }
+  var put = (el, s) => {
+    el.sil.setAttribute("d", s.sil);
+    el.cr.setAttribute("d", s.crease);
+  };
+  var flatDot = (parent, C, r, cls) => mk("ellipse", { rx: r2(r * C.S), ry: r2(r * C.S * C.k), class: cls }, parent);
+  var place = (el, q) => {
+    el.setAttribute("cx", String(r2(q[0])));
+    el.setAttribute("cy", String(r2(q[1])));
+  };
+  var fid = 0;
+  function fade(svg, y0, y1, a0 = 0.7) {
+    const id = "hl-fd" + ++fid, defs = mk("defs", {}, svg);
+    const lg = mk("linearGradient", { id: id + "g", gradientUnits: "userSpaceOnUse", x1: 0, y1: r2(y0), x2: 0, y2: r2(y1) }, defs);
+    mk("stop", { offset: 0, "stop-color": "#fff", "stop-opacity": a0 }, lg);
+    mk("stop", { offset: 1, "stop-color": "#fff", "stop-opacity": 0 }, lg);
+    const m = mk("mask", { id, maskUnits: "userSpaceOnUse", x: 0, y: 0, width: 400, height: 320 }, defs);
+    mk("rect", { x: 0, y: 0, width: 400, height: 320, fill: `url(#${id}g)` }, m);
+    return `url(#${id})`;
+  }
+  function reflect(svg, parent, P, front, ring, z0, depth) {
+    const r = ghost(P, front, ring, z0, depth);
+    const gh = mk("g", { class: "ghost", mask: fade(svg, r.y0, r.y1) }, parent);
+    mk("path", { d: r.d }, gh);
+  }
+  var boards = [];
+  var byStage = /* @__PURE__ */ new Map();
+  var raf = 0;
+  var last = 0;
+  var io = null;
+  var rm = null;
+  function frame(now) {
+    const dt = Math.min(0.05, Math.max(0, (now - last) / 1e3));
+    last = now;
+    let any = false;
+    for (const b of boards.slice()) if (b.vis && b.awake) {
+      b.awake = !!b.tick(dt, now);
+      any = any || b.awake;
+    }
+    raf = any ? requestAnimationFrame(frame) : 0;
+  }
+  function wake(b) {
+    b.awake = true;
+    if (!raf) {
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
+  }
+  var onMotion = () => {
+    setReducedMotion(!!rm?.matches);
+    boards.forEach(wake);
+  };
+  function start() {
+    if (io) return;
+    io = new IntersectionObserver((es) => {
+      for (const e of es) {
+        const b = byStage.get(e.target);
+        if (!b) continue;
+        b.vis = e.isIntersecting;
+        if (b.vis) wake(b);
+      }
+    }, { rootMargin: "80px" });
+    rm = matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(rm.matches);
+    rm.addEventListener("change", onMotion);
+  }
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    io?.disconnect();
+    io = null;
+    rm?.removeEventListener("change", onMotion);
+    rm = null;
+  }
+  function register(stage, tick) {
+    start();
+    const b = { stage, tick, vis: false, awake: true };
+    boards.push(b);
+    byStage.set(stage, b);
+    io.observe(stage);
+    tick(0, performance.now());
+    let gone = false;
+    return {
+      wake: () => {
+        if (!gone) wake(b);
+      },
+      unregister: () => {
+        if (gone) return;
+        gone = true;
+        boards = boards.filter((x) => x !== b);
+        if (byStage.get(stage) === b) {
+          byStage.delete(stage);
+          io?.unobserve(stage);
+        }
+        if (!boards.length) stop();
+      }
+    };
+  }
+  function pointer(stage, on) {
+    let tm = 0;
+    const pt = (e) => {
+      const r = stage.getBoundingClientRect();
+      return [(e.clientX - r.left) / r.width * 400, (e.clientY - r.top) / r.height * 320];
+    };
+    const move = (e) => {
+      clearTimeout(tm);
+      on.move(pt(e), e);
+    };
+    const down = (e) => {
+      clearTimeout(tm);
+      if (e.pointerType !== "mouse") stage.releasePointerCapture?.(e.pointerId);
+      if (on.down) on.down(pt(e), e);
+      else on.move(pt(e), e);
+    };
+    const leave = (e) => {
+      clearTimeout(tm);
+      tm = window.setTimeout(() => on.leave(e), e.pointerType === "mouse" ? 0 : 1400);
+    };
+    stage.addEventListener("pointermove", move);
+    stage.addEventListener("pointerdown", down);
+    stage.addEventListener("pointerleave", leave);
+    return () => {
+      clearTimeout(tm);
+      stage.removeEventListener("pointermove", move);
+      stage.removeEventListener("pointerdown", down);
+      stage.removeEventListener("pointerleave", leave);
+    };
+  }
+  function disposer() {
+    let fns = [];
+    return {
+      add: (fn) => {
+        fns.push(fn);
+      },
+      on: (target, type, fn, opts) => {
+        const h = fn;
+        target.addEventListener(type, h, opts);
+        fns.push(() => target.removeEventListener(type, h, opts));
+      },
+      dispose: () => {
+        const run2 = fns;
+        fns = [];
+        for (let i = run2.length - 1; i >= 0; i--) run2[i]();
+      }
+    };
+  }
+
+  // packages/hairline/src/core/styles.ts
+  var LIGHT = { plate: "#ffffff", hi: "#232327", edge: "#a4a4ac", mid: "#c3c3c9", lo: "#e0e0e4" };
+  var DARK = { plate: "#08090a", hi: "#d0d6e0", edge: "#5b5d64", mid: "#3e3e44", lo: "#29292d" };
+  var KEYS = ["plate", "hi", "edge", "mid", "lo"];
+  var vars = (p) => KEYS.map((k) => `--hl-${k}:var(--hairline-${k},${p[k]});`).join("");
+  var EASE = "cubic-bezier(0.5,0,0.1,1)";
+  var SVG = ":where([data-hairline]>svg)";
+  function css(lightDark) {
+    const both = Object.fromEntries(KEYS.map((k) => [k, `light-dark(${LIGHT[k]},${DARK[k]})`]));
+    return [
+      // the box, and the palette: light unless something below says otherwise
+      `:where([data-hairline]){display:block;position:relative;aspect-ratio:5/4;touch-action:pan-y;user-select:none;-webkit-user-select:none;--hl-sw:var(--hairline-stroke,0.9);${vars(LIGHT)}}`,
+      // the page's color-scheme
+      lightDark ? `:where([data-hairline]){${vars(both)}}` : "",
+      // an ancestor that says dark
+      `:where(.dark,[data-theme="dark"]) :where([data-hairline]){${vars(DARK)}}`,
+      // the figure's own theme option
+      `:where([data-hairline][data-hairline-theme="light"]){${vars(LIGHT)}}`,
+      `:where([data-hairline][data-hairline-theme="dark"]){${vars(DARK)}}`,
+      `:where([data-hairline]:focus-visible){outline:1.5px solid var(--hl-hi);outline-offset:2px}`,
+      `${SVG}{position:absolute;inset:0;width:100%;height:100%;display:block}`,
+      // Riffle's live region: read, not seen
+      `:where([data-hairline]>[data-hairline-live]){position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}`,
+      // the drawing: plates are filled with the plate colour and painted back to front
+      `${SVG} :where(path,polygon,ellipse,line){fill:var(--hl-plate);stroke:var(--hl-mid);stroke-width:var(--hl-sw);vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round;transition:stroke 260ms ${EASE}}`,
+      `${SVG} :where(.nf){fill:none}`,
+      `${SVG} :where(.fo){stroke:none}`,
+      `${SVG} :where(.sil){stroke:var(--hl-edge)}`,
+      `${SVG} :where(.hi){stroke:var(--hl-hi)}`,
+      `${SVG} :where(.lo){stroke:var(--hl-lo)}`,
+      `${SVG} :where(.dash){stroke-dasharray:1 3}`,
+      `${SVG} :where(.dot){stroke:none;fill:var(--hl-hi);transition:fill 260ms ${EASE}}`,
+      `${SVG} :where(.dot.m){fill:var(--hl-edge)}`,
+      `${SVG} :where(.dot.off){fill:var(--hl-lo)}`,
+      `${SVG} :where(.ghost path){fill:none;stroke:var(--hl-mid)}`
+    ].join("");
+  }
+  var done = /* @__PURE__ */ new WeakSet();
+  function inject(root) {
+    if (done.has(root)) return;
+    done.add(root);
+    const doc = root.nodeType === 9 ? root : root.ownerDocument;
+    const win = doc.defaultView;
+    const text = css(!!win?.CSS?.supports?.("color", "light-dark(#000,#fff)"));
+    if (win && "adoptedStyleSheets" in root) {
+      try {
+        const sheet = new win.CSSStyleSheet();
+        sheet.replaceSync(text);
+        root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet];
+        return;
+      } catch {
+      }
+    }
+    const style = doc.createElement("style");
+    style.setAttribute("data-hairline-style", "");
+    style.textContent = text;
+    (root.nodeType === 9 ? doc.head ?? doc.documentElement : root).appendChild(style);
+  }
+  return __toCommonJS(kernel_exports);
+})();
+/* /hairline kernel */
+</script>
+<script>
+/* Shared pieces for the six AISC 360 J10 figures (flanges and webs with concentrated forces). A wide-flange
+   member is drawn as deformable panels, flange surfaces and the web face, each with mesh lines, so a local
+   mechanism shows as a real distortion. Each figure gives a displacement field D(x, y, z, a), a being the
+   mechanism's amplitude 0..1; every point of the member and of what rides on it goes through Pf. Inches. */
+const WF = (() => {
+  const { Cam, fit, proj, facing, rings, circ, prism, poly, open, lerp, clamp, tween, tset, tval, mk, solid } = HL;
+  const setD = (el, d) => { if (el._d !== d){ el._d = d; el.setAttribute('d', d); } };
+  const cls = (el, c) => { if (el._c !== c){ el._c = c; el.setAttribute('class', c); } };
+  const show = (el, on) => { const v = on ? '' : 'none'; if (el._v !== v){ el._v = v; el.style.display = v; } };
+  const mix = (a, b, t) => a.map((v, i) => lerp(v, b[i], t));
+  function partial(pts, v){
+    if (v <= 0 || pts.length < 2) return [];
+    if (v >= 1) return pts;
+    const d = []; let tot = 0;
+    for (let i = 1; i < pts.length; i++){ const l = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); d.push(l); tot += l; }
+    let rem = v*tot; const out = [pts[0]];
+    for (let i = 0; i < d.length; i++){
+      if (rem >= d[i]){ out.push(pts[i+1]); rem -= d[i]; continue; }
+      out.push(mix(pts[i], pts[i+1], d[i] ? rem/d[i] : 0)); break;
+    }
+    return out;
+  }
+  const line = (pts, v = 1) => { const q = partial(pts, v); return q.length > 1 ? open(q) : ''; };
+  const ringsOf = (b, r, k) => { const w = Math.min(b[2] - b[0], b[3] - b[1]); return rings(b[0], b[1], b[2], b[3], Math.min(r, w/2), Math.min(k, w*.38)); };
+  const putc = (el, s) => {
+    if (el._s !== s.sil){ el._s = s.sil; el.sil.setAttribute('d', s.sil); }
+    if (el._k !== s.crease){ el._k = s.crease; el.cr.setAttribute('d', s.crease); }
+  };
+  const from = (a, b = Infinity) => k => k >= a && k < b;
+  const range = n => Array.from({ length: n + 1 }, (_, i) => i/n);
+  const bell = (x, w) => Math.exp(-((x/w)**2));
+  const discAt = (cx, cy, R) => circ(R, 20).map(q => ({ ...q, u: q.u + cx, v: q.v + cy }));
+
+  function seq(N){
+    const S = { k: N, now: 0 };
+    const G = (gate, dl = 0) => ({ gate, dl, t: tween(gate(N) ? 1 : 0) });
+    const val = e => { tset(e.t, e.gate(S.k) ? 1 : 0, S.now, e.dl); return tval(e.t, S.now); };
+    return { S, G, val };
+  }
+  function camera(svg, scale, pts, cy = 164){
+    const C = Cam(45, 0.5, scale); fit(C, pts, 200, cy);
+    return { C, P: proj(C), front: facing(C), g: mk('g', {}, svg) };
+  }
+
+  /* a flat panel f(u, v), u and v in 0..1, drawn up to u = grow: a filled outline and its mesh lines */
+  function panel(g, f, o = {}){
+    const p = { f, nu: o.nu || 24, nv: o.nv || 4, us: o.us || [], vs: o.vs || [], el: mk('path', { class: 'sil' }, g) };
+    if (p.us.length || p.vs.length) p.mesh = mk('path', { class: 'nf' }, g);
+    return p;
+  }
+  function drawPanel(p, Pf, grow = 1){
+    if (grow <= .001){ setD(p.el, ''); if (p.mesh) setD(p.mesh, ''); return; }
+    const U = range(p.nu).map(t => t*grow), V = range(p.nv);
+    const pts = [...U.map(u => p.f(u, 0)), ...V.slice(1).map(v => p.f(grow, v)), ...U.slice(0, -1).reverse().map(u => p.f(u, 1)), ...V.slice(1, -1).reverse().map(v => p.f(0, v))];
+    setD(p.el, poly(pts.map(q => Pf(...q))));
+    if (p.mesh){
+      let d = '';
+      p.us.forEach(u => { if (u <= grow) d += open(V.map(v => Pf(...p.f(u, v)))); });
+      p.vs.forEach(v => { d += open(U.map(u => Pf(...p.f(u, v)))); });
+      setD(p.mesh, d);
+    }
+  }
+  /* rounded boxes and stacked weights, drawn through Pf */
+  const box = (g, b, z0, z1, o = {}) => { const [ring, inner] = ringsOf(b, o.r ?? .3, o.k ?? .2); return { b, z0, z1, ring, inner, r: o.r ?? .3, k: o.k ?? .2, el: solid(g) }; };
+  function drawBox(bx, Pf, front, on, dz = 0, b = null){
+    show(bx.el.g, on); if (!on) return;
+    let ring = bx.ring, inner = bx.inner; if (b) [ring, inner] = ringsOf(b, bx.r, bx.k);
+    putc(bx.el, prism(Pf, front, ring, inner, bx.z0 + dz, bx.z1 + dz));
+  }
+  const weights = (g, G, gate, cx, cy, R, z0) => [0, 1, 2].map(n => ({ n, z0, el: solid(g), s: G(gate, n*130), ring: discAt(cx, cy, R), inner: discAt(cx, cy, R*.8) }));
+  function drawWeights(ws, val, Pf, front, hi){
+    ws.forEach(w => { const v = val(w.s), on = v > .001; show(w.el.g, on);
+      if (on){ const z = w.z0 + w.n*1.45 + 12*(1 - v); putc(w.el, prism(Pf, front, w.ring, w.inner, z, z + 1.3)); }
+      cls(w.el.sil, hi ? 'sil hi' : 'sil'); });
+  }
+
+  /* A W shape along x from X0 to X1, drawn back to front: bottom flange, web face (+y), top flange, near cut
+     face. Hooks put a figure's own parts at the right depth: under the member, behind the web, on the web, on top. */
+  function wbeam(g, s, hooks = {}){
+    const { X0, X1, d, bf, tf, tw } = s, ZT = d/2, ZTI = d/2 - tf, X = u => X0 + u*(X1 - X0);
+    const us = range(Math.round((X1 - X0)/3)).slice(1, -1), parts = {};
+    hooks.under && hooks.under(g);
+    parts.bfTop = panel(g, (u, v) => [X(u), -bf/2 + v*bf, -ZTI], { nu: 40, nv: 6, us });
+    parts.bfEdge = panel(g, (u, v) => [X(u), bf/2, -ZT + v*tf], { nu: 40, nv: 1 });
+    hooks.behindWeb && hooks.behindWeb(g);
+    parts.web = panel(g, (u, v) => [X(u), tw/2, -ZTI + v*2*ZTI], { nu: 44, nv: 16, us, vs: [1/6, 2/6, 3/6, 4/6, 5/6] });
+    hooks.onWeb && hooks.onWeb(g);
+    parts.tfTop = panel(g, (u, v) => [X(u), -bf/2 + v*bf, ZT], { nu: 44, nv: 10, us, vs: [.25, .5, .75] });
+    parts.tfEdge = panel(g, (u, v) => [X(u), bf/2, ZT - tf + v*tf], { nu: 44, nv: 1 });
+    parts.cap = mk('path', { class: 'sil' }, g);
+    hooks.onTop && hooks.onTop(g);
+    const I = [[-bf/2,-ZT],[bf/2,-ZT],[bf/2,-ZTI],[tw/2,-ZTI],[tw/2,ZTI],[bf/2,ZTI],[bf/2,ZT],[-bf/2,ZT],[-bf/2,ZTI],[-tw/2,ZTI],[-tw/2,-ZTI],[-bf/2,-ZTI]];
+    parts.draw = (Pf, grow, k, webHi) => {
+      ['bfTop', 'bfEdge', 'web', 'tfTop', 'tfEdge'].forEach(n => drawPanel(parts[n], Pf, grow));
+      setD(parts.cap, grow > .001 ? poly(I.map(([y, z]) => Pf(X(grow), y, z))) : '');
+      cls(parts.cap, k === 1 ? 'sil hi' : 'sil');
+      cls(parts.web.mesh, webHi === 'web' ? 'nf hi' : 'nf');
+      cls(parts.tfTop.mesh, webHi === 'flange' ? 'nf hi' : 'nf');
+    };
+    return parts;
+  }
+
+  /* A beam figure: section, load path, load, mechanism (half, then full). The spec supplies the field D, its
+     own parts through the hooks, and drawExtra for them. Bearing plate and weights are on unless turned off. */
+  const SECTION = { X0: -22, X1: 22, d: 14, bf: 10, tf: .65, tw: .375 };
+  function beamFig(spec){
+    const N = 5, { S, G, val } = seq(N), s = SECTION, ZT = s.d/2, ZTI = s.d/2 - s.tf;
+    const STAGES = [['section', 1], ['load path', 2], ['load', 3], ['mechanism', 4]];
+    function build(svg){
+      const { C, P, front, g } = camera(svg, spec.scale || 6.4, spec.fit || [[-22,-5,-ZT-1],[22,5,-ZT-1],[22,-5,ZT+9],[-22,5,ZT+9],[0,0,ZT+10]]);
+      const M = { C, P, front, s, ZT, ZTI, a: 1, amp: tween(1, 900), sec: G(from(1)), path: G(from(2)), load: G(from(3)) };
+      M.Pf = (x, y, z) => { if (!M.a) return P(x, y, z); const d = spec.D(x, y, z, M.a, M); return P(x + d[0], y + d[1], z + d[2]); };
+      const hook = name => g2 => spec[name] && spec[name](g2, M, G);
+      M.beam = wbeam(g, s, { under: hook('under'), behindWeb: hook('behindWeb'), onWeb: hook('onWeb'), onTop: g2 => {
+        if (spec.bearing !== false) M.plate = box(g2, [-3, -4.6, 3, 4.6], ZT, ZT + 1);
+        hook('onTop')(g2);
+        M.weights = spec.weights === false ? [] : weights(g2, G, from(3), 0, 0, 3, ZT + 1);
+      } });
+      return M;
+    }
+    function draw(M){
+      const k = S.k, { front, Pf } = M;
+      tset(M.amp, k === 4 ? .5 : k >= 5 ? 1 : 0, S.now, 0); M.a = tval(M.amp, S.now);
+      M.beam.draw(Pf, val(M.sec), k, k === 5 && spec.hi);
+      if (M.plate){ const v = val(M.path); drawBox(M.plate, Pf, front, v > .001, 10*(1 - v)); cls(M.plate.el.sil, k === 2 ? 'sil hi' : 'sil'); }
+      drawWeights(M.weights, val, Pf, front, k === 3);
+      spec.drawExtra && spec.drawExtra(M, k, val);
+    }
+    return { N, STAGES, DETAIL: spec.DETAIL, S, build, draw };
+  }
+  return { setD, cls, show, mix, line, putc, ringsOf, from, range, bell, discAt, seq, camera, panel, drawPanel, box, drawBox, weights, drawWeights, beamFig, SECTION, clamp, lerp, poly, open };
+})();
+</script>
+<script>
+/* The six AISC 360 J10 limit states for flanges and webs with concentrated forces. ZT is the top of the
+   member, ZTI the underside of its top flange; displacements are exaggerated so the mechanism reads. */
+const J10 = (() => {
+const { clamp: wclamp, bell, from: wfrom } = WF;
+const ZT = WF.SECTION.d/2, ZTI = ZT - WF.SECTION.tf, TW = WF.SECTION.tw;
+
+/* J10.1 Flange local bending: a plate welded across the flange pulls; the flange bends about the web, its
+   tips lifting more than the line over the web, and yield lines form. */
+const FLB = WF.beamFig({
+  DETAIL: ['ready', 'W14 × 61', 'plate across the flange', 'tension Pu', 'flange bends about the web', 'yield lines · Rn = 6.25 Fyf tf²'],
+  bearing: false, weights: false, hi: 'flange',
+  D(x, y, z, a){
+    const b = bell(x, 5.5), curl = a*1.7*Math.pow(Math.min(1, Math.abs(y)/5), 1.4)*b, lift = a*1.0*b;
+    if (z < ZTI - .01) return [0, 0, 0];
+    if (z <= ZT + .01) return [0, 0, curl];
+    const t = wclamp((z - ZT)/.6, 0, 1);
+    return [0, 0, curl + (lift - curl)*t];
+  },
+  onTop(g, M, G){
+    M.tplate = WF.box(g, [-.45, -4.6, .45, 4.6], ZT, ZT + 6, { r: .2, k: .12 });
+    M.grip = WF.box(g, [-2.2, -5.4, 2.2, 5.4], ZT + 6, ZT + 8.2, { r: .6, k: .3 });
+    M.pull = [-3, 3].map(y => ({ y, el: HL.mk('path', { class: 'nf dash' }, g) }));
+    M.ylines = HL.mk('path', { class: 'nf hi' }, g);
+    M.tS = G(wfrom(2)); M.gS = G(wfrom(3)); M.yS = G(wfrom(5));
+  },
+  drawExtra(M, k, val){
+    const { Pf, front } = M, vt = val(M.tS), vg = val(M.gS), vy = val(M.yS);
+    WF.drawBox(M.tplate, Pf, front, vt > .001, 10*(1 - vt)); WF.cls(M.tplate.el.sil, k === 2 ? 'sil hi' : 'sil');
+    WF.drawBox(M.grip, Pf, front, vg > .001, 8*(1 - vg)); WF.cls(M.grip.el.sil, k === 3 ? 'sil hi' : 'sil');
+    M.pull.forEach(p => WF.setD(p.el, vg > .5 ? WF.line([Pf(0, p.y, ZT + 8.2), Pf(0, p.y, ZT + 14)], vg) : ''));
+    const L = (pts, n = 10) => { const out = []; for (let i = 0; i < pts.length - 1; i++) for (let j = 0; j < n; j++) out.push(WF.mix(pts[i], pts[i+1], j/n)); out.push(pts[pts.length - 1]); return WF.open(out.map(p => Pf(...p))); };
+    WF.setD(M.ylines, vy > .5 ? [
+      L([[-7, .7, ZT], [7, .7, ZT]]), L([[-7, -.7, ZT], [7, -.7, ZT]]),
+      L([[-7, .7, ZT], [-2.6, 5, ZT]]), L([[7, .7, ZT], [2.6, 5, ZT]]), L([[-7, -.7, ZT], [-2.6, -5, ZT]]), L([[7, -.7, ZT], [2.6, -5, ZT]]),
+    ].join('') : '');
+  },
+});
+
+/* A bearing support under the bottom flange at mid-length, with weights at both ends: the reaction is the
+   concentrated force. Shared by J10.2 and J10.3, so the web just above the bottom flange is in view. */
+const SUPPORT_FIT = [[-22, -6, -ZT - 8], [22, 6, -ZT - 8], [22, -5, ZT + 6], [-22, 5, ZT + 6], [-16, 0, ZT + 6]];
+const support = {
+  bearing: false, weights: false, fit: SUPPORT_FIT,
+  under(g, M, G){
+    M.base = WF.box(g, [-4.5, -6, 4.5, 6], -ZT - 7, -ZT - 1, { r: .8, k: .4 });
+    M.bplate = WF.box(g, [-3, -4.6, 3, 4.6], -ZT - 1, -ZT);
+    M.uS = G(wfrom(2));
+  },
+  onTop(g, M, G){ M.ends = [-16, 16].map((x, i) => WF.weights(g, G, wfrom(3), x, 0, 2.6, ZT)); },
+  drawSupport(M, k, val){
+    const v = val(M.uS);
+    WF.drawBox(M.base, M.P, M.front, v > .001, -8*(1 - v)); WF.drawBox(M.bplate, M.P, M.front, v > .001, -8*(1 - v));
+    WF.cls(M.base.el.sil, k === 2 ? 'sil hi' : 'sil'); WF.cls(M.bplate.el.sil, k === 2 ? 'sil hi' : 'sil');
+    M.ends.forEach(w => WF.drawWeights(w, val, M.Pf, M.front, k === 3));
+  },
+};
+
+/* J10.2 Web local yielding: the reaction spreads through the flange at 2.5 : 1 and yields the web over
+   N + 5k at the toe of the fillet; the beam above settles and the web bulges a little there. */
+const K = 1.25, KZ = -ZT + K, SPREAD = 3 + 2.5*K;
+const WLY = WF.beamFig({
+  ...support,
+  DETAIL: ['ready', 'W14 × 61', 'bearing N on a support · 2.5 : 1', 'reaction Pu', 'web yields at the fillet toe', 'Rn = Fyw tw (5k + N)'],
+  D(x, y, z, a){
+    if (z <= KZ) return [0, 0, 0];
+    const b = bell(x, 5), t = wclamp((z - KZ)/2.6, 0, 1);
+    return [0, a*.6*b*Math.sin(Math.PI*t), -a*.55*b*t];
+  },
+  onWeb(g, M, G){
+    M.disp = [-1, 1].map(sx => ({ w: [[sx*3, TW/2 + .02, -ZT], [sx*SPREAD, TW/2 + .02, KZ], [sx*(SPREAD + 2.5*2.2), TW/2 + .02, KZ + 2.2]], el: HL.mk('path', { class: 'nf dash' }, g) }));
+    M.band = HL.mk('path', { class: 'nf' }, g); M.hatch = HL.mk('path', { class: 'nf' }, g);
+    M.dS = G(wfrom(2)); M.bS = G(wfrom(4));
+  },
+  drawExtra(M, k, val){
+    support.drawSupport(M, k, val);
+    const { Pf } = M, vd = val(M.dS), vb = val(M.bS), y = TW/2 + .03, z1 = KZ + 1.3;
+    M.disp.forEach(d => WF.setD(d.el, WF.line(d.w.map(p => Pf(...p)), vd)));
+    WF.setD(M.band, vb > .5 ? WF.poly([[-SPREAD, y, KZ], [SPREAD, y, KZ], [SPREAD, y, z1], [-SPREAD, y, z1]].map(p => Pf(...p))) : '');
+    let h = ''; if (vb > .5) for (let x = -SPREAD + .9; x < SPREAD; x += .9) h += WF.open([Pf(x, y, KZ), Pf(x, y, z1)]);
+    WF.setD(M.hatch, h);
+    WF.cls(M.band, k === 5 ? 'nf hi' : 'nf'); WF.cls(M.hatch, k === 5 ? 'nf hi' : 'nf lo');
+  },
+});
+
+/* J10.3 Web local crippling: over the bearing, the web wrinkles just above the flange and the beam
+   settles into it. */
+const WLC = WF.beamFig({
+  ...support,
+  DETAIL: ['ready', 'W14 × 61', 'bearing N on a support', 'reaction Pu', 'web wrinkles above the flange', 'web crippling'],
+  hi: 'web',
+  D(x, y, z, a){
+    if (z <= -ZTI) return [0, 0, 0];
+    const b = bell(x, 4.2), t = (z + ZTI)/3.8, drop = -a*.9*b;
+    if (t > 1) return [0, 0, drop];
+    return [0, a*1.5*b*Math.sin(Math.PI*t), drop*t];
+  },
+  drawExtra(M, k, val){ support.drawSupport(M, k, val); },
+});
+
+/* J10.4 Web sidesway buckling: with the flanges free to move sideways relative to each other, the loaded
+   compression flange swings out and the web bends under it. */
+const WSB = WF.beamFig({
+  DETAIL: ['ready', 'W14 × 61', 'bearing N · flanges unbraced', 'compression Pu', 'compression flange sways', 'web sidesway buckling'],
+  hi: 'web',
+  D(x, y, z, a){
+    const b = bell(x, 8), t = wclamp((z + ZT)/(2*ZT), 0, 1.25);
+    return [0, a*2.4*b*t*t, -a*.25*b*t];
+  },
+});
+
+/* J10.5 Web compression buckling: equal loads on both flanges at one section, and the web bows out across
+   its depth like a column. */
+const WCB = WF.beamFig({
+  DETAIL: ['ready', 'W14 × 61', 'bearing on both flanges', 'paired compression Pu', 'web bows across its depth', 'Rn = 24 tw³ √(E Fyw) / h'],
+  hi: 'web',
+  fit: [[-22, -6, -ZT - 8], [22, 6, -ZT - 8], [22, -5, ZT + 9], [-22, 5, ZT + 9], [0, 0, ZT + 10]],
+  D(x, y, z, a){
+    if (Math.abs(z) > ZTI) return [0, 0, 0];
+    return [0, a*1.9*bell(x, 6)*Math.cos(Math.PI*z/(2*ZTI)), 0];
+  },
+  under(g, M, G){
+    M.base = WF.box(g, [-4.5, -6, 4.5, 6], -ZT - 7, -ZT - 1, { r: .8, k: .4 });
+    M.bplate = WF.box(g, [-3, -4.6, 3, 4.6], -ZT - 1, -ZT);
+    M.uS = G(wfrom(2));
+  },
+  drawExtra(M, k, val){
+    const v = val(M.uS);
+    WF.drawBox(M.base, M.P, M.front, v > .001, -8*(1 - v)); WF.drawBox(M.bplate, M.P, M.front, v > .001, -8*(1 - v));
+    WF.cls(M.base.el.sil, k === 2 ? 'sil hi' : 'sil'); WF.cls(M.bplate.el.sil, k === 2 ? 'sil hi' : 'sil');
+  },
+});
+
+/* J10.6 Web panel-zone shear: beams on both sides of a column carry an unbalanced moment into it; the web
+   between the continuity plates shears into a parallelogram, the column flanges kink at its corners, and
+   the beams turn with it. */
+const PZ = (() => {
+  const N = 5, { S, G, val } = WF.seq(N);
+  const XF = 7, TFC = 1.03, TWC = .65, YB = 7.35, Z0 = -22, Z1 = 22, ZB = 9, TFB = .6, YBF = 3.75, LB = 15;
+  const STAGES = [['column', 1], ['load path', 2], ['load', 3], ['mechanism', 4]];
+  const DETAIL = ['ready', 'W14 × 132 column', 'W18 beams · continuity plates', 'unbalanced moment', 'panel zone shears', 'Rv = 0.60 Fy dc tw'];
+  function D(x, y, z, a){
+    const gam = .2*a, dx = gam*wclamp(z, -ZB, ZB);
+    const dz = x > XF ? -gam*(x - XF) : x < -XF ? -gam*(x + XF) : 0;
+    return [dx, 0, dz];
+  }
+  function build(svg){
+    const { C, P, front, g } = WF.camera(svg, 4.8, [[-22, -YB, Z0], [22, YB, Z0], [22, -YB, Z1 + 1], [-22, YB, Z1 + 1], [19, 0, ZB + 6]]);
+    const M = { C, P, front, a: 1, amp: HL.tween(1, 900), sec: G(wfrom(1)), path: G(wfrom(2)), load: G(wfrom(3)), zone: G(wfrom(5)) };
+    M.Pf = (x, y, z) => { if (!M.a) return P(x, y, z); const d = D(x, y, z, M.a); return P(x + d[0], y + d[1], z + d[2]); };
+    const Z = u => Z0 + u*(Z1 - Z0), us = WF.range(14).slice(1, -1);
+    const beam = side => ['bot', 'web', 'top'].map(part => {
+      const z = part === 'bot' ? [-ZB, -ZB + TFB] : part === 'top' ? [ZB - TFB, ZB] : [-ZB + TFB, ZB - TFB];
+      const yy = part === 'web' ? [-.18, .18] : [-YBF, YBF];
+      return { side, z, yy, el: HL.solid(g) };
+    });
+    M.left = beam(-1);
+    M.backInner = WF.panel(g, (u, v) => [-XF + TFC, -YB + v*2*YB, Z(u)], { nu: 40, nv: 4 });
+    M.backEdge = WF.panel(g, (u, v) => [-XF + v*TFC, YB, Z(u)], { nu: 40, nv: 1 });
+    M.web = WF.panel(g, (u, v) => [-XF + TFC + v*(2*XF - 2*TFC), TWC/2, Z(u)], { nu: 44, nv: 8, us, vs: [.25, .5, .75] });
+    M.zoneEl = HL.mk('path', { class: 'nf hi' }, g);
+    M.stiff = [ZB - TFB/2, -(ZB - TFB/2)].map(z => WF.box(g, [-XF + TFC, TWC/2, XF - TFC, YB - .25], z - .38, z + .38, { r: .2, k: .1 }));
+    M.frontOuter = WF.panel(g, (u, v) => [XF, -YB + v*2*YB, Z(u)], { nu: 44, nv: 6, us, vs: [.25, .5, .75] });
+    M.frontEdge = WF.panel(g, (u, v) => [XF - TFC + v*TFC, YB, Z(u)], { nu: 44, nv: 1 });
+    M.right = beam(1);
+    M.weights = WF.weights(g, G, wfrom(3), XF + 12, 0, 2.6, ZB);
+    M.cap = HL.mk('path', { class: 'sil' }, g);
+    return M;
+  }
+  const I = [[-XF, -YB], [-XF + TFC, -YB], [-XF + TFC, -TWC/2], [XF - TFC, -TWC/2], [XF - TFC, -YB], [XF, -YB], [XF, YB], [XF - TFC, YB], [XF - TFC, TWC/2], [-XF + TFC, TWC/2], [-XF + TFC, YB], [-XF, YB]];
+  function draw(M){
+    const k = S.k, { Pf, front } = M;
+    HL.tset(M.amp, k === 4 ? .5 : k >= 5 ? 1 : 0, S.now, 0); M.a = HL.tval(M.amp, S.now);
+    const grow = val(M.sec), vb = val(M.path);
+    const drawBeam = parts => parts.forEach(p => {
+      const on = vb > .001; WF.show(p.el.g, on); if (!on) return;
+      const x0 = p.side > 0 ? XF : -XF - LB*vb, x1 = p.side > 0 ? XF + LB*vb : -XF;
+      const [ring, inner] = WF.ringsOf([x0, p.yy[0], x1, p.yy[1]], .25, .15);
+      WF.putc(p.el, HL.prism(Pf, front, ring, inner, p.z[0], p.z[1]));
+      WF.cls(p.el.sil, k === 2 ? 'sil hi' : 'sil');
+    });
+    drawBeam(M.left);
+    [M.backInner, M.backEdge, M.web].forEach(p => WF.drawPanel(p, Pf, grow));
+    const vz = val(M.zone), y = TWC/2 + .02, xa = -XF + TFC, xb = XF - TFC;
+    WF.setD(M.zoneEl, vz > .5 ? WF.poly([[xa, y, -ZB], [xb, y, -ZB], [xb, y, ZB], [xa, y, ZB]].map(p => Pf(...p))) + WF.open([Pf(xa, y, -ZB), Pf(xb, y, ZB)]) + WF.open([Pf(xb, y, -ZB), Pf(xa, y, ZB)]) : '');
+    M.stiff.forEach(s => { WF.drawBox(s, Pf, front, vb > .001, 6*(1 - vb)); WF.cls(s.el.sil, k === 2 ? 'sil hi' : 'sil'); });
+    [M.frontOuter, M.frontEdge].forEach(p => WF.drawPanel(p, Pf, grow));
+    WF.cls(M.web.mesh, k === 5 ? 'nf hi' : 'nf');
+    drawBeam(M.right);
+    WF.drawWeights(M.weights, val, Pf, front, k === 3);
+    const zc = Z0 + grow*(Z1 - Z0);
+    WF.setD(M.cap, grow > .001 ? WF.poly(I.map(([x, yy]) => Pf(x, yy, zc))) : '');
+    WF.cls(M.cap, k === 1 ? 'sil hi' : 'sil');
+  }
+  return { N, STAGES, DETAIL, S, build, draw };
+})();
+return { FLB, WLY, WLC, WSB, WCB, PZ };
+})();
+</script>
+<script>
+/* One playback for every sequence on the page. Each section keeps its own clock: the loop opens on the
+   finished model, un-builds and builds again; moving across the drawing scrubs it by the pointer's x;
+   the rail jumps to a stage. All figures share the kernel's single frame loop, which sleeps offscreen. */
+(() => {
+  const { register, pointer, reducedMotion, mk, inject, clamp } = HL;
+  inject(document);
+  const FIGS = { beam: () => BEAM, turbine: () => TG, pump: () => PP, substructure: () => BS, endplate: () => EP,
+    flb: () => J10.FLB, wly: () => J10.WLY, wlc: () => J10.WLC, wsb: () => J10.WSB, wcb: () => J10.WCB, pz: () => J10.PZ };
+
+  function mount(fig, root, DW, HOLD){
+    const { N, STAGES, DETAIL, S } = fig;
+    const stage = root.querySelector('.stage'), rail = root.querySelector('.rail');
+    const nameEl = root.querySelector('.tag-name'), readEl = root.querySelector('.tag-read');
+    const svg = mk('svg', { viewBox: '0 0 400 320', 'aria-hidden': 'true' }, stage);
+    const M = fig.build(svg), CYC = (N + 1)*DW + HOLD;
+    let t0 = null, man = null, shown = -1, R = null;
+    const at = now => {
+      if (man !== null) return man;
+      if (reducedMotion()) return N;
+      if (t0 === null) t0 = now - N*DW;
+      return Math.min(N, Math.floor(((now - t0) % CYC)/DW));
+    };
+    const stageOf = k => STAGES.reduce((s, [, k0], i) => (k >= k0 ? i : s), -1);
+    const btns = STAGES.map(([name, k0], i) => {
+      const li = document.createElement('li'), b = document.createElement('button'), s = document.createElement('span');
+      b.type = 'button'; s.textContent = String(i + 1).padStart(2, '0') + ' ' + name; b.append(s);
+      b.addEventListener('click', () => { if (reducedMotion()) man = k0; else { man = null; t0 = performance.now() - k0*DW; } R && R.wake(); });
+      li.append(b); rail.append(li); return b;
+    });
+    function ui(k){
+      if (k === shown) return; shown = k;
+      const s = stageOf(k);
+      nameEl.textContent = s < 0 ? '00  start' : String(s + 1).padStart(2, '0') + '  ' + STAGES[s][0];
+      readEl.textContent = DETAIL[k];
+      btns.forEach((b, i) => { if (i === s) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); b.classList.toggle('done', i < s); });
+    }
+    R = register(stage, (dt, now) => { S.now = now; S.k = at(now); ui(S.k); fig.draw(M); return !reducedMotion(); });
+    const pick = p => { man = clamp(Math.round((p[0] - 24)/352*N), 0, N); R.wake(); };
+    pointer(stage, { move: pick, down: pick, leave: () => { if (man !== null && !reducedMotion()) t0 = performance.now() - man*DW; man = null; R.wake(); } });
+  }
+
+  document.querySelectorAll('[data-sequence]').forEach(root => {
+    try {
+      const fig = FIGS[root.dataset.sequence] && FIGS[root.dataset.sequence]();
+      if (fig) mount(fig, root, Number(root.dataset.dwell) || 1100, Number(root.dataset.hold) || 3600); }
+    catch (e) { console.error(root.dataset.sequence, e); }
+  });
+
+  /* light or dark: the system's until the switch is pressed, then the switch's, remembered on this device */
+  const doc = document.documentElement, btn = document.getElementById('theme');
+  if (!btn) return;
+  const dark = () => (doc.dataset.theme ? doc.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches);
+  const label = () => { btn.textContent = dark() ? 'dark' : 'light'; };
+  try { const saved = localStorage.getItem('si-theme'); if (saved === 'light' || saved === 'dark') doc.dataset.theme = saved; } catch (e) {}
+  btn.addEventListener('click', () => {
+    doc.dataset.theme = dark() ? 'light' : 'dark'; label();
+    try { localStorage.setItem('si-theme', doc.dataset.theme); } catch (e) {}
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+  label();
+})();
+</script>
