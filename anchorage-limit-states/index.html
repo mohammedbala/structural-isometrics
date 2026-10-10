@@ -50,6 +50,7 @@ h1{margin:0;font:300 clamp(30px,4vw,48px)/1.02 var(--f-sans);letter-spacing:-.02
 .seq-head h2{margin:0;font:400 22px/1.15 var(--f-sans);letter-spacing:-.01em}
 .seq-head p{grid-column:2;margin:0;color:var(--muted);font-size:13.5px;text-wrap:pretty}
 .plate{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--ground)}
+[data-hairline] svg text{fill:var(--hl-hi);stroke:none;font:9px/1 var(--f-mono);letter-spacing:.02em}
 .tag{position:absolute;top:14px;z-index:1;font:11px/1 var(--f-mono);letter-spacing:.02em;color:var(--muted);pointer-events:none}
 .tag-name{left:16px}
 .tag-read{right:16px;color:var(--ink);font-variant-numeric:tabular-nums}
@@ -920,6 +921,19 @@ const CAX = (() => {
   /* the two lines of a vertical rod's outline, drawn from z0 to z1 */
   const rodLines = (Pm, x, y, r, z0, z1) => { const s = Math.SQRT1_2*r; return open([Pm(x + s, y - s, z0), Pm(x + s, y - s, z1)]) + open([Pm(x - s, y + s, z0), Pm(x - s, y + s, z1)]); };
 
+  /* An angle, marked in 3-d: from vertex O, the rays a and b (unit vectors), an arc of radius r between them
+     and its label just outside the arc; the hidden failure line, if any, dashed. */
+  const angleMark = g => ({ ln: mk('path', { class: 'nf hi dash' }, g), ref: mk('path', { class: 'nf hi' }, g), arc: mk('path', { class: 'nf hi' }, g), t: mk('text', { 'text-anchor': 'middle', 'dominant-baseline': 'middle' }, g) });
+  function drawAngle(am, P, m, on){
+    if (!on){ [am.ln, am.ref, am.arc].forEach(e => setD(e, '')); am.t.textContent = ''; return; }
+    const { O, a, b, r, label, la = 0, lb = 0 } = m, ph = Math.acos(Math.max(-1, Math.min(1, a[0]*b[0] + a[1]*b[1] + a[2]*b[2])));
+    const dir = t => { const s0 = Math.sin((1 - t)*ph)/Math.sin(ph), s1 = Math.sin(t*ph)/Math.sin(ph); return [0, 1, 2].map(i => s0*a[i] + s1*b[i]); };
+    const at = (d, k) => P(O[0] + k*d[0], O[1] + k*d[1], O[2] + k*d[2]);
+    setD(am.ref, la ? open([P(...O), at(a, la)]) : '');
+    setD(am.ln, lb ? open([P(...O), at(b, lb)]) : '');
+    setD(am.arc, open(range(16).map(t => at(dir(t), r))));
+    const q = at(dir(.5), r + 2.2); am.t.setAttribute('x', q[0].toFixed(1)); am.t.setAttribute('y', q[1].toFixed(1)); am.t.textContent = label;
+  }
   /* A figure: concrete, anchor, load, mechanism (half, then full). spec.anchor = { x, y, hef, top, plate,
      adhesive }; spec.move = { anchor, embed, chunk, upper }, each p, a → p; spec.holes = { top, side, end },
      polygons in face coordinates, cut once the concrete cracks; spec.band(a) gives the two rings, in 3-d, whose
@@ -953,6 +967,7 @@ const CAX = (() => {
       hook('onPlate')(g);
       if (spec.rod !== false){ M.rod = solid(g); M.nut = solid(g); }
       hook('top')(g);
+      M.angles = (spec.angles || []).map(() => angleMark(g));
       M.arrow = arrow(g);
       return M;
     }
@@ -989,6 +1004,7 @@ const CAX = (() => {
         cls(M.rod.sil, k === 2 ? 'sil hi' : 'sil'); cls(M.nut.sil, k === 2 ? 'sil hi' : 'sil');
       }
       if (spec.load){ const [p0, p1] = spec.load, Pl = M.T(spec.loadKey || 'anchor'); drawArrow(M.arrow, Pl(...p0), Pl(...p1), val(M.load), k === 3); }
+      (spec.angles || []).forEach((m, i) => drawAngle(M.angles[i], P, m, val(M.mech) > .5));
       spec.drawExtra && spec.drawExtra(M, k, val);
     }
     return { N, STAGES, DETAIL: spec.DETAIL, S, build, draw };
@@ -1016,6 +1032,9 @@ const sq = (cu, cv, hu, hv = hu) => [[cu - hu, cv - hv], [cu + hu, cv - hv], [cu
 const sqZ = (x, y, z, hx, hy = hx) => sq(x, y, hx, hy).map(([u, v]) => [u, v, z]);
 const sqY = (y, x, z, h) => sq(x, z, h).map(([u, v]) => [u, y, v]);
 const edges = (P, a, b) => a.map((p, i) => open([P(...p), P(...b[i])])).join('') + poly(a.map(p => P(...p)));
+/* an angle mark: at O, from direction a to the point Q, labelled; the reference and the failure line drawn as long as given */
+const unit = v => { const l = Math.hypot(...v); return v.map(c => c/l); };
+const ang = (O, a, Q, r, label, la) => { const d = [Q[0] - O[0], Q[1] - O[1], Q[2] - O[2]]; return { O, a: unit(a), b: unit(d), r, label, la, lb: Math.hypot(...d) }; };
 const smooth = t => { t = Math.max(0, Math.min(1, t)); return t*t*(3 - 2*t); };
 
 /* Steel strength in tension: the rod necks just above the concrete and breaks; the top of it flies off. */
@@ -1048,6 +1067,7 @@ const ACB = CAX.fig({
   anchor: { x: 0, y: 0, hef: 8 }, block: { x: [-16, 16], y: [-14, 14] }, grid: 3,
   move: { anchor: up(L1), chunk: up(L1) },
   holes: { top: [sq(0, 0, RC)] },
+  angles: [ang([RC, 0, 0], [-1, 0, 0], [0, 0, -8], 3.2, '35°', 5)],
   band: a => { const d = a*L1; return [sqZ(0, 0, 0, RC), sqZ(0, 0, -d, RC - 1.5*d)]; },
   load: LOAD_UP(0, 0),
   onHidden(g, M){ M.cone = mk('path', { class: 'nf sil dash' }, g); },
@@ -1078,6 +1098,7 @@ const ASB = CAX.fig({
   anchor: { x: 0, y: Y1 - CA1, hef: HE }, block: { x: [-11, 11], y: [-8, Y1], z: -20 },
   move: { anchor: up(.7), chunk: shift(0, 1.3, .25) },
   holes: { side: [sq(0, -HE, RBO)] },
+  angles: [ang([0, Y1, -HE + RBO], [0, 0, -1], [0, Y1 - CA1, -HE], 2.6, '18°', 4)],
   band: a => { const d = a*1.3; return [sqY(Y1, 0, -HE, RBO), sqY(Y1 - d, 0, -HE, RBO - (RBO/CA1)*d)]; },
   load: LOAD_UP(0, Y1 - CA1),
   onHidden(g, M){ M.pyr = mk('path', { class: 'nf sil dash' }, g); },
@@ -1127,6 +1148,7 @@ const AVB = CAX.fig({
   anchor: { x: 0, y: AY, hef: 8, plate: 4, top: 2.6 }, block: { x: [-13, 13], y: [-10, YE], z: -14 },
   move: { anchor: shift(0, 1.1, -.2), chunk: shift(0, 1.1, -.2) },
   holes: { top: [[[0, AY], [W, YE], [-W, YE]]], side: [[[-W, -W], [W, -W], [W, 0], [-W, 0]]] },
+  angles: [{ ...ang([W, YE, 0], [-1, 0, 0], [0, AY, 0], 2.6, '35°', 4), lb: 0 }, ang([0, YE, -W], [0, 0, 1], [0, AY, 0], 2.6, '35°', 4)],
   load: [[0, AY - 11, .4], [0, AY - 4.25, .4]],
   onHidden(g, M){ M.pyr = mk('path', { class: 'nf sil dash' }, g); },
   drawExtra(M, k, val){ const Pc = M.T('chunk'); setD(M.pyr, at(val(M.mech) > .5, open([Pc(-W, YE, -W), Pc(0, AY, 0), Pc(W, YE, -W)]))); },
@@ -1141,6 +1163,7 @@ const AVP = CAX.fig({
   anchor: { x: 0, y: 0, hef: 4, plate: 4, top: 2.6 }, block: { x: [-10, 10], y: [-9, 9], z: -10 },
   move: { anchor: rotY(0, -1, -.16), chunk: rotY(RP, 0, .15) },
   holes: { top: [[[0, -RP], [RP, -RP], [RP, RP], [0, RP]]] },
+  angles: [ang([RP, 0, 0], [-1, 0, 0], [0, 0, -4], 2.2, '35°', 3.5)],
   band: () => [[[0, -RP, 0], [RP, -RP, 0], [RP, RP, 0], [0, RP, 0]], [[0, -RP + 2.1, -1.4], [RP - 2.1, -RP + 2.1, -1.4], [RP - 2.1, RP - 2.1, -1.4], [0, RP - 2.1, -1.4]]],
   load: LOAD_X,
   onHidden(g, M){ M.pyr = mk('path', { class: 'nf sil dash' }, g); },
