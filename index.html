@@ -106,7 +106,7 @@ footer a{color:inherit}
       <h1>Structural isometrics</h1>
       <button class="switch" id="theme" type="button" aria-label="Switch between the light and the dark theme"></button>
     </div>
-    <p>Five structural models drawn in lines, four in concrete and one bolted steel connection, then the local limit states of wide-flange members under concentrated forces and of rectangular and round HSS-to-HSS connections. Each builds stage by stage in a loop. Pick colours below and download any figure as SVG, PNG or GIF. Move across a drawing to scrub it, or pick a stage under it. Deflections, cracks and mode shapes are sketches, not analysis results.</p>
+    <p>Five structural models drawn in lines, four in concrete and one bolted steel connection, then the local limit states of wide-flange members under concentrated forces of rectangular and round HSS-to-HSS connections, and of the end-plate moment connection. Each builds stage by stage in a loop. Pick colours below and download any figure as SVG, PNG or GIF. Move across a drawing to scrub it, or pick a stage under it. Deflections, cracks and mode shapes are sketches, not analysis results.</p>
     <ol class="toc">
       <li><a href="#beam"><span>01</span>Concrete beam</a></li>
       <li><a href="#turbine"><span>02</span>Turbine foundation</a></li>
@@ -131,6 +131,15 @@ footer a{color:inherit}
       <li><a href="#rpx"><span>21</span>Chord plastification, cross</a></li>
       <li><a href="#rpk"><span>22</span>Chord plastification, K</a></li>
       <li><a href="#rps"><span>23</span>Punching shear, round</a></li>
+      <li><a href="#epy"><span>24</span>End-plate yielding</a></li>
+      <li><a href="#btr"><span>25</span>Bolt tension rupture</a></li>
+      <li><a href="#eps"><span>26</span>Extended plate shear</a></li>
+      <li><a href="#bsr"><span>27</span>Bolt shear rupture</a></li>
+      <li><a href="#fwr"><span>28</span>Flange weld rupture</a></li>
+      <li><a href="#cfy"><span>29</span>Column flange yielding</a></li>
+      <li><a href="#cwy"><span>30</span>Column web yielding</a></li>
+      <li><a href="#cwc"><span>31</span>Column web crippling</a></li>
+      <li><a href="#cpz"><span>32</span>Panel-zone shear</a></li>
     </ol>
     <div class="colors">
       <span>Colours</span>
@@ -346,6 +355,84 @@ footer a{color:inherit}
           <div class="stage" data-hairline="rps" role="img" aria-label="A round tube chord with a round tube branch nearly as wide as it, pushed by an arrow; the branch sinks into the chord as the wall shears around the saddle."></div>
         </div>
         <ol class="rail" aria-label="Stages of punching shear, round"></ol>
+      </section>
+    </div>
+  </section>
+
+  <section class="group" aria-labelledby="ep-h">
+    <div class="group-head"><span class="num">358</span><h2 id="ep-h">End-plate connection limit states</h2><p>AISC 358 Chapter 6: the limit states of the four-bolt extended end-plate (4E) moment connection, the plate, bolts and weld first, then the column. Each figure builds the connection, bolts it and loads the beam, then lets the mechanism develop. Displacements are exaggerated.</p></div>
+    <div class="seqs">
+      <section class="seq" id="epy" data-sequence="epy" data-dwell="1300" data-hold="3400" aria-labelledby="epy-h">
+        <div class="seq-head"><span class="num">24</span><h2 id="epy-h">End-plate yielding</h2><p>Thin-plate behaviour · The plate bends round the tension flange along yield lines at the flange and the bolt rows, while the bolts hold.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="epy" role="img" aria-label="A bolted extended end-plate connection of a wide-flange beam to a column is drawn in lines, loaded with weights at the beam tip; the end plate bends away from the column round the tension flange and yield lines form across it."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of end-plate yielding"></ol>
+      </section>
+      <section class="seq" id="btr" data-sequence="btr" data-dwell="1300" data-hold="3400" aria-labelledby="btr-h">
+        <div class="seq-head"><span class="num">25</span><h2 id="btr-h">Bolt tension rupture</h2><p>Thick-plate behaviour, no prying · The plate stays flat and turns with the beam about its compression flange; the four tension bolts stretch and break.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="btr" role="img" aria-label="A bolted extended end-plate connection loaded with weights at the beam tip; the end plate stays flat and turns away from the column, and the bolts at the tension flange stretch and break."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of bolt tension rupture"></ol>
+      </section>
+      <section class="seq" id="eps" data-sequence="eps" data-dwell="1300" data-hold="3400" aria-labelledby="eps-h">
+        <div class="seq-head"><span class="num">26</span><h2 id="eps-h">Extended plate shear</h2><p>Shear yielding, then rupture · The outer bolts hold the extension while the flange pulls the rest of the plate away, shearing it across its thickness at the flange.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="eps" role="img" aria-label="A bolted extended end-plate connection loaded with weights at the beam tip; the part of the plate above the tension flange stays bolted to the column while the rest pulls away, shearing the plate at the flange."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of extended plate shear"></ol>
+      </section>
+      <section class="seq" id="bsr" data-sequence="bsr" data-dwell="1300" data-hold="3400" aria-labelledby="bsr-h">
+        <div class="seq-head"><span class="num">27</span><h2 id="bsr-h">Bolt shear rupture</h2><p>The beam shear goes to the bolts at the compression flange; the plate slides down on them and they shear at the faying surface.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="bsr" role="img" aria-label="A bolted extended end-plate connection loaded with weights at the beam tip; the end plate and beam slide down the column face, and hidden lines show the lower bolts shearing at the faying surface."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of bolt shear rupture"></ol>
+      </section>
+      <section class="seq" id="fwr" data-sequence="fwr" data-dwell="1300" data-hold="3400" aria-labelledby="fwr-h">
+        <div class="seq-head"><span class="num">28</span><h2 id="fwr-h">Flange weld rupture</h2><p>The weld of the tension flange tears, the flange pulls off the plate, and the web weld unzips from the top.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="fwr" role="img" aria-label="A bolted extended end-plate connection loaded with weights at the beam tip; the beam tension flange tears away from the end plate at its weld and the beam turns about its compression flange."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of flange weld rupture"></ol>
+      </section>
+      <section class="seq" id="cfy" data-sequence="cfy" data-dwell="1300" data-hold="3400" aria-labelledby="cfy-h">
+        <div class="seq-head"><span class="num">29</span><h2 id="cfy-h">Column flange yielding</h2><p>No continuity plates · The bolts pull the column flange out; it bends about the column web and its tips curl toward the beam.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="cfy" role="img" aria-label="A bolted extended end-plate connection to a column without continuity plates, loaded with weights at the beam tip; the column flange bends out at the tension bolts and its tips curl toward the beam."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of column flange yielding"></ol>
+      </section>
+      <section class="seq" id="cwy" data-sequence="cwy" data-dwell="1300" data-hold="3400" aria-labelledby="cwy-h">
+        <div class="seq-head"><span class="num">30</span><h2 id="cwy-h">Column web yielding</h2><p>No continuity plates · The tension flange force spreads through the plate and the column flange and yields the web at the toe of its fillet over 6k + tbf + 2tp.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="cwy" role="img" aria-label="A bolted extended end-plate connection to a column without continuity plates, loaded with weights at the beam tip; the column flange pulls out at the tension flange and a band of the column web yields behind it."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of column web yielding"></ol>
+      </section>
+      <section class="seq" id="cwc" data-sequence="cwc" data-dwell="1300" data-hold="3400" aria-labelledby="cwc-h">
+        <div class="seq-head"><span class="num">31</span><h2 id="cwc-h">Column web crippling</h2><p>No continuity plates · The compression flange pushes the plate into the column, and the web wrinkles just behind the column flange.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="cwc" role="img" aria-label="A bolted extended end-plate connection to a column without continuity plates, loaded with weights at the beam tip; the beam compression flange pushes into the column and the column web wrinkles behind its flange."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of column web crippling"></ol>
+      </section>
+      <section class="seq" id="cpz" data-sequence="cpz" data-dwell="1300" data-hold="3400" aria-labelledby="cpz-h">
+        <div class="seq-head"><span class="num">32</span><h2 id="cpz-h">Panel-zone shear</h2><p>The flange forces shear the column web between the continuity plates into a parallelogram; the column flanges kink and the beam turns with it.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="cpz" role="img" aria-label="A bolted extended end-plate connection to a column with continuity plates, loaded with weights at the beam tip; the column web between the continuity plates shears into a parallelogram and the beam turns with it."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of panel-zone shear"></ol>
       </section>
     </div>
   </section>
@@ -2907,7 +2994,7 @@ const WF = (() => {
     }
     return { N, STAGES, DETAIL: spec.DETAIL, S, build, draw };
   }
-  return { setD, cls, show, mix, line, putc, ringsOf, from, range, bell, discAt, seq, camera, panel, drawPanel, box, drawBox, weights, drawWeights, beamFig, SECTION, clamp, lerp, poly, open };
+  return { setD, cls, show, mix, line, putc, ringsOf, from, range, bell, discAt, seq, camera, panel, drawPanel, box, drawBox, weights, drawWeights, wbeam, beamFig, SECTION, clamp, lerp, poly, open };
 })();
 </script>
 <script>
@@ -3693,6 +3780,322 @@ return { CWP, PUN, SLY, SLC, SLB, BEW, CSG, CDF, RPT, RPX, RPK, RPS };
 })();
 </script>
 <script>
+/* The AISC 358 four-bolt extended end-plate connection (4E) again, built to deform: a W14×132 column, a
+   1¼ in end plate, a W24×76 beam and eight 1⅛ in bolts, every surface a meshed panel drawn through Pf, a
+   figure's displacement field. x runs along the beam from the column's bolted flange face at x = 0, y across
+   it, z up. part(x, y, z) says what a point belongs to, so a field can move the column, the plate with its
+   bolt heads, and the beam separately. Inches. */
+const EPX = (() => {
+  const { setD, cls, show, line, putc, from, range, seq, panel, drawPanel, box, drawBox, weights, drawWeights, wbeam, lerp, poly, open, mix } = WF;
+  const { mk, tween, tset, tval, solid, hull, Cam, fit, proj, facing } = HL;
+  const CD = 14.7, CBF = 14.7, CTF = 1.03, CTW = .645, CK = 1.63, CZ0 = -17, CZ1 = 19;
+  const BD = 23.9, BBF = 9, BTF = .68, BTW = .44, BL = 24;
+  const TP = 1.25, PW = 10, ZT = BD/2, ZTI = ZT - BTF, PH = ZT + 4.5;
+  const GG = 5.5, PF = 2, RB = .95, RS = .5625, X0P = .002;
+  const ROWS = [ZT + PF, ZTI - PF, -(ZTI - PF), -(ZT + PF)];
+  const BOLTS = ROWS.flatMap(z => [-GG/2, GG/2].map(y => ({ y, z })));
+  const ZS = ZT - BTF/2;                       // the beam flanges' mid-planes, where continuity plates go
+
+  const inBeam = (y, z) => Math.abs(z) <= ZT + .01 && (Math.abs(y) <= BTW/2 + .01 || (Math.abs(z) >= ZTI - .01 && Math.abs(y) <= BBF/2 + .01));
+  const part = (x, y, z) => (x <= .001 ? 'col' : x <= TP + .001 || (x <= TP + .8 && !inBeam(y, z)) ? 'plate' : 'beam');
+
+  /* a prism along x: n-sided rings in the y-z plane at x0 and x1, turned by ph; the near cap is the crease */
+  const xprism = (Pf, x0, x1, y, z, R, n, ph) => {
+    const ring = x => range(n).slice(0, -1).map(u => { const a = ph + u*2*Math.PI; return Pf(x, y + R*Math.cos(a), z + R*Math.sin(a)); });
+    const a = ring(x0), b = ring(x1);
+    return { sil: poly(hull(a.concat(b))), crease: poly(b) };
+  };
+
+  const FIT = [[-CD, -CBF/2, CZ1], [-CD, CBF/2, CZ0], [0, CBF/2, CZ0], [BL, BBF/2, -ZT - 1], [BL, -BBF/2, ZT + 1], [BL - 3.5, 0, ZT + 5]];
+  /* A figure: connection, bolts, load, mechanism (half, then full). spec.D(x, y, z, a, part) is the field;
+     spec.stiff puts continuity plates in; spec.split cuts the plate at those heights so a field can tear it;
+     hooks add a figure's own parts at their depth; drawExtra draws them. */
+  function fig(spec){
+    const N = 5, { S, G, val } = seq(N);
+    const STAGES = [['connection', 1], ['bolts', 2], ['load', 3], ['mechanism', 4]];
+    function build(svg){
+      /* seen from the beam's side, or from behind the column (back), where the web next to the bolted flange shows */
+      const back = !!spec.back, C = Cam(back ? -45 : 45, .5, spec.scale || 6), g = mk('g', {}, svg);
+      fit(C, spec.fit || FIT, 200, 162);
+      const P = proj(C), front = facing(C);
+      const M = { C, P, front, back, a: 1, amp: tween(1, 900), col: G(from(1)), plt: G(from(1), 150), bm: G(from(1), 300),
+        bolt: G(from(2)), load: G(from(3)), mech: G(from(4)), full: G(from(5)) };
+      M.Pf = (x, y, z) => { if (!M.a) return P(x, y, z); const d = spec.D(x, y, z, M.a, part(x, y, z)); return P(x + d[0], y + d[1], z + d[2]); };
+      const hook = name => g2 => spec[name] && spec[name](g2, M, G);
+      const Zc = u => lerp(CZ0, CZ1, u), us = range(12).slice(1, -1);
+      const stiff = () => { M.stiff = spec.stiff ? [ZS, -ZS].map(z => box(g, [-CD + CTF, CTW/2, -CTF, CBF/2 - .3], z - .38, z + .38, { r: .2, k: .1 })) : []; };
+      const web = () => panel(g, (u, v) => [lerp(-CD + CTF, -CTF, v), CTW/2, Zc(u)], { nu: 72, nv: 14, us, vs: [.25, .5, .75] });
+      /* the column, back to front for the view */
+      const column = () => {
+        if (back){
+          M.colP = [panel(g, (u, v) => [-CTF, lerp(-CBF/2, CBF/2, v), Zc(u)], { nu: 72, nv: 6 }), panel(g, (u, v) => [-CTF + v*CTF, CBF/2, Zc(u)], { nu: 72, nv: 1 }), M.web = web()];
+          hook('onWeb')(g); stiff();
+          M.colP.push(panel(g, (u, v) => [-CD + v*CTF, CBF/2, Zc(u)], { nu: 36, nv: 1 }),
+            panel(g, (u, v) => [-CD, lerp(-CBF/2, CBF/2, v), Zc(u)], { nu: 36, nv: 8, us, vs: [.15, .3, .7, .85] }));
+        } else {
+          M.colP = [panel(g, (u, v) => [-CD + CTF, lerp(-CBF/2, CBF/2, v), Zc(u)], { nu: 36, nv: 6 }), panel(g, (u, v) => [-CD + v*CTF, CBF/2, Zc(u)], { nu: 36, nv: 1 }), M.web = web()];
+          hook('onWeb')(g); stiff();
+          M.colP.push(panel(g, (u, v) => [-CTF + v*CTF, CBF/2, Zc(u)], { nu: 72, nv: 1 }),
+            panel(g, (u, v) => [0, lerp(-CBF/2, CBF/2, v), Zc(u)], { nu: 72, nv: 14, us, vs: [.15, .3, .7, .85] }));
+        }
+        M.cap = mk('path', { class: 'sil' }, g);
+        hook('onFace')(g);
+        M.shanks = back ? [] : BOLTS.map(b => ({ ...b, el: mk('path', { class: 'nf' }, g) }));
+      };
+      /* the plate, in pieces cut at spec.split, lowest first; from behind only its edge and top show */
+      const plate = () => {
+        const cuts = [-PH, ...(spec.split || []), PH];
+        M.plate = cuts.slice(0, -1).map((z0, i) => {
+          const z1 = cuts[i + 1], e0 = i ? z0 + .002 : z0, e1 = i < cuts.length - 2 ? z1 - .002 : z1, Zp = u => lerp(e0, e1, u);
+          const zs = [-14.5, -9.5, -4.5, 0, 4.5, 9.5, 14.5].filter(z => z > e0 + .05 && z < e1 - .05).map(z => (z - e0)/(e1 - e0));
+          return { z0: e0, z1: e1,
+            edge: panel(g, (u, v) => [lerp(X0P, TP, v), PW/2, Zp(u)], { nu: 40, nv: 1 }),
+            top: panel(g, (u, v) => [lerp(X0P, TP, u), lerp(-PW/2, PW/2, v), e1], { nu: 2, nv: 12 }),
+            face: back ? null : panel(g, (u, v) => [TP, lerp(-PW/2, PW/2, v), Zp(u)], { nu: 40, nv: 12, us: zs, vs: [.15, .5, .85] }) };
+        });
+        hook('onPlate')(g);
+      };
+      /* the beam, with the bolt heads each at the depth its view needs */
+      const head = (b, g2) => ({ ...b, el: solid(g2), s: G(from(2), (b.z < 0 ? 200 : 0) + (b.y > 0 ? 80 : 0)) });
+      M.heads = [];
+      const beam = () => {
+        M.beam = wbeam(g, { X0: TP, X1: BL, d: BD, bf: BBF, tf: BTF, tw: BTW }, {
+          under: g2 => BOLTS.filter(b => b.y < 0 && b.z < -ZT).forEach(b => M.heads.push(head(b, g2))),
+          behindWeb: g2 => BOLTS.filter(b => b.y < 0 && b.z > -ZT).forEach(b => M.heads.push(head(b, g2))),
+          onTop: g2 => {
+            BOLTS.filter(b => b.y > 0).forEach(b => M.heads.push(head(b, g2)));
+            M.weld = mk('path', { class: 'sil' }, g2);
+            M.weights = weights(g2, G, from(3), BL - 3.5, 0, 3, ZT);
+            hook('onBeam')(g2);
+          },
+        });
+      };
+      if (back){ beam(); plate(); column(); } else { column(); plate(); beam(); }
+      hook('top')(g);
+      return M;
+    }
+    function draw(M){
+      const k = S.k, { Pf, P, front } = M;
+      tset(M.amp, k === 4 ? .5 : k >= 5 ? 1 : 0, S.now, 0); M.a = tval(M.amp, S.now);
+      const vc = val(M.col), vp = val(M.plt), vb = val(M.bm), vt = val(M.bolt);
+      M.colP.forEach(p => drawPanel(p, Pf, vc));
+      const zc = lerp(CZ0, CZ1, vc), I = [[-CD, -CBF/2], [-CD + CTF, -CBF/2], [-CD + CTF, -CTW/2], [-CTF, -CTW/2], [-CTF, -CBF/2], [0, -CBF/2], [0, CBF/2], [-CTF, CBF/2], [-CTF, CTW/2], [-CD + CTF, CTW/2], [-CD + CTF, CBF/2], [-CD, CBF/2]];
+      setD(M.cap, vc > .001 ? poly(I.map(([x, y]) => Pf(x, y, zc))) : ''); cls(M.cap, k === 1 ? 'sil hi' : 'sil');
+      M.stiff.forEach(s => { drawBox(s, Pf, front, vt > .001, 8*(1 - vt)); cls(s.el.sil, k === 2 ? 'sil hi' : 'sil'); });
+      M.plate.forEach(pc => {
+        const h = (pc.z1 - pc.z0)/(2*PH), lo = (pc.z0 + PH)/(2*PH), gp = Math.max(0, Math.min(1, (vp - lo)/h));
+        drawPanel(pc.edge, Pf, gp); drawPanel(pc.top, Pf, gp > .999 ? 1 : 0); cls(pc.edge.el, k === 1 ? 'sil hi' : 'sil');
+        if (pc.face){ drawPanel(pc.face, Pf, gp); cls(pc.face.el, k === 1 ? 'sil hi' : 'sil'); }
+      });
+      M.beam.draw(Pf, vb, k, spec.beamHi && k === 5 ? spec.beamHi : null);
+      if (M.back) setD(M.beam.cap, '');
+      M.heads.forEach(h => {
+        const v = val(h.s), on = v > .001 && vp > .999; show(h.el.g, on);
+        if (on) putc(h.el, xprism(Pf, TP + X0P + 8*(1 - v), TP + .72 + 8*(1 - v), h.y, h.z, RB, 6, Math.PI/6));
+        cls(h.el.sil, k === 2 || (spec.headHi && spec.headHi(h, k)) ? 'sil hi' : 'sil');
+      });
+      setD(M.weld, vb > .99 && spec.weld !== false ? poly([[TP, -BBF/2, ZT + .5], [TP + .5, -BBF/2, ZT + .02], [TP + .5, BBF/2, ZT + .02], [TP, BBF/2, ZT + .5]].map(p => Pf(...p))) : '');
+      drawWeights(M.weights, val, Pf, front, k === 3);
+      /* shank sides in the gap between the column face and the plate, broken where spec.broken says */
+      M.shanks.forEach(b => {
+        const br = spec.broken && spec.broken(b, k);
+        let d = '';
+        if (vt > .99) [-RS, RS].forEach(o => {
+          const p0 = Pf(-.0005, b.y, b.z + o), p1 = Pf(.0015, b.y, b.z + o);
+          if (Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) < .4) return;
+          d += br ? open([p0, mix(p0, p1, .42)]) + open([mix(p0, p1, .58), p1]) : open([p0, p1]);
+        });
+        setD(b.el, d); cls(b.el, spec.shankHi && spec.shankHi(b, k) ? 'nf hi' : 'nf');
+      });
+      spec.drawExtra && spec.drawExtra(M, k, val);
+    }
+    return { N, STAGES, DETAIL: spec.DETAIL, S, build, draw };
+  }
+  /* straight lines sampled through Pf, so they follow the field */
+  const lines = (Pf, segs, n = 16) => segs.map(([p, q]) => open(range(n).map(u => Pf(...mix(p, q, u))))).join('');
+  return { CD, CBF, CTF, CTW, CK, CZ0, CZ1, BD, BBF, BTF, BTW, BL, TP, PW, ZT, ZTI, PH, GG, PF, RB, ROWS, BOLTS, ZS, part, fig, lines };
+})();
+</script>
+<script>
+/* The limit states of the 4E end-plate moment connection, AISC 358 Chapter 6: the beam side (plate, bolts,
+   weld), then the column side. Every field leaves the column, the plate with its bolt heads, and the beam to
+   move on their own, and displacements are exaggerated so the mechanism reads. */
+const EPLS = (() => {
+const { CD, CTF, CTW, CK, BTF, TP, PW, ZT, ZTI, PH, GG, PF, BOLTS, ZS, lines } = EPX;
+const { clamp, bell, setD, cls, open } = WF, { mk } = HL;
+const smooth = t => { t = clamp(t, 0, 1); return t*t*(3 - 2*t); }, plat = (x, h, w) => { const d = Math.abs(x) - h; return d <= 0 ? 1 : Math.exp(-((d/w)**2)); };
+const at = (on, d) => (on ? d : '');
+const D1 = 'W14×132 · PL 1¼ × 10 · W24×76';
+const turn = (th, x0, z0) => (x, z) => [th*(z - z0), 0, -th*(x - x0)];   // a small turn about the line (x0, z0)
+
+/* a band on a surface, outlined and hatched, its corner c and sides du, dv in inches */
+function band(g){ return { o: mk('path', { class: 'nf' }, g), h: mk('path', { class: 'nf' }, g) }; }
+function drawBand(B, Pf, on, hi, c, du, dv, n){
+  const P = (u, v) => [c[0] + u*du[0] + v*dv[0], c[1] + u*du[1] + v*dv[1], c[2] + u*du[2] + v*dv[2]];
+  setD(B.o, at(on, lines(Pf, [[P(0, 0), P(1, 0)], [P(1, 0), P(1, 1)], [P(1, 1), P(0, 1)], [P(0, 1), P(0, 0)]])));
+  let h = ''; if (on) for (let i = 1; i < n; i++) h += lines(Pf, [[P(i/n, 0), P(i/n, 1)]], 6);
+  setD(B.h, h); cls(B.o, hi ? 'nf hi' : 'nf'); cls(B.h, hi ? 'nf hi' : 'nf lo');
+}
+
+/* End-plate flexural yielding: a thin plate bends round the tension flange, along yield lines at the flange and
+   at the bolt rows; the bolts hold, and the tip of the extension stays down on the column. */
+const EPY = EPX.fig({
+  DETAIL: ['ready', D1, '4E · 8 × A490 1⅛ · continuity plates', 'Mf and Vu', 'the plate bends round the tension flange', 'yield lines · Fyp tp² Yp'],
+  stiff: true,
+  D(x, y, z, a, p){
+    if (p === 'col') return [0, 0, 0];
+    const th = a*.05;
+    if (p === 'beam') return turn(th, TP, -ZT)(x, z);
+    let dx;
+    if (z >= ZT) dx = th*2*ZT*smooth((ZT + PF - z)/PF);
+    else if (z >= ZTI) dx = th*(z + ZT);
+    else { const w = bell(y, 2.2); dx = th*(z + ZT)*(w + (1 - w)*smooth((z - (ZTI - PF))/PF)); }
+    return [dx, 0, 0];
+  },
+  onPlate(g, M){ M.yl = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){
+    const P = (y, z) => [TP, y, z], s = .5*Math.sqrt(PW*GG), w = PW/2;
+    setD(M.yl, at(val(M.full) > .5, lines(M.Pf, [[P(-w, ZT + .6), P(w, ZT + .6)], [P(-w, ZT + PF), P(w, ZT + PF)], [P(-w, ZTI - .3), P(w, ZTI - .3)],
+      [P(-w, ZTI - PF), P(w, ZTI - PF)], [P(-GG/2, ZTI - PF), P(-GG/2, ZTI - PF - s)], [P(GG/2, ZTI - PF), P(GG/2, ZTI - PF - s)]], 20)));
+  },
+});
+
+/* Bolt tension rupture: a thick plate stays flat and turns with the beam about its compression flange, and the
+   four bolts at the tension flange stretch and break. */
+const BTR = EPX.fig({
+  DETAIL: ['ready', D1, '4E · 8 × A490 1⅛ · continuity plates', 'Mf and Vu', 'the plate stays flat; the tension bolts stretch', 'Mnp = 2Pt (h0 + h1)'],
+  stiff: true,
+  D(x, y, z, a, p){ return p === 'col' ? [0, 0, 0] : turn(a*.06, 0, -ZT)(x, z); },
+  onPlate(g, M){ M.sh = mk('path', { class: 'nf dash' }, g); },
+  drawExtra(M, k, val){
+    const brk = k === 5, d = val(M.mech) > .5 ? BOLTS.filter(b => b.z > 0).map(b => {
+      const q = [[TP + .72, b.y, b.z], [.002, b.y, b.z], [-.0005, b.y, b.z], [-CTF - .8, b.y, b.z]].map(p => M.Pf(...p));
+      if (!brk) return open(q);
+      const m0 = [q[1][0] + .42*(q[2][0] - q[1][0]), q[1][1] + .42*(q[2][1] - q[1][1])], m1 = [q[1][0] + .58*(q[2][0] - q[1][0]), q[1][1] + .58*(q[2][1] - q[1][1])];
+      return open([q[0], q[1], m0]) + open([m1, q[2], q[3]]);
+    }).join('') : '';
+    setD(M.sh, d); cls(M.sh, k === 5 ? 'nf dash hi' : 'nf dash');
+  },
+  headHi: (b, k) => k === 5 && b.z > 0,
+});
+
+/* Shear of the extended plate: the outer bolts hold the extension while the flange pulls the rest of the plate
+   away, and the plate shears across its thickness at the face of the flange. */
+const EPS = EPX.fig({
+  DETAIL: ['ready', D1, '4E · 8 × A490 1⅛ · continuity plates', 'Mf and Vu', 'the extension shears off at the flange', '0.6 Fyp bp tp · 0.6 Fup An'],
+  stiff: true, split: [ZT], weld: false,
+  D(x, y, z, a, p){
+    if (p === 'col' || (p === 'plate' && z > ZT)) return [0, 0, 0];
+    return turn(a*.055, 0, -ZT)(x, z);
+  },
+  onPlate(g, M){ M.cut = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){
+    const w = PW/2, lo = ZT - .003, hi = ZT + .003;
+    setD(M.cut, at(val(M.full) > .5, lines(M.Pf, [[[TP, -w, lo], [TP, w, lo]], [[TP, -w, hi], [TP, w, hi]], [[0, w, lo], [TP, w, lo]], [[0, w, hi], [TP, w, hi]]])));
+  },
+});
+
+/* Bolt shear rupture: the beam's shear goes to the bolts at the compression flange; the plate slides down on
+   them and they shear at the faying surface, drawn hidden. */
+const BSR = EPX.fig({
+  DETAIL: ['ready', D1, '4E · 8 × A490 1⅛ · continuity plates', 'Mf and Vu', 'the plate slides down on the bolts', 'Rn = nb Fnv Ab'],
+  stiff: true, headHi: (b, k) => k === 5 && b.z < 0,
+  D(x, y, z, a, p){ return p === 'col' ? [0, 0, 0] : [0, 0, -a*1.1]; },
+  onPlate(g, M){ M.sh = mk('path', { class: 'nf dash hi' }, g); },
+  drawExtra(M, k, val){
+    setD(M.sh, at(val(M.mech) > .5, BOLTS.filter(b => b.z < 0).map(b => open([[TP + .72, b.y, b.z], [.002, b.y, b.z], [-.0005, b.y, b.z], [-CTF - .8, b.y, b.z]].map(p => M.Pf(...p)))).join('')));
+    cls(M.sh, k === 5 ? 'nf dash hi' : 'nf dash');
+  },
+});
+
+/* Flange weld rupture: the weld of the tension flange tears, the flange pulls off the plate, and the web weld
+   unzips from the top as the beam turns about its compression flange. */
+const FWR = EPX.fig({
+  DETAIL: ['ready', D1, '4E · CJP flange welds · continuity plates', 'Mf and Vu', 'the tension flange tears off the plate', 'CJP weld rupture'],
+  stiff: true,
+  D(x, y, z, a, p){ return p === 'beam' ? turn(a*.05, TP, -ZT)(x, z) : [0, 0, 0]; },
+  drawExtra(M, k){ cls(M.weld, k === 5 ? 'hi' : 'sil'); },
+});
+
+/* Column flange flexural yielding: with no continuity plates the bolts pull the column flange out; it bends
+   about the web and its tips curl toward the beam. */
+const ZB = (ZT + PF + ZTI - PF)/2;
+const CFY = EPX.fig({
+  DETAIL: ['ready', D1, '4E · 8 × A490 1⅛ · no continuity plates', 'Mf and Vu', 'the column flange bends at the tension bolts', 'Fyc tcf² Yc'],
+  D(x, y, z, a, p){
+    const d = a*1.1;
+    if (p !== 'col') return turn(d/(ZB + ZT), 0, -ZT)(x, z);
+    if (x < -CTF - .01) return [0, 0, 0];
+    const ay = Math.abs(y), f = ay <= GG/2 ? (ay/(GG/2))**1.6 : 1 + .45*(ay - GG/2)/(7.35 - GG/2);
+    return [d*bell(z - ZB, 5.5)*f, 0, 0];
+  },
+  onFace(g, M){ M.zone = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){
+    const segs = [];
+    [-1, 1].forEach(s => {
+      [5, 7.5, 10, 12.5, 15, 17.5].forEach(z => segs.push([[0, s*5.05, z], [0, s*7.35, z]]));
+      segs.push([[0, s*6.2, 3.5], [0, s*6.2, 18.8]]);
+    });
+    segs.push([[-CTF, 7.35, 3.5], [0, 7.35, 3.5]], [[-CTF, 7.35, 18.8], [0, 7.35, 18.8]]);
+    setD(M.zone, at(val(M.full) > .5, lines(M.Pf, segs)));
+  },
+});
+
+/* Column web local yielding: with no continuity plates the tension flange force spreads through the plate and
+   the column flange and yields the web at the toe of its fillet over 6k + tbf + 2tp. */
+const LW = 6*CK + BTF + 2*TP, XK = -CTF - CK;
+const CWY = EPX.fig({
+  DETAIL: ['ready', D1, '4E · 8 × A490 1⅛ · no continuity plates', 'Mf and Vu', 'the column web yields at the tension flange', 'Ct (6k + tbf + 2tp) Fyc twc'],
+  back: true,
+  D(x, y, z, a, p){
+    const d = a*.9;
+    if (p !== 'col') return turn(d/(ZS + ZT), 0, -ZT)(x, z);
+    const t = smooth((x - (XK - 1.6))/1.6);
+    return [d*plat(z - ZS, 4.5, 2.5)*t, 0, 0];
+  },
+  onWeb(g, M){ M.yb = band(g); },
+  drawExtra(M, k, val){ drawBand(M.yb, M.Pf, val(M.mech) > .5, k === 5, [XK - 1.3, CTW/2 + .02, ZS - LW/2], [0, 0, LW], [1.3, 0, 0], 14); },
+});
+
+/* Column web crippling: with no continuity plates the compression flange pushes the plate into the column, and
+   the web wrinkles just behind the flange; the beam turns about its tension flange. */
+const CWC = EPX.fig({
+  DETAIL: ['ready', D1, '4E · 8 × A490 1⅛ · no continuity plates', 'Mf and Vu', 'the column web wrinkles at the compression flange', 'column web crippling'],
+  back: true,
+  D(x, y, z, a, p){
+    const d = a*.8, bz = bell(z + ZS, 3.2);
+    if (p !== 'col') return turn(d/(ZT + ZS), 0, ZT)(x, z);
+    const t = (x + CTF + 4.2)/4.2;
+    if (t <= 0) return [0, 0, 0];
+    if (t >= 1) return [-d*bz, 0, 0];
+    return [-d*bz*t, a*1.3*bz*Math.sin(Math.PI*t), 0];
+  },
+  onWeb(g, M){ M.zone = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){
+    const segs = [], y = CTW/2 + .01, x0 = -CTF - 5, x1 = -CTF;
+    [-4.5, -3, -1.5, 0, 1.5, 3, 4.5].forEach(dz => segs.push([[x0, y, -ZS + dz], [x1, y, -ZS + dz]]));
+    [1, 2, 3, 4].forEach(dx => segs.push([[-CTF - dx, y, -ZS - 5], [-CTF - dx, y, -ZS + 5]]));
+    setD(M.zone, at(val(M.full) > .5, lines(M.Pf, segs)));
+  },
+});
+
+/* Panel-zone shear: the flange forces shear the column web between the continuity plates into a
+   parallelogram, the column flanges kink at its corners, and the beam turns with it. */
+const CPZ = EPX.fig({
+  DETAIL: ['ready', D1, '4E · 8 × A490 1⅛ · continuity plates', 'Mf and Vu', 'the panel zone shears', 'Rv = 0.60 Fy dc tw'],
+  stiff: true,
+  D(x, y, z, a){ const g = a*.07; return [g*clamp(z, -ZS, ZS), 0, x > 0 ? -g*x : 0]; },
+  onWeb(g, M){ M.pz = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){
+    const y = CTW/2 + .02, xa = -CD + CTF, xb = -CTF, c = [[xa, y, -ZS], [xb, y, -ZS], [xb, y, ZS], [xa, y, ZS]];
+    setD(M.pz, at(val(M.full) > .5, lines(M.Pf, [[c[0], c[1]], [c[1], c[2]], [c[2], c[3]], [c[3], c[0]], [c[0], c[2]], [c[1], c[3]]])));
+  },
+});
+
+return { EPY, BTR, EPS, BSR, FWR, CFY, CWY, CWC, CPZ };
+})();
+</script>
+<script>
 /* One playback for every sequence on the page, plus colours and downloads. Each section keeps its own
    clock: the loop opens on the finished model, un-builds and builds again; moving across the drawing scrubs
    it; the rail jumps to a stage. The colour picker recolours every drawing, and each section can save its
@@ -3701,7 +4104,7 @@ return { CWP, PUN, SLY, SLC, SLB, BEW, CSG, CDF, RPT, RPX, RPK, RPS };
   const { register, pointer, reducedMotion, mk, inject, clamp } = HL;
   inject(document);
   const FIGS = { beam: () => BEAM, turbine: () => TG, pump: () => PP, substructure: () => BS, endplate: () => EP,
-    flb: () => J10.FLB, wly: () => J10.WLY, wlc: () => J10.WLC, wsb: () => J10.WSB, wcb: () => J10.WCB, pz: () => J10.PZ, cwp: () => KH.CWP, pun: () => KH.PUN, sly: () => KH.SLY, slc: () => KH.SLC, slb: () => KH.SLB, bew: () => KH.BEW, csg: () => KH.CSG, cdf: () => KH.CDF, rpt: () => KH.RPT, rpx: () => KH.RPX, rpk: () => KH.RPK, rps: () => KH.RPS };
+    flb: () => J10.FLB, wly: () => J10.WLY, wlc: () => J10.WLC, wsb: () => J10.WSB, wcb: () => J10.WCB, pz: () => J10.PZ, cwp: () => KH.CWP, pun: () => KH.PUN, sly: () => KH.SLY, slc: () => KH.SLC, slb: () => KH.SLB, bew: () => KH.BEW, csg: () => KH.CSG, cdf: () => KH.CDF, rpt: () => KH.RPT, rpx: () => KH.RPX, rpk: () => KH.RPK, rps: () => KH.RPS, epy: () => EPLS.EPY, btr: () => EPLS.BTR, eps: () => EPLS.EPS, bsr: () => EPLS.BSR, fwr: () => EPLS.FWR, cfy: () => EPLS.CFY, cwy: () => EPLS.CWY, cwc: () => EPLS.CWC, cpz: () => EPLS.CPZ };
   const docEl = document.documentElement, KEYS = ['plate', 'hi', 'edge', 'mid', 'lo'];
   const store = { get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} } };
 

@@ -889,7 +889,7 @@ const WF = (() => {
     }
     return { N, STAGES, DETAIL: spec.DETAIL, S, build, draw };
   }
-  return { setD, cls, show, mix, line, putc, ringsOf, from, range, bell, discAt, seq, camera, panel, drawPanel, box, drawBox, weights, drawWeights, beamFig, SECTION, clamp, lerp, poly, open };
+  return { setD, cls, show, mix, line, putc, ringsOf, from, range, bell, discAt, seq, camera, panel, drawPanel, box, drawBox, weights, drawWeights, wbeam, beamFig, SECTION, clamp, lerp, poly, open };
 })();
 </script>
 <script>
@@ -1483,7 +1483,7 @@ return { CWP, PUN, SLY, SLC, SLB, BEW, CSG, CDF, RPT, RPX, RPK, RPS };
   const { register, pointer, reducedMotion, mk, inject, clamp } = HL;
   inject(document);
   const FIGS = { beam: () => BEAM, turbine: () => TG, pump: () => PP, substructure: () => BS, endplate: () => EP,
-    flb: () => J10.FLB, wly: () => J10.WLY, wlc: () => J10.WLC, wsb: () => J10.WSB, wcb: () => J10.WCB, pz: () => J10.PZ, cwp: () => KH.CWP, pun: () => KH.PUN, sly: () => KH.SLY, slc: () => KH.SLC, slb: () => KH.SLB, bew: () => KH.BEW, csg: () => KH.CSG, cdf: () => KH.CDF, rpt: () => KH.RPT, rpx: () => KH.RPX, rpk: () => KH.RPK, rps: () => KH.RPS };
+    flb: () => J10.FLB, wly: () => J10.WLY, wlc: () => J10.WLC, wsb: () => J10.WSB, wcb: () => J10.WCB, pz: () => J10.PZ, cwp: () => KH.CWP, pun: () => KH.PUN, sly: () => KH.SLY, slc: () => KH.SLC, slb: () => KH.SLB, bew: () => KH.BEW, csg: () => KH.CSG, cdf: () => KH.CDF, rpt: () => KH.RPT, rpx: () => KH.RPX, rpk: () => KH.RPK, rps: () => KH.RPS, epy: () => EPLS.EPY, btr: () => EPLS.BTR, eps: () => EPLS.EPS, bsr: () => EPLS.BSR, fwr: () => EPLS.FWR, cfy: () => EPLS.CFY, cwy: () => EPLS.CWY, cwc: () => EPLS.CWC, cpz: () => EPLS.CPZ };
 
   function mount(fig, root, DW, HOLD){
     const { N, STAGES, DETAIL, S } = fig;
