@@ -106,7 +106,7 @@ footer a{color:inherit}
       <h1>Structural isometrics</h1>
       <button class="switch" id="theme" type="button" aria-label="Switch between the light and the dark theme"></button>
     </div>
-    <p>Five structural models drawn in lines, four in concrete and one bolted steel connection, then the local limit states of wide-flange members under concentrated forces of rectangular and round HSS-to-HSS connections, and of the end-plate moment connection. Each builds stage by stage in a loop. Pick colours below and download any figure as SVG, PNG or GIF. Move across a drawing to scrub it, or pick a stage under it. Deflections, cracks and mode shapes are sketches, not analysis results.</p>
+    <p>Five structural models drawn in lines, four in concrete and one bolted steel connection, then the local limit states of wide-flange members under concentrated forces of rectangular and round HSS-to-HSS connections, of the end-plate moment connection, and of the shear tab. Each builds stage by stage in a loop. Pick colours below and download any figure as SVG, PNG or GIF. Move across a drawing to scrub it, or pick a stage under it. Deflections, cracks and mode shapes are sketches, not analysis results.</p>
     <ol class="toc">
       <li><a href="#beam"><span>01</span>Concrete beam</a></li>
       <li><a href="#turbine"><span>02</span>Turbine foundation</a></li>
@@ -142,6 +142,14 @@ footer a{color:inherit}
       <li><a href="#cwy"><span>32</span>Column web yielding</a></li>
       <li><a href="#cwc"><span>33</span>Column web crippling</a></li>
       <li><a href="#cpz"><span>34</span>Panel-zone shear</a></li>
+      <li><a href="#sbs"><span>35</span>Bolt shear</a></li>
+      <li><a href="#spb"><span>36</span>Tab bearing and tear-out</a></li>
+      <li><a href="#swb"><span>37</span>Web bearing and tear-out</a></li>
+      <li><a href="#spy"><span>38</span>Tab shear yielding</a></li>
+      <li><a href="#spr"><span>39</span>Tab shear rupture</a></li>
+      <li><a href="#spk"><span>40</span>Tab block shear</a></li>
+      <li><a href="#swr"><span>41</span>Weld rupture</a></li>
+      <li><a href="#swk"><span>42</span>Web block shear</a></li>
     </ol>
     <div class="colors">
       <span>Colours</span>
@@ -451,6 +459,76 @@ footer a{color:inherit}
           <div class="stage" data-hairline="cpz" role="img" aria-label="A bolted extended end-plate connection to a column with continuity plates, loaded with weights at the beam tip; the column web between the continuity plates shears into a parallelogram and the beam turns with it."></div>
         </div>
         <ol class="rail" aria-label="Stages of panel-zone shear"></ol>
+      </section>
+    </div>
+  </section>
+
+  <section class="group" aria-labelledby="st-h">
+    <div class="group-head"><span class="num">10</span><h2 id="st-h">Shear tab limit states</h2><p>AISC Manual Part 10: the limit states of a conventional single-plate shear connection, a ⅜ in tab welded to the column flange and bolted to the beam web with four ¾ in bolts. Each figure builds the connection, bolts it and loads the beam, then lets the mechanism develop. Displacements are exaggerated.</p></div>
+    <div class="seqs">
+      <section class="seq" id="sbs" data-sequence="sbs" data-dwell="1300" data-hold="3400" aria-labelledby="sbs-h">
+        <div class="seq-head"><span class="num">35</span><h2 id="sbs-h">Bolt shear</h2><p>The eccentric reaction shears the bolt group; the beam drops and turns about the group’s instantaneous centre, and the bolts shear where the tab meets the web, drawn hidden.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="sbs" role="img" aria-label="A shear tab connection of a wide-flange beam to a column flange is drawn in lines, loaded with weights at the beam tip; the beam drops and turns a little on the four bolts, and hidden lines show the bolts shearing where the tab meets the web."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of bolt shear"></ol>
+      </section>
+      <section class="seq" id="spb" data-sequence="spb" data-dwell="1300" data-hold="3400" aria-labelledby="spb-h">
+        <div class="seq-head"><span class="num">36</span><h2 id="spb-h">Tab bearing and tear-out</h2><p>Heads left off · The web carries the bolts down; the tab’s holes stretch below them, and the tab tears out to the next hole and from the lowest hole to its bottom edge.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="spb" role="img" aria-label="A shear tab connection of a wide-flange beam to a column flange is drawn in lines, loaded with weights at the beam tip; the bolts are drawn cut flush with the tab; they move down with the beam, the tab’s holes stretch below them and the tab tears out beneath each hole."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of tab bearing and tear-out"></ol>
+      </section>
+      <section class="seq" id="swb" data-sequence="swb" data-dwell="1300" data-hold="3400" aria-labelledby="swb-h">
+        <div class="seq-head"><span class="num">37</span><h2 id="swb-h">Web bearing and tear-out</h2><p>Tab behind the web, nuts left off · The beam drops past the bolts; the web’s holes stretch above them and the web tears out up to the hole above.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="swb" role="img" aria-label="A shear tab connection of a wide-flange beam to a column flange is drawn in lines, loaded with weights at the beam tip; the tab is behind the web and the bolts are drawn cut flush with the web; the beam drops, the web’s holes stretch above the bolts and the web tears out between them."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of web bearing and tear-out"></ol>
+      </section>
+      <section class="seq" id="spy" data-sequence="spy" data-dwell="1300" data-hold="3400" aria-labelledby="spy-h">
+        <div class="seq-head"><span class="num">38</span><h2 id="spy-h">Tab shear yielding</h2><p>The tab yields in shear on its gross section between the weld and the bolts, and the bolt line drops with the beam.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="spy" role="img" aria-label="A shear tab connection of a wide-flange beam to a column flange is drawn in lines, loaded with weights at the beam tip; the tab shears into a parallelogram between the weld and the bolt line, and a hatched band marks the yielding."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of tab shear yielding"></ol>
+      </section>
+      <section class="seq" id="spr" data-sequence="spr" data-dwell="1300" data-hold="3400" aria-labelledby="spr-h">
+        <div class="seq-head"><span class="num">39</span><h2 id="spr-h">Tab shear rupture</h2><p>The tab tears along the line of bolts, through the holes, and the strip outside it drops with the beam.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="spr" role="img" aria-label="A shear tab connection of a wide-flange beam to a column flange is drawn in lines, loaded with weights at the beam tip; the tab tears vertically along the bolt line and the strip outside the bolts drops with the beam."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of tab shear rupture"></ol>
+      </section>
+      <section class="seq" id="spk" data-sequence="spk" data-dwell="1300" data-hold="3400" aria-labelledby="spk-h">
+        <div class="seq-head"><span class="num">40</span><h2 id="spk-h">Tab block shear</h2><p>A block of the tab outside the bolts and below the top bolt tears out: shear down the bolt line, tension across to the free edge.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="spk" role="img" aria-label="A shear tab connection of a wide-flange beam to a column flange is drawn in lines, loaded with weights at the beam tip; a block of the tab outside the bolt line and below the top bolt tears out and drops with the beam."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of tab block shear"></ol>
+      </section>
+      <section class="seq" id="swr" data-sequence="swr" data-dwell="1300" data-hold="3400" aria-labelledby="swr-h">
+        <div class="seq-head"><span class="num">41</span><h2 id="swr-h">Weld rupture</h2><p>The fillet welds tear, and the tab slides down the column flange with the beam.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="swr" role="img" aria-label="A shear tab connection of a wide-flange beam to a column flange is drawn in lines, loaded with weights at the beam tip; the fillet weld stays on the column while the tab, bolts and beam slide down past it."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of weld rupture"></ol>
+      </section>
+      <section class="seq" id="swk" data-sequence="swk" data-dwell="1300" data-hold="3400" aria-labelledby="swk-h">
+        <div class="seq-head"><span class="num">42</span><h2 id="swk-h">Web block shear</h2><p>Coped beam, tab behind the web, nuts left off · The corner of the web inside the bolts stays on them as the beam drops: shear up the bolt line to the cope, tension across to the beam’s end.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="swk" role="img" aria-label="A shear tab connection of a coped wide-flange beam to a column flange, loaded with weights at the beam tip, the tab behind the web; the corner of the web inside the bolts tears out and stays on the bolts while the beam drops."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of web block shear"></ol>
       </section>
     </div>
   </section>
@@ -4157,6 +4235,277 @@ return { EPY, BTR, EPS, BSR, BBP, FWR, CFY, BBC, CWY, CWC, CPZ };
 })();
 </script>
 <script>
+/* A shear tab (single-plate connection, AISC Manual Part 10), built to deform: a W14×132 column, a ⅜ in
+   plate welded to its flange, and a W18×50 beam bolted to the plate with four ¾ in bolts. x runs along the
+   beam from the column's flange face at x = 0, y across it, z up. The plate sits on the near (+y) face of the
+   web, or behind it (far) when a figure needs the web's holes in view. Plate and web can be cut into pieces
+   so a field can tear them; part(x, y, z) says what a point belongs to, so a field can move the column, the
+   plate, the bolts and the beam on their own. Inches. */
+const STX = (() => {
+  const { setD, cls, show, putc, from, range, seq, panel, drawPanel, weights, drawWeights, lerp, poly, open, mix, clamp } = WF;
+  const { mk, tween, tset, tval, solid, hull, Cam, fit, proj, facing } = HL;
+  const CD = 14.7, CBF = 14.7, CTF = 1.03, CTW = .645, CZ0 = -11, CZ1 = 11;
+  const BD = 18, BBF = 7.5, BTF = .57, BTW = .355, BL = 14, ZT = BD/2, ZTI = ZT - BTF, XE = .5;
+  const TPL = .375, PLW = 4.5, PLH = 11.5, XB = 3, ROWS = [4.5, 1.5, -1.5, -4.5], RH = 13/32, RB = .72, HH = .47, RBS = .375;
+  const COPE = { x: 4.5, z: 7 }, GAP = .003, ZP = PLH/2;
+  const plateY = far => (far ? [-BTW/2 - TPL, -BTW/2 - GAP] : [BTW/2 + GAP, BTW/2 + TPL]);
+
+  const part = far => (x, y, z) => {
+    if (x <= .001) return 'col';
+    const [y0, y1] = plateY(far);
+    if (y >= y0 - .002 && y <= y1 + .002 && x <= PLW + .002 && Math.abs(z) <= ZP + .002) return 'plate';
+    if ((far ? y < y0 - .002 : y > y1 + .002) && Math.abs(x - XB) < 1.2 && Math.abs(z) < ZP) return 'bolt';
+    return 'beam';
+  };
+  /* a hex prism along y at (x, z), from y0 to y1; the cap at y1 is the crease */
+  const yprism = (Pf, x, z, y0, y1, R) => {
+    const ring = y => range(6).slice(0, -1).map(u => { const a = Math.PI/6 + u*2*Math.PI; return Pf(x + R*Math.cos(a), y, z + R*Math.sin(a)); });
+    const a = ring(y0), b = ring(y1);
+    return { sil: poly(hull(a.concat(b))), crease: poly(b) };
+  };
+  /* a hole in the x-z plane at y, a circle stretched up (e > 0) or down (e < 0) into a slot */
+  const slot = (Pf, x, y, z, r, e = 0, n = 16) => {
+    const pts = [];
+    for (let i = 0; i <= n; i++){ const t = i/n*Math.PI; pts.push([x + r*Math.cos(t), y, z + Math.max(e, 0) + r*Math.sin(t)]); }
+    for (let i = 0; i <= n; i++){ const t = Math.PI*(1 + i/n); pts.push([x + r*Math.cos(t), y, z + Math.min(e, 0) + r*Math.sin(t)]); }
+    return poly(pts.map(p => Pf(...p)));
+  };
+  const lines = (Pf, segs, n = 12) => segs.map(([p, q]) => open(range(n).map(u => Pf(...mix(p, q, u))))).join('');
+  /* a rectangle of a surface as a panel, with mesh lines at absolute positions */
+  const rectXZ = (g, y, r, xs, zs) => { const [x0, x1, z0, z1] = r;
+    const p = panel(g, (u, v) => [lerp(x0, x1, u), y, lerp(z0, z1, v)], { nu: Math.max(3, Math.ceil((x1 - x0)/.5)), nv: Math.max(3, Math.ceil((z1 - z0)/.5)),
+      us: xs.filter(x => x > x0 + .01 && x < x1 - .01).map(x => (x - x0)/(x1 - x0)), vs: zs.filter(z => z > z0 + .01 && z < z1 - .01).map(z => (z - z0)/(z1 - z0)) });
+    p.r = r; return p; };
+
+  const FIT = [[-CD, -CBF/2, CZ1], [-CD, CBF/2, CZ0], [0, CBF/2, CZ0], [BL, BBF/2, -ZT - 1], [BL, -BBF/2, ZT + 1], [BL - 3.5, 0, ZT + 5]];
+  /* A figure: connection, bolts, load, mechanism (half, then full). spec.D(x, y, z, a, part) is the field;
+     spec.far puts the plate behind the web; spec.cope copes the top flange; spec.plate and spec.web list the
+     pieces (x0, x1, z0, z1) to cut them into; spec.heads = false leaves the bolt heads off; hooks add a
+     figure's own parts at their depth and drawExtra draws them. */
+  function fig(spec){
+    const N = 5, { S, G, val } = seq(N), far = !!spec.far, pt = part(far);
+    const STAGES = [['connection', 1], ['bolts', 2], ['load', 3], ['mechanism', 4]];
+    function build(svg){
+      const C = Cam(45, .5, spec.scale || 9), g = mk('g', {}, svg);
+      fit(C, spec.fit || FIT, 200, 162);
+      const P = proj(C), front = facing(C);
+      const M = { C, P, front, far, a: 1, amp: tween(1, 900), col: G(from(1)), plt: G(from(1), 150), bm: G(from(1), 300),
+        bolt: G(from(2)), load: G(from(3)), mech: G(from(4)), full: G(from(5)) };
+      M.Pk = p => (x, y, z) => { if (!M.a) return P(x, y, z); const d = spec.D(x, y, z, M.a, p); return P(x + d[0], y + d[1], z + d[2]); };
+      M.Pf = (x, y, z) => M.Pk(pt(x, y, z))(x, y, z);
+      const hook = name => g2 => spec[name] && spec[name](g2, M, G);
+      const Zc = u => lerp(CZ0, CZ1, u), us = range(10).slice(1, -1);
+      /* the column */
+      M.colP = [panel(g, (u, v) => [-CD + CTF, lerp(-CBF/2, CBF/2, v), Zc(u)], { nu: 30, nv: 6 }), panel(g, (u, v) => [-CD + v*CTF, CBF/2, Zc(u)], { nu: 30, nv: 1 }),
+        panel(g, (u, v) => [lerp(-CD + CTF, -CTF, v), CTW/2, Zc(u)], { nu: 30, nv: 10, us, vs: [.25, .5, .75] }),
+        panel(g, (u, v) => [-CTF + v*CTF, CBF/2, Zc(u)], { nu: 30, nv: 1 }),
+        panel(g, (u, v) => [0, lerp(-CBF/2, CBF/2, v), Zc(u)], { nu: 30, nv: 10, us, vs: [.15, .3, .7, .85] })];
+      M.cap = mk('path', { class: 'sil' }, g);
+      /* the beam's bottom flange */
+      const X = u => lerp(XE, BL, u), bxs = range(6).slice(1, -1).map(u => X(u));
+      M.beamP = [panel(g, (u, v) => [X(u), lerp(-BBF/2, BBF/2, v), -ZTI], { nu: 30, nv: 6, us: range(6).slice(1, -1), vs: [.25, .5, .75] }),
+        panel(g, (u, v) => [X(u), BBF/2, lerp(-ZT, -ZTI, v)], { nu: 30, nv: 1 })];
+      /* the plate: pieces back to front, each a face, its top and its free edge, and the fillet weld */
+      const [py0, py1] = plateY(far), pyF = py1, pzs = [-4.5, -3, -1.5, 0, 1.5, 3, 4.5], pxs = [1.5, XB];
+      const plate = () => {
+        M.plate = (spec.plate || [[0, PLW, -ZP, ZP]]).map(r => {
+          const [x0, x1, z0, z1] = r;
+          return { r, face: rectXZ(g, pyF, r, pxs, pzs),
+            top: panel(g, (u, v) => [lerp(x0, x1, u), lerp(py0, py1, v), z1], { nu: 6, nv: 1 }),
+            edge: panel(g, (u, v) => [x1, lerp(py0, py1, v), lerp(z0, z1, u)], { nu: 12, nv: 1 }) };
+        });
+        M.weld = mk('path', { class: 'sil' }, g);
+      };
+      if (far){ plate(); hook('behindWeb')(g); }
+      /* the web, in pieces, coped at the top if asked */
+      const webR = spec.web || (spec.cope ? [[XE, COPE.x, -ZTI, COPE.z], [COPE.x, BL, -ZTI, ZTI]] : [[XE, BL, -ZTI, ZTI]]);
+      M.web = webR.map(r => rectXZ(g, BTW/2, r, bxs.concat([XB]), [-6, -3, 0, 3, 6]));
+      M.copeTop = spec.cope ? panel(g, (u, v) => [lerp(XE, COPE.x, u), lerp(-BTW/2, BTW/2, v), COPE.z], { nu: 8, nv: 1 }) : null;
+      hook('onWeb')(g);
+      M.heads = [];
+      if (!far){
+        plate(); hook('onPlate')(g);
+        if (spec.heads !== false) ROWS.forEach((z, i) => M.heads.push({ z, el: solid(g), s: G(from(2), i*90) }));
+        hook('onHeads')(g);
+      }
+      /* the top flange, from the cope on if there is one, then the cut end and the load */
+      const xt = spec.cope ? COPE.x : XE, XT = u => lerp(xt, BL, u);
+      M.beamP.push(panel(g, (u, v) => [XT(u), lerp(-BBF/2, BBF/2, v), ZT], { nu: 30, nv: 6, us: bxs.filter(x => x > xt + .1).map(x => (x - xt)/(BL - xt)), vs: [.25, .5, .75] }),
+        panel(g, (u, v) => [XT(u), BBF/2, lerp(ZTI, ZT, v)], { nu: 30, nv: 1 }));
+      M.bcap = mk('path', { class: 'sil' }, g);
+      M.weights = weights(g, G, from(3), BL - 3.5, 0, 2.6, ZT);
+      hook('top')(g);
+      return M;
+    }
+    function draw(M){
+      const k = S.k, { Pf, P, front } = M;
+      tset(M.amp, k === 4 ? .5 : k >= 5 ? 1 : 0, S.now, 0); M.a = tval(M.amp, S.now);
+      const vc = val(M.col), vp = val(M.plt), vb = val(M.bm), vt = val(M.bolt);
+      M.colP.forEach(p => drawPanel(p, P, vc));
+      const zc = lerp(CZ0, CZ1, vc), I = [[-CD, -CBF/2], [-CD + CTF, -CBF/2], [-CD + CTF, -CTW/2], [-CTF, -CTW/2], [-CTF, -CBF/2], [0, -CBF/2], [0, CBF/2], [-CTF, CBF/2], [-CTF, CTW/2], [-CD + CTF, CTW/2], [-CD + CTF, CBF/2], [-CD, CBF/2]];
+      setD(M.cap, vc > .001 ? poly(I.map(([x, y]) => P(x, y, zc))) : ''); cls(M.cap, k === 1 ? 'sil hi' : 'sil');
+      M.beamP.forEach(p => drawPanel(p, Pf, vb));
+      M.web.forEach(p => { const [x0, x1] = p.r, xg = lerp(XE, BL, vb); drawPanel(p, Pf, clamp((xg - x0)/(x1 - x0), 0, 1)); });
+      if (M.copeTop) drawPanel(M.copeTop, Pf, vb > .25 ? 1 : 0);
+      const B = [[XE, -BBF/2, -ZT], [XE, BBF/2, -ZT], [XE, BBF/2, -ZTI], [XE, BTW/2, -ZTI], [XE, BTW/2, ZTI], [XE, BBF/2, ZTI], [XE, BBF/2, ZT], [XE, -BBF/2, ZT], [XE, -BBF/2, ZTI], [XE, -BTW/2, ZTI], [XE, -BTW/2, -ZTI], [XE, -BBF/2, -ZTI]];
+      const xg = lerp(XE, BL, vb);
+      setD(M.bcap, vb > .001 ? poly(B.map(([, y, z]) => Pf(xg, y, z))) : ''); cls(M.bcap, k === 1 ? 'sil hi' : 'sil');
+      const [py0, py1] = plateY(M.far);
+      M.plate.forEach(pc => {
+        const [, , z0, z1] = pc.r, gp = clamp((vp*PLH - (z0 + ZP))/(z1 - z0), 0, 1);
+        drawPanel(pc.face, Pf, gp); drawPanel(pc.edge, Pf, gp); drawPanel(pc.top, Pf, gp > .999 ? 1 : 0);
+        cls(pc.face.el, k === 1 ? 'sil hi' : 'sil');
+      });
+      /* the fillet weld on the plate's +y face stays on the column, whatever the plate does */
+      setD(M.weld, vp > .999 ? poly([[.002, py1 + .25, -ZP], [.25, py1, -ZP], [.25, py1, ZP], [.002, py1 + .25, ZP]].map(p => P(...p))) : '');
+      cls(M.weld, spec.weldHi && k === 5 ? 'hi' : 'sil');
+      M.heads.forEach(h => {
+        const v = val(h.s), on = v > .001 && vp > .999; show(h.el.g, on);
+        if (on){ const dy = 6*(1 - v); putc(h.el, yprism(M.Pk('bolt'), XB, h.z, py1 + dy, py1 + HH + dy, RB)); }
+        cls(h.el.sil, k === 2 || (spec.headHi && k === 5) ? 'sil hi' : 'sil');
+      });
+      drawWeights(M.weights, val, Pf, front, k === 3);
+      spec.drawExtra && spec.drawExtra(M, k, val);
+    }
+    return { N, STAGES, DETAIL: spec.DETAIL, S, build, draw };
+  }
+  return { CD, CTF, BD, BTW, BL, ZT, ZTI, XE, TPL, PLW, PLH, ZP, XB, ROWS, RH, RB, HH, RBS, COPE, plateY, slot, lines, fig };
+})();
+</script>
+<script>
+/* The limit states of a conventional shear tab, AISC Manual Part 10: the bolts, the plate (tab), its weld and
+   the beam web. Fields move the column, the plate, the bolts and the beam on their own; displacements are
+   exaggerated so the mechanism reads. */
+const STLS = (() => {
+const { BTW, ZTI, XE, PLW, ZP, XB, ROWS, RH, RBS, HH, COPE, plateY, slot, lines } = STX;
+const { setD, cls, open, clamp } = WF, { mk } = HL;
+const at = (on, d) => (on ? d : '');
+const D1 = 'W14×132 · PL ⅜ × 4½ × 11½ · W18×50', D2 = '4 × A325-N ¾ · ¼ fillet welds', E = .002;
+const [PY0, PY1] = plateY(false), YW = BTW/2 + .001;
+/* the beam and its bolts drop with the slip; everything else stays */
+const drop = (x, y, z, a, p) => (p === 'beam' || p === 'bolt' ? [0, 0, -a] : [0, 0, 0]);
+/* holes, the bolts cut flush in them, and the tear lines of a bearing figure */
+function bearing(g, M){ M.holes = mk('path', { class: 'nf' }, g); M.pins = mk('path', { class: 'sil' }, g); M.tear = mk('path', { class: 'nf hi' }, g); }
+/* a hatched band on the plate's face */
+function band(g, M){ M.bo = mk('path', { class: 'nf' }, g); M.bh = mk('path', { class: 'nf' }, g); }
+function drawBand(M, on, hi, x0, x1, n){
+  const y = PY1 + .001, segs = [];
+  for (let i = 1; i < n; i++){ const x = x0 + (x1 - x0)*i/n; segs.push([[x, y, -ZP + .3], [x, y, ZP - .3]]); }
+  setD(M.bo, at(on, lines(M.Pf, [[[x0, y, -ZP + .3], [x1, y, -ZP + .3]], [[x1, y, -ZP + .3], [x1, y, ZP - .3]], [[x1, y, ZP - .3], [x0, y, ZP - .3]], [[x0, y, ZP - .3], [x0, y, -ZP + .3]]])));
+  setD(M.bh, at(on, lines(M.Pf, segs))); cls(M.bo, hi ? 'nf hi' : 'nf'); cls(M.bh, hi ? 'nf hi' : 'nf lo');
+}
+/* a crack along a line, drawn on both of its sides so it opens as the pieces part */
+const crack = (M, segs, pa, pb) => lines(M.Pk(pa), segs.map(s => s[0])) + lines(M.Pk(pb), segs.map(s => s[1]));
+
+/* Bolt shear: the eccentric reaction shears the bolt group; the beam drops and turns a little about the
+   group's instantaneous centre, and the bolts shear where the plate meets the web, drawn hidden. */
+const SBS = STX.fig({
+  DETAIL: ['ready', D1, D2, 'Vu', 'the beam drops and turns on the bolts', 'Rn = C Fnv Ab'],
+  headHi: true,
+  D(x, y, z, a, p){ if (p !== 'beam') return [0, 0, 0]; const f = a*.02; return [f*z, 0, -a*.9 - f*(x - XB)]; },
+  onHeads(g, M){ M.sh = mk('path', { class: 'nf dash' }, g); },
+  drawExtra(M, k, val){
+    setD(M.sh, at(val(M.mech) > .5, ROWS.map(z => open([M.Pk('bolt')(XB, PY1 + HH, z), M.Pk('plate')(XB, PY0, z), M.Pk('beam')(XB, BTW/2 - .001, z), M.Pk('beam')(XB, -BTW/2 - .6, z)])).join('')));
+    cls(M.sh, k === 5 ? 'nf dash hi' : 'nf dash');
+  },
+});
+
+/* Bearing and tear-out at the tab: the web carries the bolts down; the plate's holes stretch below them and the
+   plate tears out down to the next hole, and from the lowest to the bottom edge. Heads left off. */
+const SPB = STX.fig({
+  DETAIL: ['ready', D1, '4 × A325-N ¾ · heads left off', 'Vu', 'the holes stretch below the bolts', 'rn = 1.2 lc t Fu ≤ 2.4 d t Fu'],
+  heads: false, D: drop, onPlate: bearing,
+  drawExtra(M, k, val){
+    const vt = val(M.bolt), e = M.a, y = PY1 + .001;
+    setD(M.holes, vt > .5 ? ROWS.map(z => slot(M.P, XB, y, z, RH, -e)).join('') : ''); cls(M.holes, k === 5 ? 'nf hi' : 'nf');
+    setD(M.pins, vt > .001 ? ROWS.map(z => slot(M.Pk('bolt'), XB, y + .001 + 6*(1 - vt), z, RBS)).join('') : '');
+    setD(M.tear, at(val(M.full) > .5, lines(M.P, ROWS.flatMap((z, i) => { const zb = i < ROWS.length - 1 ? ROWS[i + 1] + RH : -ZP; return [-1, 1].map(s => [[XB + s*RH, y, z - e], [XB + s*RH, y, zb]]); }))));
+  },
+});
+
+/* Bearing and tear-out at the beam web, the plate behind the web and the nuts left off: the beam drops past
+   the bolts, the web's holes stretch above them, and the web tears out up to the hole above. */
+const SWB = STX.fig({
+  DETAIL: ['ready', D1, '4 × A325-N ¾ · plate behind · nuts left off', 'Vu', 'the web’s holes stretch above the bolts', 'rn = 1.2 lc tw Fu ≤ 2.4 d tw Fu'],
+  far: true, D: (x, y, z, a, p) => (p === 'beam' ? [0, 0, -a] : [0, 0, 0]), onWeb: bearing,
+  drawExtra(M, k, val){
+    const vt = val(M.bolt), e = M.a, Pb = M.Pk('beam');
+    setD(M.holes, vt > .5 ? ROWS.map(z => slot(Pb, XB, YW, z, RH, e)).join('') : ''); cls(M.holes, k === 5 ? 'nf hi' : 'nf');
+    setD(M.pins, vt > .001 ? ROWS.map(z => slot(M.P, XB, YW + .001 + 6*(1 - vt), z, RBS)).join('') : '');
+    setD(M.tear, at(val(M.full) > .5, lines(Pb, ROWS.slice(1).flatMap((z, i) => [-1, 1].map(s => [[XB + s*RH, YW, z + e], [XB + s*RH, YW, ROWS[i] - RH]])))));
+  },
+});
+
+/* Shear yielding of the tab: the plate yields in shear on its gross section between the weld and the bolts,
+   and the bolt line drops with the beam. */
+const SPY = STX.fig({
+  DETAIL: ['ready', D1, D2, 'Vu', 'the plate shears between weld and bolts', 'Rn = 0.60 Fy Agv'],
+  D(x, y, z, a, p){ return p === 'col' ? [0, 0, 0] : p === 'plate' ? [0, 0, -a*clamp(x/XB, 0, 1)] : [0, 0, -a]; },
+  onPlate: band,
+  drawExtra(M, k, val){ drawBand(M, val(M.mech) > .5, k === 5, .3, XB - .8, 6); },
+});
+
+/* Shear rupture of the tab: the plate tears along the line of bolts, through the holes, and the strip outside
+   it drops with the beam. */
+const SPR = STX.fig({
+  DETAIL: ['ready', D1, D2, 'Vu', 'the plate tears along the bolt line', 'Rn = 0.60 Fu Anv'],
+  plate: [[0, XB - E, -ZP, ZP], [XB + E, PLW, -ZP, ZP]],
+  D(x, y, z, a, p){ return p === 'col' || (p === 'plate' && x < XB) ? [0, 0, 0] : [0, 0, -a]; },
+  onPlate(g, M){ M.cr = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){
+    const y = PY1 + .001;
+    setD(M.cr, at(val(M.full) > .5, crack(M, [[[[XB - E, y, ZP], [XB - E, y, -ZP]], [[XB + E, y, ZP], [XB + E, y, -ZP]]]], 'plate', 'plate')));
+  },
+});
+
+/* Block shear of the tab: the block of plate outside the bolts and below the top bolt tears out, in shear
+   down the bolt line and in tension across from the top bolt to the free edge. */
+const ZB = ROWS[0];
+const SPK = STX.fig({
+  DETAIL: ['ready', D1, D2, 'Vu', 'a block of the plate tears out', 'Rn = 0.60 Fu Anv + Ubs Fu Ant'],
+  plate: [[0, XB - E, -ZP, ZP], [XB + E, PLW, -ZP, ZB - E], [XB + E, PLW, ZB + E, ZP]],
+  D(x, y, z, a, p){ return p === 'col' || (p === 'plate' && (x < XB || z > ZB)) ? [0, 0, 0] : [0, 0, -a]; },
+  onPlate(g, M){ M.cr = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){
+    const y = PY1 + .001;
+    setD(M.cr, at(val(M.full) > .5, crack(M, [[[[XB - E, y, ZB], [XB - E, y, -ZP]], [[XB + E, y, ZB - E], [XB + E, y, -ZP]]]], 'plate', 'plate')
+      + crack(M, [[[[XB, y, ZB + E], [PLW, y, ZB + E]], [[XB + E, y, ZB - E], [PLW, y, ZB - E]]]], 'plate', 'plate')));
+  },
+});
+
+/* Weld rupture: the fillet welds tear and the plate slides down the column flange with the beam. */
+const SWR = STX.fig({
+  DETAIL: ['ready', D1, D2, 'Vu', 'the welds tear and the plate slides', 'Rn = 0.60 FEXX Awe'],
+  weldHi: true,
+  D(x, y, z, a, p){ return p === 'col' ? [0, 0, 0] : [0, 0, -a]; },
+});
+
+/* Block shear of a coped beam's web, the plate behind it and the nuts left off: the corner of the web inside the
+   bolts stays on them while the beam drops, torn in shear up the bolt line to the cope and in tension across
+   from the bottom bolt to the beam's end. */
+const ZL = ROWS[ROWS.length - 1];
+const SWK = STX.fig({
+  DETAIL: ['ready', D1, '4 × A325-N ¾ · top flange coped · nuts left off', 'Vu', 'a block of the web tears out', 'Rn = 0.60 Fu Anv + Ubs Fu Ant'],
+  far: true, cope: true,
+  web: [[XE, XB - E, -ZTI, ZL - E], [XE, XB - E, ZL + E, COPE.z], [XB + E, COPE.x, -ZTI, COPE.z], [COPE.x, STX.BL, -ZTI, STX.ZTI]],
+  D(x, y, z, a, p){
+    if (p !== 'beam') return [0, 0, 0];
+    return x < XB && z > ZL && z <= COPE.z + .01 && Math.abs(y) <= BTW/2 + .01 ? [0, 0, 0] : [0, 0, -a];
+  },
+  onWeb(g, M){ M.holes = mk('path', { class: 'nf' }, g); M.pins = mk('path', { class: 'sil' }, g); M.cr = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){
+    const vt = val(M.bolt);
+    setD(M.holes, vt > .5 ? ROWS.map(z => slot(M.P, XB, YW, z, RH)).join('') : '');
+    setD(M.pins, vt > .001 ? ROWS.map(z => slot(M.P, XB, YW + .001 + 6*(1 - vt), z, RBS)).join('') : '');
+    setD(M.cr, at(val(M.full) > .5, crack(M, [[[[XB - E, YW, ZL], [XB - E, YW, COPE.z]], [[XB + E, YW, ZL], [XB + E, YW, COPE.z]]],
+      [[[XE, YW, ZL + E], [XB, YW, ZL + E]], [[XE, YW, ZL - E], [XB, YW, ZL - E]]]], 'beam', 'beam')));
+  },
+});
+
+return { SBS, SPB, SWB, SPY, SPR, SPK, SWR, SWK };
+})();
+</script>
+<script>
 /* One playback for every sequence on the page, plus colours and downloads. Each section keeps its own
    clock: the loop opens on the finished model, un-builds and builds again; moving across the drawing scrubs
    it; the rail jumps to a stage. The colour picker recolours every drawing, and each section can save its
@@ -4165,7 +4514,7 @@ return { EPY, BTR, EPS, BSR, BBP, FWR, CFY, BBC, CWY, CWC, CPZ };
   const { register, pointer, reducedMotion, mk, inject, clamp } = HL;
   inject(document);
   const FIGS = { beam: () => BEAM, turbine: () => TG, pump: () => PP, substructure: () => BS, endplate: () => EP,
-    flb: () => J10.FLB, wly: () => J10.WLY, wlc: () => J10.WLC, wsb: () => J10.WSB, wcb: () => J10.WCB, pz: () => J10.PZ, cwp: () => KH.CWP, pun: () => KH.PUN, sly: () => KH.SLY, slc: () => KH.SLC, slb: () => KH.SLB, bew: () => KH.BEW, csg: () => KH.CSG, cdf: () => KH.CDF, rpt: () => KH.RPT, rpx: () => KH.RPX, rpk: () => KH.RPK, rps: () => KH.RPS, epy: () => EPLS.EPY, btr: () => EPLS.BTR, eps: () => EPLS.EPS, bsr: () => EPLS.BSR, bbp: () => EPLS.BBP, bbc: () => EPLS.BBC, fwr: () => EPLS.FWR, cfy: () => EPLS.CFY, cwy: () => EPLS.CWY, cwc: () => EPLS.CWC, cpz: () => EPLS.CPZ };
+    flb: () => J10.FLB, wly: () => J10.WLY, wlc: () => J10.WLC, wsb: () => J10.WSB, wcb: () => J10.WCB, pz: () => J10.PZ, cwp: () => KH.CWP, pun: () => KH.PUN, sly: () => KH.SLY, slc: () => KH.SLC, slb: () => KH.SLB, bew: () => KH.BEW, csg: () => KH.CSG, cdf: () => KH.CDF, rpt: () => KH.RPT, rpx: () => KH.RPX, rpk: () => KH.RPK, rps: () => KH.RPS, epy: () => EPLS.EPY, btr: () => EPLS.BTR, eps: () => EPLS.EPS, bsr: () => EPLS.BSR, bbp: () => EPLS.BBP, bbc: () => EPLS.BBC, fwr: () => EPLS.FWR, cfy: () => EPLS.CFY, cwy: () => EPLS.CWY, cwc: () => EPLS.CWC, cpz: () => EPLS.CPZ, sbs: () => STLS.SBS, spb: () => STLS.SPB, swb: () => STLS.SWB, spy: () => STLS.SPY, spr: () => STLS.SPR, spk: () => STLS.SPK, swr: () => STLS.SWR, swk: () => STLS.SWK };
   const docEl = document.documentElement, KEYS = ['plate', 'hi', 'edge', 'mid', 'lo'];
   const store = { get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} } };
 
