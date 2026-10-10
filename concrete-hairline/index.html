@@ -760,7 +760,7 @@ const BEAM = (() => {
     M.kps = [0, 1, 3, 2, 4, 5, 7, 6].map((ix, n) => ({ p: K[ix], n, ph: n < 4 ? 4 : 5,
       drop: mk('path', { class: 'nf dash' }, g), el: mk('circle', { r: 1.8, class: 'dot m' }, g), s: G(from(n < 4 ? 4 : 5, 9), (n & 3)*110) }));
 
-    M.weights = [L/3, 2*L/3].map(x => ({ x, pad: solid(g), ps: G(from(17)), discs: [0, 1, 2, 3].map(n => ({ n, el: solid(g), s: G(from(n < 2 ? 18 : 19), (n & 1)*130) })) }));
+    M.loads = [L/3, 2*L/3].map(x => ({ x, pad: solid(g), ps: G(from(17)), a1: G(from(18)), a2: G(from(19)), s: mk('path', { class: 'nf' }, g), h: mk('path', { class: 'nf' }, g) }));
     M.lam = tween(1, 900);
     return M;
   }
@@ -864,17 +864,19 @@ const BEAM = (() => {
     });
     M.kps.forEach(q => cls(q.el, q.n === newest ? 'dot' : 'dot m'));
 
-    M.weights.forEach(s => {
-      const z0 = Z0 + H + dfn(s.x), vp = val(s.ps);
+    /* a load arrow on each pad, as long as the load: half at P 50, all of it at P 100 */
+    M.loads.forEach(s => {
+      const z0 = Z0 + H + dfn(s.x), vp = val(s.ps), len = 11*val(s.a1) + 11*val(s.a2), hi = k === 18 || k === 19;
       show(s.pad.g, vp > .01);
       if (vp > .01) put(s.pad, box(P, front, s.x - 7, -2, z0 + 20*(1 - vp), s.x + 7, B + 2, z0 + 3 + 20*(1 - vp), 2, .8));
       cls(s.pad.sil, k === 17 ? 'sil hi' : 'sil');
-      s.discs.forEach(d => {
-        const v = val(d.s), z = z0 + 3 + d.n*3.9 + 24*(1 - v);
-        show(d.el.g, v > .01);
-        if (v > .01) put(d.el, prism(P, front, disc(s.x, B/2, 6.5), disc(s.x, B/2, 5.6), z, z + 3.6));
-        cls(d.el.sil, (k === 18 && d.n === 1) || (k === 19 && d.n === 3) ? 'sil hi' : 'sil');
-      });
+      const p1 = P(s.x, B/2, z0 + 3.4), p0 = P(s.x, B/2, z0 + 3.4 + Math.max(len, .01));
+      setD(s.s, len > .3 ? seg(p0, p1) : '');
+      if (len > .3){
+        const dx = p1[0] - p0[0], dy = p1[1] - p0[1], l = Math.hypot(dx, dy) || 1, ux = dx/l, uy = dy/l;
+        setD(s.h, open([[p1[0] - ux*5.5 + uy*2.8, p1[1] - uy*5.5 - ux*2.8], p1, [p1[0] - ux*5.5 - uy*2.8, p1[1] - uy*5.5 + ux*2.8]]));
+      } else setD(s.h, '');
+      cls(s.s, hi ? 'nf hi' : 'nf'); cls(s.h, hi ? 'nf hi' : 'nf');
     });
   };
 })();

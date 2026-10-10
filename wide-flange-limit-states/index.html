@@ -92,7 +92,7 @@ footer a{color:inherit}
         <div class="seq-head"><span class="num">07</span><h2 id="wly-h">Web local yielding</h2><p>J10.2 · The reaction at a bearing support spreads through the flange at 2.5 : 1 and yields the web at the fillet toe over N + 5k.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="wly" role="img" aria-label="A wide-flange beam is drawn in lines on a bearing support with weights at both ends; dashed lines show the reaction spreading at 2.5 to 1, and a band of the web yields at the toe of the fillet."></div>
+          <div class="stage" data-hairline="wly" role="img" aria-label="A wide-flange beam is drawn in lines on a bearing support, loaded at both ends; dashed lines show the reaction spreading at 2.5 to 1, and a band of the web yields at the toe of the fillet."></div>
         </div>
         <ol class="rail" aria-label="Stages of web local yielding"></ol>
       </section>
@@ -100,7 +100,7 @@ footer a{color:inherit}
         <div class="seq-head"><span class="num">08</span><h2 id="wlc-h">Web local crippling</h2><p>J10.3 · Over a bearing support the web wrinkles just above the flange, and the beam settles into it.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="wlc" role="img" aria-label="A wide-flange beam is drawn in lines on a bearing support with weights at both ends; the web wrinkles just above the bottom flange over the support."></div>
+          <div class="stage" data-hairline="wlc" role="img" aria-label="A wide-flange beam is drawn in lines on a bearing support, loaded at both ends; the web wrinkles just above the bottom flange over the support."></div>
         </div>
         <ol class="rail" aria-label="Stages of web local crippling"></ol>
       </section>
@@ -108,7 +108,7 @@ footer a{color:inherit}
         <div class="seq-head"><span class="num">09</span><h2 id="wsb-h">Web sidesway buckling</h2><p>J10.4 · With the flanges free to move sideways, the loaded flange swings out and the web bends under it.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="wsb" role="img" aria-label="A wide-flange beam is drawn in lines with a bearing plate and weights on its top flange; the loaded compression flange moves sideways relative to the bottom flange and the web bends."></div>
+          <div class="stage" data-hairline="wsb" role="img" aria-label="A wide-flange beam is drawn in lines with a bearing plate on its top flange, loaded from above; the loaded compression flange moves sideways relative to the bottom flange and the web bends."></div>
         </div>
         <ol class="rail" aria-label="Stages of web sidesway buckling"></ol>
       </section>
@@ -736,7 +736,6 @@ const WF = (() => {
   const from = (a, b = Infinity) => k => k >= a && k < b;
   const range = n => Array.from({ length: n + 1 }, (_, i) => i/n);
   const bell = (x, w) => Math.exp(-((x/w)**2));
-  const discAt = (cx, cy, R) => circ(R, 20).map(q => ({ ...q, u: q.u + cx, v: q.v + cy }));
 
   function seq(N){
     const S = { k: N, now: 0 };
@@ -767,18 +766,23 @@ const WF = (() => {
       setD(p.mesh, d);
     }
   }
-  /* rounded boxes and stacked weights, drawn through Pf */
+  /* rounded boxes, drawn through Pf */
   const box = (g, b, z0, z1, o = {}) => { const [ring, inner] = ringsOf(b, o.r ?? .3, o.k ?? .2); return { b, z0, z1, ring, inner, r: o.r ?? .3, k: o.k ?? .2, el: solid(g) }; };
   function drawBox(bx, Pf, front, on, dz = 0, b = null){
     show(bx.el.g, on); if (!on) return;
     let ring = bx.ring, inner = bx.inner; if (b) [ring, inner] = ringsOf(b, bx.r, bx.k);
     putc(bx.el, prism(Pf, front, ring, inner, bx.z0 + dz, bx.z1 + dz));
   }
-  const weights = (g, G, gate, cx, cy, R, z0) => [0, 1, 2].map(n => ({ n, z0, el: solid(g), s: G(gate, n*130), ring: discAt(cx, cy, R), inner: discAt(cx, cy, R*.8) }));
-  function drawWeights(ws, val, Pf, front, hi){
-    ws.forEach(w => { const v = val(w.s), on = v > .001; show(w.el.g, on);
-      if (on){ const z = w.z0 + w.n*1.45 + 12*(1 - v); putc(w.el, prism(Pf, front, w.ring, w.inner, z, z + 1.3)); }
-      cls(w.el.sil, hi ? 'sil hi' : 'sil'); });
+  /* a load arrow, drawn on the screen between two projected points: the shaft grows with v from p0 toward
+     p1, and the head lands at p1 */
+  const arrow = g => ({ s: mk('path', { class: 'nf' }, g), h: mk('path', { class: 'nf' }, g) });
+  function drawArrow(ar, p0, p1, v, hi){
+    setD(ar.s, v > .001 ? line([p0, p1], v) : '');
+    if (v > .98){
+      const dx = p1[0] - p0[0], dy = p1[1] - p0[1], l = Math.hypot(dx, dy) || 1, ux = dx/l, uy = dy/l, L = 5.5, W = 2.8;
+      setD(ar.h, open([[p1[0] - ux*L + uy*W, p1[1] - uy*L - ux*W], p1, [p1[0] - ux*L - uy*W, p1[1] - uy*L + ux*W]]));
+    } else setD(ar.h, '');
+    cls(ar.s, hi ? 'nf hi' : 'nf'); cls(ar.h, hi ? 'nf hi' : 'nf');
   }
 
   /* A W shape along x from X0 to X1, drawn back to front: bottom flange, web face (+y), top flange, near cut
@@ -808,7 +812,7 @@ const WF = (() => {
   }
 
   /* A beam figure: section, load path, load, mechanism (half, then full). The spec supplies the field D, its
-     own parts through the hooks, and drawExtra for them. Bearing plate and weights are on unless turned off. */
+     own parts through the hooks, and drawExtra for them. Bearing plate and load arrow are on unless turned off. */
   const SECTION = { X0: -22, X1: 22, d: 14, bf: 10, tf: .65, tw: .375 };
   function beamFig(spec){
     const N = 5, { S, G, val } = seq(N), s = SECTION, ZT = s.d/2, ZTI = s.d/2 - s.tf;
@@ -821,7 +825,7 @@ const WF = (() => {
       M.beam = wbeam(g, s, { under: hook('under'), behindWeb: hook('behindWeb'), onWeb: hook('onWeb'), onTop: g2 => {
         if (spec.bearing !== false) M.plate = box(g2, [-3, -4.6, 3, 4.6], ZT, ZT + 1);
         hook('onTop')(g2);
-        M.weights = spec.weights === false ? [] : weights(g2, G, from(3), 0, 0, 3, ZT + 1);
+        M.arrow = spec.arrow === false ? null : arrow(g2);
       } });
       return M;
     }
@@ -830,12 +834,12 @@ const WF = (() => {
       tset(M.amp, k === 4 ? .5 : k >= 5 ? 1 : 0, S.now, 0); M.a = tval(M.amp, S.now);
       M.beam.draw(Pf, val(M.sec), k, k === 5 && spec.hi);
       if (M.plate){ const v = val(M.path); drawBox(M.plate, Pf, front, v > .001, 10*(1 - v)); cls(M.plate.el.sil, k === 2 ? 'sil hi' : 'sil'); }
-      drawWeights(M.weights, val, Pf, front, k === 3);
+      if (M.arrow) drawArrow(M.arrow, Pf(0, 0, ZT + 10), Pf(0, 0, ZT + 1.25), val(M.load), k === 3);
       spec.drawExtra && spec.drawExtra(M, k, val);
     }
     return { N, STAGES, DETAIL: spec.DETAIL, S, build, draw };
   }
-  return { setD, cls, show, mix, line, putc, ringsOf, from, range, bell, discAt, seq, camera, panel, drawPanel, box, drawBox, weights, drawWeights, beamFig, SECTION, clamp, lerp, poly, open };
+  return { setD, cls, show, mix, line, putc, ringsOf, from, range, bell, seq, camera, panel, drawPanel, box, drawBox, arrow, drawArrow, wbeam, beamFig, SECTION, clamp, lerp, poly, open };
 })();
 </script>
 <script>
@@ -849,7 +853,8 @@ const ZT = WF.SECTION.d/2, ZTI = ZT - WF.SECTION.tf, TW = WF.SECTION.tw;
    tips lifting more than the line over the web, and yield lines form. */
 const FLB = WF.beamFig({
   DETAIL: ['ready', 'W14 × 61', 'plate across the flange', 'tension Pu', 'flange bends about the web', 'yield lines · Rn = 6.25 Fyf tf²'],
-  bearing: false, weights: false, hi: 'flange',
+  bearing: false, arrow: false, hi: 'flange',
+  fit: [[-22, -5, -ZT - 1], [22, 5, -ZT - 1], [22, -5, ZT + 14], [-22, 5, ZT + 14], [0, 0, ZT + 15]],
   D(x, y, z, a){
     const b = bell(x, 5.5), curl = a*1.7*Math.pow(Math.min(1, Math.abs(y)/5), 1.4)*b, lift = a*1.0*b;
     if (z < ZTI - .01) return [0, 0, 0];
@@ -860,7 +865,7 @@ const FLB = WF.beamFig({
   onTop(g, M, G){
     M.tplate = WF.box(g, [-.45, -4.6, .45, 4.6], ZT, ZT + 6, { r: .2, k: .12 });
     M.grip = WF.box(g, [-2.2, -5.4, 2.2, 5.4], ZT + 6, ZT + 8.2, { r: .6, k: .3 });
-    M.pull = [-3, 3].map(y => ({ y, el: HL.mk('path', { class: 'nf dash' }, g) }));
+    M.pull = WF.arrow(g);
     M.ylines = HL.mk('path', { class: 'nf hi' }, g);
     M.tS = G(wfrom(2)); M.gS = G(wfrom(3)); M.yS = G(wfrom(5));
   },
@@ -868,7 +873,7 @@ const FLB = WF.beamFig({
     const { Pf, front } = M, vt = val(M.tS), vg = val(M.gS), vy = val(M.yS);
     WF.drawBox(M.tplate, Pf, front, vt > .001, 10*(1 - vt)); WF.cls(M.tplate.el.sil, k === 2 ? 'sil hi' : 'sil');
     WF.drawBox(M.grip, Pf, front, vg > .001, 8*(1 - vg)); WF.cls(M.grip.el.sil, k === 3 ? 'sil hi' : 'sil');
-    M.pull.forEach(p => WF.setD(p.el, vg > .5 ? WF.line([Pf(0, p.y, ZT + 8.2), Pf(0, p.y, ZT + 14)], vg) : ''));
+    WF.drawArrow(M.pull, Pf(0, 0, ZT + 8.4), Pf(0, 0, ZT + 15), vg, k === 3);
     const L = (pts, n = 10) => { const out = []; for (let i = 0; i < pts.length - 1; i++) for (let j = 0; j < n; j++) out.push(WF.mix(pts[i], pts[i+1], j/n)); out.push(pts[pts.length - 1]); return WF.open(out.map(p => Pf(...p))); };
     WF.setD(M.ylines, vy > .5 ? [
       L([[-7, .7, ZT], [7, .7, ZT]]), L([[-7, -.7, ZT], [7, -.7, ZT]]),
@@ -877,22 +882,22 @@ const FLB = WF.beamFig({
   },
 });
 
-/* A bearing support under the bottom flange at mid-length, with weights at both ends: the reaction is the
+/* A bearing support under the bottom flange at mid-length, with loads at both ends: the reaction is the
    concentrated force. Shared by J10.2 and J10.3, so the web just above the bottom flange is in view. */
 const SUPPORT_FIT = [[-22, -6, -ZT - 8], [22, 6, -ZT - 8], [22, -5, ZT + 6], [-22, 5, ZT + 6], [-16, 0, ZT + 6]];
 const support = {
-  bearing: false, weights: false, fit: SUPPORT_FIT,
+  bearing: false, arrow: false, fit: SUPPORT_FIT,
   under(g, M, G){
     M.base = WF.box(g, [-4.5, -6, 4.5, 6], -ZT - 7, -ZT - 1, { r: .8, k: .4 });
     M.bplate = WF.box(g, [-3, -4.6, 3, 4.6], -ZT - 1, -ZT);
     M.uS = G(wfrom(2));
   },
-  onTop(g, M, G){ M.ends = [-16, 16].map((x, i) => WF.weights(g, G, wfrom(3), x, 0, 2.6, ZT)); },
+  onTop(g, M, G){ M.ends = [-16, 16].map(x => ({ x, ar: WF.arrow(g) })); M.endS = G(wfrom(3)); },
   drawSupport(M, k, val){
     const v = val(M.uS);
     WF.drawBox(M.base, M.P, M.front, v > .001, -8*(1 - v)); WF.drawBox(M.bplate, M.P, M.front, v > .001, -8*(1 - v));
     WF.cls(M.base.el.sil, k === 2 ? 'sil hi' : 'sil'); WF.cls(M.bplate.el.sil, k === 2 ? 'sil hi' : 'sil');
-    M.ends.forEach(w => WF.drawWeights(w, val, M.Pf, M.front, k === 3));
+    const ve = val(M.endS); M.ends.forEach(e => WF.drawArrow(e.ar, M.Pf(e.x, 0, ZT + 7), M.Pf(e.x, 0, ZT + .3), ve, k === 3));
   },
 };
 
@@ -1003,7 +1008,7 @@ const PZ = (() => {
     M.frontOuter = WF.panel(g, (u, v) => [XF, -YB + v*2*YB, Z(u)], { nu: 44, nv: 6, us, vs: [.25, .5, .75] });
     M.frontEdge = WF.panel(g, (u, v) => [XF - TFC + v*TFC, YB, Z(u)], { nu: 44, nv: 1 });
     M.right = beam(1);
-    M.weights = WF.weights(g, G, wfrom(3), XF + 12, 0, 2.6, ZB);
+    M.arrow = WF.arrow(g);
     M.cap = HL.mk('path', { class: 'sil' }, g);
     return M;
   }
@@ -1027,7 +1032,7 @@ const PZ = (() => {
     [M.frontOuter, M.frontEdge].forEach(p => WF.drawPanel(p, Pf, grow));
     WF.cls(M.web.mesh, k === 5 ? 'nf hi' : 'nf');
     drawBeam(M.right);
-    WF.drawWeights(M.weights, val, Pf, front, k === 3);
+    WF.drawArrow(M.arrow, Pf(XF + 12, 0, ZB + 8), Pf(XF + 12, 0, ZB + .3), val(M.load), k === 3);
     const zc = Z0 + grow*(Z1 - Z0);
     WF.setD(M.cap, grow > .001 ? WF.poly(I.map(([x, yy]) => Pf(x, yy, zc))) : '');
     WF.cls(M.cap, k === 1 ? 'sil hi' : 'sil');
@@ -1045,7 +1050,7 @@ return { FLB, WLY, WLC, WSB, WCB, PZ };
   const { register, pointer, reducedMotion, mk, inject, clamp } = HL;
   inject(document);
   const FIGS = { beam: () => BEAM, turbine: () => TG, pump: () => PP, substructure: () => BS, endplate: () => EP,
-    flb: () => J10.FLB, wly: () => J10.WLY, wlc: () => J10.WLC, wsb: () => J10.WSB, wcb: () => J10.WCB, pz: () => J10.PZ };
+    flb: () => J10.FLB, wly: () => J10.WLY, wlc: () => J10.WLC, wsb: () => J10.WSB, wcb: () => J10.WCB, pz: () => J10.PZ, cwp: () => KH.CWP, pun: () => KH.PUN, sly: () => KH.SLY, slc: () => KH.SLC, slb: () => KH.SLB, bew: () => KH.BEW, csg: () => KH.CSG, cdf: () => KH.CDF, rpt: () => KH.RPT, rpx: () => KH.RPX, rpk: () => KH.RPK, rps: () => KH.RPS, epy: () => EPLS.EPY, btr: () => EPLS.BTR, eps: () => EPLS.EPS, bsr: () => EPLS.BSR, bbp: () => EPLS.BBP, bbc: () => EPLS.BBC, fwr: () => EPLS.FWR, cfy: () => EPLS.CFY, cwy: () => EPLS.CWY, cwc: () => EPLS.CWC, cpz: () => EPLS.CPZ, sbs: () => STLS.SBS, spb: () => STLS.SPB, swb: () => STLS.SWB, spy: () => STLS.SPY, spr: () => STLS.SPR, spk: () => STLS.SPK, swr: () => STLS.SWR, swk: () => STLS.SWK };
 
   function mount(fig, root, DW, HOLD){
     const { N, STAGES, DETAIL, S } = fig;

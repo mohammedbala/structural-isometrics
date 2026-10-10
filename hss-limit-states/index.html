@@ -790,7 +790,6 @@ const WF = (() => {
   const from = (a, b = Infinity) => k => k >= a && k < b;
   const range = n => Array.from({ length: n + 1 }, (_, i) => i/n);
   const bell = (x, w) => Math.exp(-((x/w)**2));
-  const discAt = (cx, cy, R) => circ(R, 20).map(q => ({ ...q, u: q.u + cx, v: q.v + cy }));
 
   function seq(N){
     const S = { k: N, now: 0 };
@@ -821,18 +820,23 @@ const WF = (() => {
       setD(p.mesh, d);
     }
   }
-  /* rounded boxes and stacked weights, drawn through Pf */
+  /* rounded boxes, drawn through Pf */
   const box = (g, b, z0, z1, o = {}) => { const [ring, inner] = ringsOf(b, o.r ?? .3, o.k ?? .2); return { b, z0, z1, ring, inner, r: o.r ?? .3, k: o.k ?? .2, el: solid(g) }; };
   function drawBox(bx, Pf, front, on, dz = 0, b = null){
     show(bx.el.g, on); if (!on) return;
     let ring = bx.ring, inner = bx.inner; if (b) [ring, inner] = ringsOf(b, bx.r, bx.k);
     putc(bx.el, prism(Pf, front, ring, inner, bx.z0 + dz, bx.z1 + dz));
   }
-  const weights = (g, G, gate, cx, cy, R, z0) => [0, 1, 2].map(n => ({ n, z0, el: solid(g), s: G(gate, n*130), ring: discAt(cx, cy, R), inner: discAt(cx, cy, R*.8) }));
-  function drawWeights(ws, val, Pf, front, hi){
-    ws.forEach(w => { const v = val(w.s), on = v > .001; show(w.el.g, on);
-      if (on){ const z = w.z0 + w.n*1.45 + 12*(1 - v); putc(w.el, prism(Pf, front, w.ring, w.inner, z, z + 1.3)); }
-      cls(w.el.sil, hi ? 'sil hi' : 'sil'); });
+  /* a load arrow, drawn on the screen between two projected points: the shaft grows with v from p0 toward
+     p1, and the head lands at p1 */
+  const arrow = g => ({ s: mk('path', { class: 'nf' }, g), h: mk('path', { class: 'nf' }, g) });
+  function drawArrow(ar, p0, p1, v, hi){
+    setD(ar.s, v > .001 ? line([p0, p1], v) : '');
+    if (v > .98){
+      const dx = p1[0] - p0[0], dy = p1[1] - p0[1], l = Math.hypot(dx, dy) || 1, ux = dx/l, uy = dy/l, L = 5.5, W = 2.8;
+      setD(ar.h, open([[p1[0] - ux*L + uy*W, p1[1] - uy*L - ux*W], p1, [p1[0] - ux*L - uy*W, p1[1] - uy*L + ux*W]]));
+    } else setD(ar.h, '');
+    cls(ar.s, hi ? 'nf hi' : 'nf'); cls(ar.h, hi ? 'nf hi' : 'nf');
   }
 
   /* A W shape along x from X0 to X1, drawn back to front: bottom flange, web face (+y), top flange, near cut
@@ -862,7 +866,7 @@ const WF = (() => {
   }
 
   /* A beam figure: section, load path, load, mechanism (half, then full). The spec supplies the field D, its
-     own parts through the hooks, and drawExtra for them. Bearing plate and weights are on unless turned off. */
+     own parts through the hooks, and drawExtra for them. Bearing plate and load arrow are on unless turned off. */
   const SECTION = { X0: -22, X1: 22, d: 14, bf: 10, tf: .65, tw: .375 };
   function beamFig(spec){
     const N = 5, { S, G, val } = seq(N), s = SECTION, ZT = s.d/2, ZTI = s.d/2 - s.tf;
@@ -875,7 +879,7 @@ const WF = (() => {
       M.beam = wbeam(g, s, { under: hook('under'), behindWeb: hook('behindWeb'), onWeb: hook('onWeb'), onTop: g2 => {
         if (spec.bearing !== false) M.plate = box(g2, [-3, -4.6, 3, 4.6], ZT, ZT + 1);
         hook('onTop')(g2);
-        M.weights = spec.weights === false ? [] : weights(g2, G, from(3), 0, 0, 3, ZT + 1);
+        M.arrow = spec.arrow === false ? null : arrow(g2);
       } });
       return M;
     }
@@ -884,12 +888,12 @@ const WF = (() => {
       tset(M.amp, k === 4 ? .5 : k >= 5 ? 1 : 0, S.now, 0); M.a = tval(M.amp, S.now);
       M.beam.draw(Pf, val(M.sec), k, k === 5 && spec.hi);
       if (M.plate){ const v = val(M.path); drawBox(M.plate, Pf, front, v > .001, 10*(1 - v)); cls(M.plate.el.sil, k === 2 ? 'sil hi' : 'sil'); }
-      drawWeights(M.weights, val, Pf, front, k === 3);
+      if (M.arrow) drawArrow(M.arrow, Pf(0, 0, ZT + 10), Pf(0, 0, ZT + 1.25), val(M.load), k === 3);
       spec.drawExtra && spec.drawExtra(M, k, val);
     }
     return { N, STAGES, DETAIL: spec.DETAIL, S, build, draw };
   }
-  return { setD, cls, show, mix, line, putc, ringsOf, from, range, bell, discAt, seq, camera, panel, drawPanel, box, drawBox, weights, drawWeights, wbeam, beamFig, SECTION, clamp, lerp, poly, open };
+  return { setD, cls, show, mix, line, putc, ringsOf, from, range, bell, seq, camera, panel, drawPanel, box, drawBox, arrow, drawArrow, wbeam, beamFig, SECTION, clamp, lerp, poly, open };
 })();
 </script>
 <script>

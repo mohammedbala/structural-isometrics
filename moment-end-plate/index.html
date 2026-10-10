@@ -642,7 +642,7 @@ var HL = (() => {
    is x = 0. Ten stages, 15 phases. Under the moment, the plate, bolt heads, beam and welds rotate about the
    compression flange through Pm, so the plate pulls off the column flange at the tension side. */
 const EP = (() => {
-  const { Cam, fit, proj, facing, rings, circ, prism, hull, poly, open, lerp, tween, tset, tval, mk, solid, place } = HL;
+  const { Cam, fit, proj, facing, rings, prism, hull, poly, open, lerp, tween, tset, tval, mk, solid, place } = HL;
   const N = 15;
   const CD = 14.7, CBF = 14.7, CTF = 1.03, CTW = .645, CZ0 = -20, CZ1 = 22;
   const BD = 23.9, BBF = 9, BTF = .68, BTW = .44, BL = 41;
@@ -694,7 +694,7 @@ const EP = (() => {
 
   function build(svg){
     const C = Cam(45, 0.5, 4.15);
-    fit(C, [[-CD, -CBF/2, CZ0], [-CD, CBF/2, CZ1], [0, CBF/2, CZ0], [BL, BBF/2, -ZT - 4], [BL, -BBF/2, ZT + 6], [36, 0, ZT + 6]], 200, 164);
+    fit(C, [[-CD, -CBF/2, CZ0], [-CD, CBF/2, CZ1], [0, CBF/2, CZ0], [BL, BBF/2, -ZT - 4], [BL, -BBF/2, ZT + 6], [36, 0, ZT + 9]], 200, 164);
     const P = proj(C), front = facing(C), g = mk('g', {}, svg), Pm = (x, y, z) => P(...rot(x, y, z));
     const M = { P, Pm, front, C, items: [], xps: [] };
     const item = (b, z0, z1, o) => {
@@ -748,8 +748,7 @@ const EP = (() => {
       mesh: [...xs.map(x => [[x, -BBF/2 + .3, ZT], [x, BBF/2, ZT], [x, BBF/2, ZTI + .1]]), [[TP + .6, 0, ZT], [BL, 0, ZT]]], meshAt: 11 });
     weld([[TP, -BBF/2, ZT + .5], [TP + .5, -BBF/2, ZT], [TP + .5, BBF/2, ZT], [TP, BBF/2, ZT + .5]], 0);
 
-    M.weights = [0, 1, 2].map(n => ({ n, el: solid(g), s: G(from(13), n*130),
-      ring: circ(3.2, 20).map(q => ({ ...q, u: q.u + 35, v: q.v })), inner: circ(2.6, 20).map(q => ({ ...q, u: q.u + 35, v: q.v })) }));
+    M.load = { s: mk('path', { class: 'nf' }, g), h: mk('path', { class: 'nf' }, g), v: G(from(13)) };
     M.th = tween(1, 900);
     return M;
   }
@@ -790,11 +789,14 @@ const EP = (() => {
       setD(w.el, v > .001 ? poly([q[0], q[1], e(q[1], q[2]), e(q[0], q[3])].map(p => Pm(...p))) : '');
       cls(w.el, k === 5 ? 'hi' : 'sil');
     });
-    M.weights.forEach(wt => {
-      const v = val(wt.s), on = v > .001; show(wt.el.g, on);
-      if (on){ const z = ZT + wt.n*1.7 + 16*(1 - v); putc(wt.el, prism(Pm, front, wt.ring, wt.inner, z, z + 1.5)); }
-      cls(wt.el.sil, k === 13 ? 'sil hi' : 'sil');
-    });
+    /* the load: an arrow down onto the beam near its tip, turning with it */
+    const vl = val(M.load.v), p0 = Pm(35, 0, ZT + 9), p1 = Pm(35, 0, ZT + .3);
+    setD(M.load.s, vl > .001 ? line([p0, p1], vl) : '');
+    if (vl > .98){
+      const dx = p1[0] - p0[0], dy = p1[1] - p0[1], l = Math.hypot(dx, dy) || 1, ux = dx/l, uy = dy/l;
+      setD(M.load.h, open([[p1[0] - ux*5.5 + uy*2.8, p1[1] - uy*5.5 - ux*2.8], p1, [p1[0] - ux*5.5 - uy*2.8, p1[1] - uy*5.5 + ux*2.8]]));
+    } else setD(M.load.h, '');
+    cls(M.load.s, k === 13 ? 'nf hi' : 'nf'); cls(M.load.h, k === 13 ? 'nf hi' : 'nf');
   }
   /* the turn-of-nut rotation: one tween shared by every head, on from phase 10 */
   const G0 = M => M.turnS || (M.turnS = G(from(10)));
