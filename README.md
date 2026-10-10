@@ -4,6 +4,8 @@ Animated, isometric line studies of structural models: four in concrete, one bol
 
 **Everything on one page:** [`index.html`](index.html), served by GitHub Pages at https://mohammedbala.github.io/structural-isometrics/ once Pages is turned on (Settings → Pages → Deploy from a branch → `main`, `/ (root)`).
 
+On that page you can recolour every figure (presets such as ink, night, blueprint, paper, phosphor and redline, or your own background and line colours) and download any figure as SVG or PNG (the frame on screen, optionally with a transparent background) or as an animated GIF of one full loop. The GIF encoder is [gifenc](https://github.com/mattdesl/gifenc) by Matt DesLauriers (MIT), inlined.
+
 The folders below hold each animation on its own page.
 
 - [`concrete-hairline/index.html`](concrete-hairline/index.html): a concrete beam, built in eleven stages: dimensions, keypoints, lines, area, volume, partition, materials, mesh, supports, loads and cracking.
@@ -13,4 +15,4 @@ The folders below hold each animation on its own page.
 - [`moment-end-plate/index.html`](moment-end-plate/index.html): an AISC 358 four-bolt extended end-plate moment connection (4E), built in ten stages: work lines, a W14×132 column, a W24×76 beam, the 1¼ in end plate, flange and web welds, holes, eight 1⅛ in A490 bolts and nuts, column continuity plates, turn-of-nut pretension, mesh, and a moment that rotates the beam so the plate separates from the column flange at the tension side.
 - [`wide-flange-limit-states/index.html`](wide-flange-limit-states/index.html): the six AISC 360 Section J10 limit states for flanges and webs with concentrated forces, one looping figure each: flange local bending (J10.1), web local yielding (J10.2), web local crippling (J10.3), web sidesway buckling (J10.4), web compression buckling (J10.5) and web panel-zone shear (J10.6). Each builds the member, its load path and load, then the mechanism. Displacements are exaggerated sketches, not analysis output.
 
-Both are drawn on the [hairline](https://github.com/lucasmarkes/hairline) kernel by Lucas Marques (MIT), inlined unchanged. The pages are written as artifact bodies (no `<html>`/`<head>` wrapper); opened directly in a browser they still render. Deflections, crack patterns and mode shapes are illustrative sketches, not analysis output.
+All are drawn on the [hairline](https://github.com/lucasmarkes/hairline) kernel by Lucas Marques (MIT), inlined unchanged. The pages are written as artifact bodies (no `<html>`/`<head>` wrapper); opened directly in a browser they still render. Deflections, crack patterns and mode shapes are illustrative sketches, not analysis output.
