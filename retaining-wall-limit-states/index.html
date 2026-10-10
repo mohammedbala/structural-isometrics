@@ -1,4 +1,4 @@
-<title>Wide Flange Limit States</title>
+<title>Retaining Wall Limit States</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&display=swap">
@@ -73,60 +73,76 @@ footer a{color:inherit}
 </style>
 <div class="wrap">
   <header class="top">
-    <div class="title"><h1>Wide flange limit states</h1></div>
-    <p>Flanges and webs with concentrated forces, AISC 360 Section J10. Each figure loops on its own; move across a drawing to scrub it, or pick a stage under it.</p>
+    <div class="title"><h1>Retaining wall limit states</h1></div>
+    <p>A cantilever retaining wall: stability, IBC 1807.2.3, and strength, ACI 318. Each figure loops on its own; move across a drawing to scrub it, or pick a stage under it.</p>
   </header>
 
-  <section class="group" style="border-top:0;padding-top:0" aria-labelledby="j10-h">
-    <div class="group-head"><span class="num">J10</span><h2 id="j10-h">Flanges and webs with concentrated forces</h2><p>AISC 360 Section J10: the six local limit states of a wide-flange member under a concentrated force. Each figure builds the member, its load path and its load, then lets the mechanism develop. Displacements are exaggerated.</p></div>
+  <section class="group" style="border-top:0;padding-top:0" aria-labelledby="rw-h">
+    <div class="group-head"><span class="num">1807</span><h2 id="rw-h">Retaining wall</h2><p>A cantilever retaining wall, 16 ft high on a 10 ft footing: first its stability as a block, against overturning, sliding, bearing and a deep slip circle (IBC 1807.2.3), then the strength of its concrete, the stem in flexure and shear and the heel and toe in flexure (ACI 318). Each figure sets the wall, places the backfill, applies the earth pressure, then lets the mechanism develop. Displacements are exaggerated.</p></div>
     <div class="seqs">
-      <section class="seq" id="flb" data-sequence="flb" data-dwell="1300" data-hold="3400" aria-labelledby="flb-h">
-        <div class="seq-head"><span class="num">06</span><h2 id="flb-h">Flange local bending</h2><p>J10.1 · A plate welded across the flange pulls on it; the flange bends about the web and yield lines form.</p></div>
+      <section class="seq" id="rwo" data-sequence="rwo" data-dwell="1300" data-hold="3400" aria-labelledby="rwo-h">
+        <div class="seq-head"><span class="num">51</span><h2 id="rwo-h">Overturning</h2><p>The thrust of the backfill tips the wall forward about its toe; the heel lifts off and the active wedge slides down its plane behind the wall.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="flb" role="img" aria-label="A wide-flange beam is drawn in lines, a plate welded across its top flange is pulled upward, and the flange bends about the web with its tips lifting, forming yield lines."></div>
+          <div class="stage" data-hairline="rwo" role="img" aria-label="A cantilever retaining wall on its footing, backfill behind it and ground under it, is drawn in lines as a section extruded along the wall, with a triangle of earth pressure; the wall tips forward about its toe and the wedge of backfill behind it slides down."></div>
         </div>
-        <ol class="rail" aria-label="Stages of flange local bending"></ol>
+        <ol class="rail" aria-label="Stages of overturning"></ol>
       </section>
-      <section class="seq" id="wly" data-sequence="wly" data-dwell="1300" data-hold="3400" aria-labelledby="wly-h">
-        <div class="seq-head"><span class="num">07</span><h2 id="wly-h">Web local yielding</h2><p>J10.2 · The reaction at a bearing support spreads through the flange at 2.5 : 1 and yields the web at the fillet toe over N + 5k.</p></div>
+      <section class="seq" id="rws" data-sequence="rws" data-dwell="1300" data-hold="3400" aria-labelledby="rws-h">
+        <div class="seq-head"><span class="num">52</span><h2 id="rws-h">Sliding</h2><p>The wall slides forward on its base; the active wedge drops in behind it and a passive wedge in front of the toe is shoved up its plane.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="wly" role="img" aria-label="A wide-flange beam is drawn in lines on a bearing support, loaded at both ends; dashed lines show the reaction spreading at 2.5 to 1, and a band of the web yields at the toe of the fillet."></div>
+          <div class="stage" data-hairline="rws" role="img" aria-label="A cantilever retaining wall on its footing, backfill behind it and ground under it, is drawn in lines as a section extruded along the wall, with a triangle of earth pressure; the wall slides forward on its base, the wedge behind it drops and a wedge of soil in front of the toe rides up."></div>
         </div>
-        <ol class="rail" aria-label="Stages of web local yielding"></ol>
+        <ol class="rail" aria-label="Stages of sliding"></ol>
       </section>
-      <section class="seq" id="wlc" data-sequence="wlc" data-dwell="1300" data-hold="3400" aria-labelledby="wlc-h">
-        <div class="seq-head"><span class="num">08</span><h2 id="wlc-h">Web local crippling</h2><p>J10.3 · Over a bearing support the web wrinkles just above the flange, and the beam settles into it.</p></div>
+      <section class="seq" id="rwb" data-sequence="rwb" data-dwell="1300" data-hold="3400" aria-labelledby="rwb-h">
+        <div class="seq-head"><span class="num">53</span><h2 id="rwb-h">Bearing capacity</h2><p>The eccentric load crowds the bearing pressure under the toe until the soil there shears out on a curved surface; the toe sinks, the wall tilts and the ground in front heaves.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="wlc" role="img" aria-label="A wide-flange beam is drawn in lines on a bearing support, loaded at both ends; the web wrinkles just above the bottom flange over the support."></div>
+          <div class="stage" data-hairline="rwb" role="img" aria-label="A cantilever retaining wall on its footing, backfill behind it and ground under it, is drawn in lines as a section extruded along the wall, with a triangle of earth pressure; the toe sinks and the wall tilts forward while a mass of soil under the toe turns on a curved surface and heaves the ground in front."></div>
         </div>
-        <ol class="rail" aria-label="Stages of web local crippling"></ol>
+        <ol class="rail" aria-label="Stages of bearing capacity"></ol>
       </section>
-      <section class="seq" id="wsb" data-sequence="wsb" data-dwell="1300" data-hold="3400" aria-labelledby="wsb-h">
-        <div class="seq-head"><span class="num">09</span><h2 id="wsb-h">Web sidesway buckling</h2><p>J10.4 · With the flanges free to move sideways, the loaded flange swings out and the web bends under it.</p></div>
+      <section class="seq" id="rwg" data-sequence="rwg" data-dwell="1300" data-hold="3400" aria-labelledby="rwg-h">
+        <div class="seq-head"><span class="num">54</span><h2 id="rwg-h">Global stability</h2><p>A deep slip circle passes under the whole wall; the wall, the backfill and the ground inside it turn together, the backfill dropping and the ground in front heaving.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="wsb" role="img" aria-label="A wide-flange beam is drawn in lines with a bearing plate on its top flange, loaded from above; the loaded compression flange moves sideways relative to the bottom flange and the web bends."></div>
+          <div class="stage" data-hairline="rwg" role="img" aria-label="A cantilever retaining wall on its footing, backfill behind it and ground under it, is drawn in lines as a section extruded along the wall, with a triangle of earth pressure; a circular slip surface passes under the wall, and everything inside it turns together, the backfill dropping and the ground in front rising."></div>
         </div>
-        <ol class="rail" aria-label="Stages of web sidesway buckling"></ol>
+        <ol class="rail" aria-label="Stages of global stability"></ol>
       </section>
-      <section class="seq" id="wcb" data-sequence="wcb" data-dwell="1300" data-hold="3400" aria-labelledby="wcb-h">
-        <div class="seq-head"><span class="num">10</span><h2 id="wcb-h">Web compression buckling</h2><p>J10.5 · Equal loads on both flanges at one section bow the web out across its depth.</p></div>
+      <section class="seq" id="rsf" data-sequence="rsf" data-dwell="1300" data-hold="3400" aria-labelledby="rsf-h">
+        <div class="seq-head"><span class="num">55</span><h2 id="rsf-h">Stem flexure</h2><p>The stem cantilevers off the footing. The earth pressure bends it forward, and it cracks on the soil face at its base, where the moment is largest.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="wcb" role="img" aria-label="A wide-flange beam is drawn in lines, loaded from above and bearing on a support below at the same section; the web bows out across its depth like a column."></div>
+          <div class="stage" data-hairline="rsf" role="img" aria-label="A cantilever retaining wall on its footing, backfill behind it and ground under it, is drawn in lines as a section extruded along the wall, with a triangle of earth pressure; the stem bends forward off the footing and a crack opens on its soil face at the base."></div>
         </div>
-        <ol class="rail" aria-label="Stages of web compression buckling"></ol>
+        <ol class="rail" aria-label="Stages of stem flexure"></ol>
       </section>
-      <section class="seq" id="pz" data-sequence="pz" data-dwell="1300" data-hold="3400" aria-labelledby="pz-h">
-        <div class="seq-head"><span class="num">11</span><h2 id="pz-h">Web panel-zone shear</h2><p>J10.6 · An unbalanced beam moment shears the column web between the continuity plates.</p></div>
+      <section class="seq" id="rss" data-sequence="rss" data-dwell="1300" data-hold="3400" aria-labelledby="rss-h">
+        <div class="seq-head"><span class="num">56</span><h2 id="rss-h">Stem shear</h2><p>Near the base the shear opens a diagonal crack from the soil face down toward the front face, and the stem above slides on it.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="pz" role="img" aria-label="A wide-flange column is drawn in lines with beams framing into both flanges and continuity plates; an unbalanced moment shears the panel zone into a parallelogram and the beams turn with it."></div>
+          <div class="stage" data-hairline="rss" role="img" aria-label="A cantilever retaining wall on its footing, backfill behind it and ground under it, is drawn in lines as a section extruded along the wall, with a triangle of earth pressure; a diagonal crack runs down through the stem near its base and the stem above slides forward and down on it."></div>
         </div>
-        <ol class="rail" aria-label="Stages of web panel-zone shear"></ol>
+        <ol class="rail" aria-label="Stages of stem shear"></ol>
+      </section>
+      <section class="seq" id="rhf" data-sequence="rhf" data-dwell="1300" data-hold="3400" aria-labelledby="rhf-h">
+        <div class="seq-head"><span class="num">57</span><h2 id="rhf-h">Heel flexure</h2><p>The soil on the heel outweighs the pressure under it; the heel bends down off the stem and cracks on top at the stem face.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="rhf" role="img" aria-label="A cantilever retaining wall on its footing, backfill behind it and ground under it, is drawn in lines as a section extruded along the wall, with a triangle of earth pressure; arrows show the weight of the soil on the heel; the heel bends down and a crack opens on its top at the stem."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of heel flexure"></ol>
+      </section>
+      <section class="seq" id="rtf" data-sequence="rtf" data-dwell="1300" data-hold="3400" aria-labelledby="rtf-h">
+        <div class="seq-head"><span class="num">58</span><h2 id="rtf-h">Toe flexure</h2><p>The bearing pressure, highest under the toe, bends the toe up off the stem; it cracks underneath at the stem face.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="rtf" role="img" aria-label="A cantilever retaining wall on its footing, backfill behind it and ground under it, is drawn in lines as a section extruded along the wall, with a triangle of earth pressure; a trapezoid of bearing pressure pushes up under the toe; the toe bends up and a crack opens on its underside at the stem."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of toe flexure"></ol>
       </section>
     </div>
   </section>
@@ -843,203 +859,322 @@ const WF = (() => {
 })();
 </script>
 <script>
-/* The six AISC 360 J10 limit states for flanges and webs with concentrated forces. ZT is the top of the
-   member, ZTI the underside of its top flange; displacements are exaggerated so the mechanism reads. */
-const J10 = (() => {
-const { clamp: wclamp, bell, from: wfrom } = WF;
-const ZT = WF.SECTION.d/2, ZTI = ZT - WF.SECTION.tf, TW = WF.SECTION.tw;
-
-/* J10.1 Flange local bending: a plate welded across the flange pulls; the flange bends about the web, its
-   tips lifting more than the line over the web, and yield lines form. */
-const FLB = WF.beamFig({
-  DETAIL: ['ready', 'W14 × 61', 'plate across the flange', 'tension Pu', 'flange bends about the web', 'yield lines · Rn = 6.25 Fyf tf²'],
-  bearing: false, arrow: false, hi: 'flange',
-  fit: [[-22, -5, -ZT - 1], [22, 5, -ZT - 1], [22, -5, ZT + 14], [-22, 5, ZT + 14], [0, 0, ZT + 15]],
-  D(x, y, z, a){
-    const b = bell(x, 5.5), curl = a*1.7*Math.pow(Math.min(1, Math.abs(y)/5), 1.4)*b, lift = a*1.0*b;
-    if (z < ZTI - .01) return [0, 0, 0];
-    if (z <= ZT + .01) return [0, 0, curl];
-    const t = wclamp((z - ZT)/.6, 0, 1);
-    return [0, 0, curl + (lift - curl)*t];
-  },
-  onTop(g, M, G){
-    M.tplate = WF.box(g, [-.45, -4.6, .45, 4.6], ZT, ZT + 6, { r: .2, k: .12 });
-    M.grip = WF.box(g, [-2.2, -5.4, 2.2, 5.4], ZT + 6, ZT + 8.2, { r: .6, k: .3 });
-    M.pull = WF.arrow(g);
-    M.ylines = HL.mk('path', { class: 'nf hi' }, g);
-    M.tS = G(wfrom(2)); M.gS = G(wfrom(3)); M.yS = G(wfrom(5));
-  },
-  drawExtra(M, k, val){
-    const { Pf, front } = M, vt = val(M.tS), vg = val(M.gS), vy = val(M.yS);
-    WF.drawBox(M.tplate, Pf, front, vt > .001, 10*(1 - vt)); WF.cls(M.tplate.el.sil, k === 2 ? 'sil hi' : 'sil');
-    WF.drawBox(M.grip, Pf, front, vg > .001, 8*(1 - vg)); WF.cls(M.grip.el.sil, k === 3 ? 'sil hi' : 'sil');
-    WF.drawArrow(M.pull, Pf(0, 0, ZT + 8.4), Pf(0, 0, ZT + 15), vg, k === 3);
-    const L = (pts, n = 10) => { const out = []; for (let i = 0; i < pts.length - 1; i++) for (let j = 0; j < n; j++) out.push(WF.mix(pts[i], pts[i+1], j/n)); out.push(pts[pts.length - 1]); return WF.open(out.map(p => Pf(...p))); };
-    WF.setD(M.ylines, vy > .5 ? [
-      L([[-7, .7, ZT], [7, .7, ZT]]), L([[-7, -.7, ZT], [7, -.7, ZT]]),
-      L([[-7, .7, ZT], [-2.6, 5, ZT]]), L([[7, .7, ZT], [2.6, 5, ZT]]), L([[-7, -.7, ZT], [-2.6, -5, ZT]]), L([[7, -.7, ZT], [2.6, -5, ZT]]),
-    ].join('') : '');
-  },
-});
-
-/* A bearing support under the bottom flange at mid-length, with loads at both ends: the reaction is the
-   concentrated force. Shared by J10.2 and J10.3, so the web just above the bottom flange is in view. */
-const SUPPORT_FIT = [[-22, -6, -ZT - 8], [22, 6, -ZT - 8], [22, -5, ZT + 6], [-22, 5, ZT + 6], [-16, 0, ZT + 6]];
-const support = {
-  bearing: false, arrow: false, fit: SUPPORT_FIT,
-  under(g, M, G){
-    M.base = WF.box(g, [-4.5, -6, 4.5, 6], -ZT - 7, -ZT - 1, { r: .8, k: .4 });
-    M.bplate = WF.box(g, [-3, -4.6, 3, 4.6], -ZT - 1, -ZT);
-    M.uS = G(wfrom(2));
-  },
-  onTop(g, M, G){ M.ends = [-16, 16].map(x => ({ x, ar: WF.arrow(g) })); M.endS = G(wfrom(3)); },
-  drawSupport(M, k, val){
-    const v = val(M.uS);
-    WF.drawBox(M.base, M.P, M.front, v > .001, -8*(1 - v)); WF.drawBox(M.bplate, M.P, M.front, v > .001, -8*(1 - v));
-    WF.cls(M.base.el.sil, k === 2 ? 'sil hi' : 'sil'); WF.cls(M.bplate.el.sil, k === 2 ? 'sil hi' : 'sil');
-    const ve = val(M.endS); M.ends.forEach(e => WF.drawArrow(e.ar, M.Pf(e.x, 0, ZT + 7), M.Pf(e.x, 0, ZT + .3), ve, k === 3));
-  },
-};
-
-/* J10.2 Web local yielding: the reaction spreads through the flange at 2.5 : 1 and yields the web over
-   N + 5k at the toe of the fillet; the beam above settles and the web bulges a little there. */
-const K = 1.25, KZ = -ZT + K, SPREAD = 3 + 2.5*K;
-const WLY = WF.beamFig({
-  ...support,
-  DETAIL: ['ready', 'W14 × 61', 'bearing N on a support · 2.5 : 1', 'reaction Pu', 'web yields at the fillet toe', 'Rn = Fyw tw (5k + N)'],
-  D(x, y, z, a){
-    if (z <= KZ) return [0, 0, 0];
-    const b = bell(x, 5), t = wclamp((z - KZ)/2.6, 0, 1);
-    return [0, a*.6*b*Math.sin(Math.PI*t), -a*.55*b*t];
-  },
-  onWeb(g, M, G){
-    M.disp = [-1, 1].map(sx => ({ w: [[sx*3, TW/2 + .02, -ZT], [sx*SPREAD, TW/2 + .02, KZ], [sx*(SPREAD + 2.5*2.2), TW/2 + .02, KZ + 2.2]], el: HL.mk('path', { class: 'nf dash' }, g) }));
-    M.band = HL.mk('path', { class: 'nf' }, g); M.hatch = HL.mk('path', { class: 'nf' }, g);
-    M.dS = G(wfrom(2)); M.bS = G(wfrom(4));
-  },
-  drawExtra(M, k, val){
-    support.drawSupport(M, k, val);
-    const { Pf } = M, vd = val(M.dS), vb = val(M.bS), y = TW/2 + .03, z1 = KZ + 1.3;
-    M.disp.forEach(d => WF.setD(d.el, WF.line(d.w.map(p => Pf(...p)), vd)));
-    WF.setD(M.band, vb > .5 ? WF.poly([[-SPREAD, y, KZ], [SPREAD, y, KZ], [SPREAD, y, z1], [-SPREAD, y, z1]].map(p => Pf(...p))) : '');
-    let h = ''; if (vb > .5) for (let x = -SPREAD + .9; x < SPREAD; x += .9) h += WF.open([Pf(x, y, KZ), Pf(x, y, z1)]);
-    WF.setD(M.hatch, h);
-    WF.cls(M.band, k === 5 ? 'nf hi' : 'nf'); WF.cls(M.hatch, k === 5 ? 'nf hi' : 'nf lo');
-  },
-});
-
-/* J10.3 Web local crippling: over the bearing, the web wrinkles just above the flange and the beam
-   settles into it. */
-const WLC = WF.beamFig({
-  ...support,
-  DETAIL: ['ready', 'W14 × 61', 'bearing N on a support', 'reaction Pu', 'web wrinkles above the flange', 'web crippling'],
-  hi: 'web',
-  D(x, y, z, a){
-    if (z <= -ZTI) return [0, 0, 0];
-    const b = bell(x, 4.2), t = (z + ZTI)/3.8, drop = -a*.9*b;
-    if (t > 1) return [0, 0, drop];
-    return [0, a*1.5*b*Math.sin(Math.PI*t), drop*t];
-  },
-  drawExtra(M, k, val){ support.drawSupport(M, k, val); },
-});
-
-/* J10.4 Web sidesway buckling: with the flanges free to move sideways relative to each other, the loaded
-   compression flange swings out and the web bends under it. */
-const WSB = WF.beamFig({
-  DETAIL: ['ready', 'W14 × 61', 'bearing N · flanges unbraced', 'compression Pu', 'compression flange sways', 'web sidesway buckling'],
-  hi: 'web',
-  D(x, y, z, a){
-    const b = bell(x, 8), t = wclamp((z + ZT)/(2*ZT), 0, 1.25);
-    return [0, a*2.4*b*t*t, -a*.25*b*t];
-  },
-});
-
-/* J10.5 Web compression buckling: equal loads on both flanges at one section, and the web bows out across
-   its depth like a column. */
-const WCB = WF.beamFig({
-  DETAIL: ['ready', 'W14 × 61', 'bearing on both flanges', 'paired compression Pu', 'web bows across its depth', 'Rn = 24 tw³ √(E Fyw) / h'],
-  hi: 'web',
-  fit: [[-22, -6, -ZT - 8], [22, 6, -ZT - 8], [22, -5, ZT + 9], [-22, 5, ZT + 9], [0, 0, ZT + 10]],
-  D(x, y, z, a){
-    if (Math.abs(z) > ZTI) return [0, 0, 0];
-    return [0, a*1.9*bell(x, 6)*Math.cos(Math.PI*z/(2*ZTI)), 0];
-  },
-  under(g, M, G){
-    M.base = WF.box(g, [-4.5, -6, 4.5, 6], -ZT - 7, -ZT - 1, { r: .8, k: .4 });
-    M.bplate = WF.box(g, [-3, -4.6, 3, 4.6], -ZT - 1, -ZT);
-    M.uS = G(wfrom(2));
-  },
-  drawExtra(M, k, val){
-    const v = val(M.uS);
-    WF.drawBox(M.base, M.P, M.front, v > .001, -8*(1 - v)); WF.drawBox(M.bplate, M.P, M.front, v > .001, -8*(1 - v));
-    WF.cls(M.base.el.sil, k === 2 ? 'sil hi' : 'sil'); WF.cls(M.bplate.el.sil, k === 2 ? 'sil hi' : 'sil');
-  },
-});
-
-/* J10.6 Web panel-zone shear: beams on both sides of a column carry an unbalanced moment into it; the web
-   between the continuity plates shears into a parallelogram, the column flanges kink at its corners, and
-   the beams turn with it. */
-const PZ = (() => {
-  const N = 5, { S, G, val } = WF.seq(N);
-  const XF = 7, TFC = 1.03, TWC = .65, YB = 7.35, Z0 = -22, Z1 = 22, ZB = 9, TFB = .6, YBF = 3.75, LB = 15;
-  const STAGES = [['column', 1], ['load path', 2], ['load', 3], ['mechanism', 4]];
-  const DETAIL = ['ready', 'W14 × 132 column', 'W18 beams · continuity plates', 'unbalanced moment', 'panel zone shears', 'Rv = 0.60 Fy dc tw'];
-  function D(x, y, z, a){
-    const gam = .2*a, dx = gam*wclamp(z, -ZB, ZB);
-    const dz = x > XF ? -gam*(x - XF) : x < -XF ? -gam*(x + XF) : 0;
-    return [dx, 0, dz];
+/* A cantilever retaining wall, its footing, the backfill it holds and the ground it stands on, drawn as a
+   section extruded along the wall: every region is a prism whose cut end faces the viewer. A figure cuts the
+   regions as its mechanism needs and moves each piece in the plane of the section. Feet; x runs from the
+   backfill (−) to the open front (+), z up from the underside of the footing, y along the wall. */
+const RWX = (() => {
+  const { setD, cls, from, range, seq, arrow, drawArrow, lerp } = WF;
+  const { Cam, fit, proj, poly, open, mk, tween, tset, tval } = HL;
+  const YL = 5, PHI = 30*Math.PI/180, XW = -7 - 14.5/Math.tan(Math.PI/4 + PHI/2);
+  const backX = z => -1.25 + .25*(z - 1.5)/14.5;            // the sloped soil face of the stem
+  /* the section: a 16 ft wall on a 10 ft footing, toe 3 ft, heel 5¾ ft, backfill to the top with its Rankine
+     active wedge behind the heel, and 1½ ft of soil over the toe */
+  const SEC = {
+    wall: [[-7, 0], [3, 0], [3, 1.5], [0, 1.5], [0, 16], [-1, 16], [-1.25, 1.5], [-7, 1.5]],
+    foot: [[-7, 0], [3, 0], [3, 1.5], [-7, 1.5]], stem: [[-1.25, 1.5], [0, 1.5], [0, 16], [-1, 16]],
+    ground: [[-18, -6], [10, -6], [10, 0], [-18, 0]],
+    front: [[3, 0], [10, 0], [10, 3], [0, 3], [0, 1.5], [3, 1.5]],
+    overToe: [[0, 1.5], [3, 1.5], [3, 3], [0, 3]], frontRest: [[3, 0], [10, 0], [10, 3], [3, 3]],
+    fill: [[-18, 0], [-7, 0], [-7, 1.5], [-1.25, 1.5], [-1, 16], [-18, 16]],
+    heelSoil: [[-7, 1.5], [-1.25, 1.5], [-1, 16], [-7, 16]],
+    wedge: [[-7, 1.5], [-7, 16], [XW, 16]],
+    back: [[-18, 0], [-7, 0], [-7, 1.5], [XW, 16], [-18, 16]],
+  };
+  /* before the mechanism the regions are whole; a figure's own pieces replace them once it starts */
+  const WHOLE = [
+    { poly: SEC.ground, kind: 'soil', gate: 'ground' }, { poly: SEC.fill, kind: 'soil', gate: 'fill' },
+    { poly: SEC.front, kind: 'soil', gate: 'fill' }, { poly: SEC.wall, kind: 'concrete', gate: 'wall' },
+  ];
+  /* the camera turns further onto the cut end than the other figures' so the section reads; VX, VZ point
+     toward the viewer in the section */
+  const AZ = 30, VX = Math.sin(AZ*Math.PI/180), VZ = .5/Math.sqrt(.75);
+  const area = Q => Q.reduce((s, p, i) => { const q = Q[(i + 1) % Q.length]; return s + p[0]*q[1] - q[0]*p[1]; }, 0)/2;
+  const ccw = Q => (area(Q) < 0 ? Q.slice().reverse() : Q);
+  const inPoly = (q, Q) => { let c = false; for (let i = 0, j = Q.length - 1; i < Q.length; j = i++){ const a = Q[i], b = Q[j];
+    if ((a[1] > q[1]) !== (b[1] > q[1]) && q[0] < (b[0] - a[0])*(q[1] - a[1])/(b[1] - a[1]) + a[0]) c = !c; } return c; };
+  const side = (a, b, p) => (b[0] - a[0])*(p[1] - a[1]) - (b[1] - a[1])*(p[0] - a[0]);
+  const inConvex = (p, K) => K.every((a, i) => side(a, K[(i + 1) % K.length], p) >= 0);
+  /* a circle as a convex polygon, counter-clockwise */
+  const disk = (cx, cz, R, n = 120) => range(n).slice(0, -1).map(t => [cx + R*Math.cos(2*Math.PI*t), cz + R*Math.sin(2*Math.PI*t)]);
+  /* the part of polygon S inside convex polygon K (Sutherland–Hodgman) */
+  function clipConvex(S, K){
+    let out = ccw(S); K = ccw(K);
+    for (let i = 0; i < K.length && out.length; i++){
+      const a = K[i], b = K[(i + 1) % K.length], inp = out; out = [];
+      for (let j = 0; j < inp.length; j++){
+        const p = inp[j], q = inp[(j + 1) % inp.length], sp = side(a, b, p), sq = side(a, b, q);
+        if (sp >= 0) out.push(p);
+        if ((sp >= 0) !== (sq >= 0)){ const t = sp/(sp - sq); out.push([p[0] + t*(q[0] - p[0]), p[1] + t*(q[1] - p[1])]); }
+      }
+    }
+    return out.length > 2 ? out : null;
   }
-  function build(svg){
-    const { C, P, front, g } = WF.camera(svg, 4.8, [[-22, -YB, Z0], [22, YB, Z0], [22, -YB, Z1 + 1], [-22, YB, Z1 + 1], [19, 0, ZB + 6]]);
-    const M = { C, P, front, a: 1, amp: HL.tween(1, 900), sec: G(wfrom(1)), path: G(wfrom(2)), load: G(wfrom(3)), zone: G(wfrom(5)) };
-    M.Pf = (x, y, z) => { if (!M.a) return P(x, y, z); const d = D(x, y, z, M.a); return P(x + d[0], y + d[1], z + d[2]); };
-    const Z = u => Z0 + u*(Z1 - Z0), us = WF.range(14).slice(1, -1);
-    const beam = side => ['bot', 'web', 'top'].map(part => {
-      const z = part === 'bot' ? [-ZB, -ZB + TFB] : part === 'top' ? [ZB - TFB, ZB] : [-ZB + TFB, ZB - TFB];
-      const yy = part === 'web' ? [-.18, .18] : [-YBF, YBF];
-      return { side, z, yy, el: HL.solid(g) };
-    });
-    M.left = beam(-1);
-    M.backInner = WF.panel(g, (u, v) => [-XF + TFC, -YB + v*2*YB, Z(u)], { nu: 40, nv: 4 });
-    M.backEdge = WF.panel(g, (u, v) => [-XF + v*TFC, YB, Z(u)], { nu: 40, nv: 1 });
-    M.web = WF.panel(g, (u, v) => [-XF + TFC + v*(2*XF - 2*TFC), TWC/2, Z(u)], { nu: 44, nv: 8, us, vs: [.25, .5, .75] });
-    M.zoneEl = HL.mk('path', { class: 'nf hi' }, g);
-    M.stiff = [ZB - TFB/2, -(ZB - TFB/2)].map(z => WF.box(g, [-XF + TFC, TWC/2, XF - TFC, YB - .25], z - .38, z + .38, { r: .2, k: .1 }));
-    M.frontOuter = WF.panel(g, (u, v) => [XF, -YB + v*2*YB, Z(u)], { nu: 44, nv: 6, us, vs: [.25, .5, .75] });
-    M.frontEdge = WF.panel(g, (u, v) => [XF - TFC + v*TFC, YB, Z(u)], { nu: 44, nv: 1 });
-    M.right = beam(1);
-    M.arrow = WF.arrow(g);
-    M.cap = HL.mk('path', { class: 'sil' }, g);
-    return M;
+  /* the part of polygon Q outside convex polygon K, when Q's outline crosses K's twice: Q's outline from where
+     it leaves K to where it enters, then back along K, clockwise, through the vertices of K that lie in Q */
+  function minusConvex(Q, K){
+    Q = ccw(Q); K = ccw(K);
+    const n = Q.length, m = K.length, X = [];
+    Q.forEach((p, i) => { const q = Q[(i + 1) % n], rx = q[0] - p[0], rz = q[1] - p[1];
+      K.forEach((a, j) => { const b = K[(j + 1) % m], sx = b[0] - a[0], sz = b[1] - a[1], den = rx*sz - rz*sx;
+        if (Math.abs(den) < 1e-12) return;
+        const t = ((a[0] - p[0])*sz - (a[1] - p[1])*sx)/den, u = ((a[0] - p[0])*rz - (a[1] - p[1])*rx)/den;
+        if (t >= 0 && t < 1 && u >= 0 && u < 1) X.push({ i, t, j, pt: [p[0] + t*rx, p[1] + t*rz] }); }); });
+    if (X.length !== 2) return inConvex(Q[0], K) ? null : Q;
+    const leaves = x => { const p = Q[x.i], q = Q[(x.i + 1) % n], t = x.t + 1e-6; return !inConvex([p[0] + t*(q[0] - p[0]), p[1] + t*(q[1] - p[1])], K); };
+    const [ex, en] = leaves(X[0]) ? [X[0], X[1]] : [X[1], X[0]], out = [ex.pt];
+    if (!(en.i === ex.i && en.t > ex.t)) { let i = ex.i; do { i = (i + 1) % n; out.push(Q[i]); } while (i !== en.i); }
+    out.push(en.pt);
+    if (en.j !== ex.j) for (let j = en.j; ; j = (j - 1 + m) % m){ out.push(K[j]); if (j === (ex.j + 1) % m) break; }
+    return out;
   }
-  const I = [[-XF, -YB], [-XF + TFC, -YB], [-XF + TFC, -TWC/2], [XF - TFC, -TWC/2], [XF - TFC, -YB], [XF, -YB], [XF, YB], [XF - TFC, YB], [XF - TFC, TWC/2], [-XF + TFC, TWC/2], [-XF + TFC, YB], [-XF, YB]];
-  function draw(M){
-    const k = S.k, { Pf, front } = M;
-    HL.tset(M.amp, k === 4 ? .5 : k >= 5 ? 1 : 0, S.now, 0); M.a = HL.tval(M.amp, S.now);
-    const grow = val(M.sec), vb = val(M.path);
-    const drawBeam = parts => parts.forEach(p => {
-      const on = vb > .001; WF.show(p.el.g, on); if (!on) return;
-      const x0 = p.side > 0 ? XF : -XF - LB*vb, x1 = p.side > 0 ? XF + LB*vb : -XF;
-      const [ring, inner] = WF.ringsOf([x0, p.yy[0], x1, p.yy[1]], .25, .15);
-      WF.putc(p.el, HL.prism(Pf, front, ring, inner, p.z[0], p.z[1]));
-      WF.cls(p.el.sil, k === 2 ? 'sil hi' : 'sil');
-    });
-    drawBeam(M.left);
-    [M.backInner, M.backEdge, M.web].forEach(p => WF.drawPanel(p, Pf, grow));
-    const vz = val(M.zone), y = TWC/2 + .02, xa = -XF + TFC, xb = XF - TFC;
-    WF.setD(M.zoneEl, vz > .5 ? WF.poly([[xa, y, -ZB], [xb, y, -ZB], [xb, y, ZB], [xa, y, ZB]].map(p => Pf(...p))) + WF.open([Pf(xa, y, -ZB), Pf(xb, y, ZB)]) + WF.open([Pf(xb, y, -ZB), Pf(xa, y, ZB)]) : '');
-    M.stiff.forEach(s => { WF.drawBox(s, Pf, front, vb > .001, 6*(1 - vb)); WF.cls(s.el.sil, k === 2 ? 'sil hi' : 'sil'); });
-    [M.frontOuter, M.frontEdge].forEach(p => WF.drawPanel(p, Pf, grow));
-    WF.cls(M.web.mesh, k === 5 ? 'nf hi' : 'nf');
-    drawBeam(M.right);
-    WF.drawArrow(M.arrow, Pf(XF + 12, 0, ZB + 8), Pf(XF + 12, 0, ZB + .3), val(M.load), k === 3);
-    const zc = Z0 + grow*(Z1 - Z0);
-    WF.setD(M.cap, grow > .001 ? WF.poly(I.map(([x, yy]) => Pf(x, yy, zc))) : '');
-    WF.cls(M.cap, k === 1 ? 'sil hi' : 'sil');
+  const rot = (cx, cz, ang) => (p, a) => { const t = ang*a, c = Math.cos(t), s = Math.sin(t), dx = p[0] - cx, dz = p[1] - cz; return [cx + dx*c - dz*s, cz + dx*s + dz*c]; };
+  const tr = (dx, dz) => (p, a) => [p[0] + a*dx, p[1] + a*dz];
+  const arcPts = (cx, cz, R, a0, a1, n = 48) => range(n).map(t => { const a = lerp(a0, a1, t); return [cx + R*Math.cos(a), cz + R*Math.sin(a)]; });
+
+  /* The side faces that face the viewer, in an order to paint them: all are extruded over the same length, so
+     one hides another where a line toward the viewer in the section meets it first. Faces of the whole and of
+     the cut pieces never show together and are not compared. */
+  function paintOrder(faces){
+    const W = p => -VZ*p[0] + VX*p[1], Dp = p => VX*p[0] + VZ*p[1];
+    faces.forEach(f => { const a = f.pts[0], b = f.pts[f.pts.length - 1]; f.w0 = W(a); f.w1 = W(b); f.mid = (Dp(a) + Dp(b))/2; });
+    const at = (f, w) => { const P = f.pts; let i = 0; while (i < P.length - 2 && W(P[i + 1]) < w) i++;
+      const w0 = W(P[i]), w1 = W(P[i + 1]); return lerp(Dp(P[i]), Dp(P[i + 1]), w1 > w0 ? (w - w0)/(w1 - w0) : 0); };
+    const n = faces.length, next = faces.map(() => []), indeg = faces.map(() => 0);
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++){
+      const a = faces[i], b = faces[j];
+      if (a.pc.phase !== b.pc.phase) continue;
+      const lo = Math.max(a.w0, b.w0), hi = Math.min(a.w1, b.w1);
+      if (hi - lo < 1e-4) continue;
+      const da = at(a, (lo + hi)/2), db = at(b, (lo + hi)/2);
+      if (Math.abs(da - db) < 1e-6) continue;
+      if (da < db){ next[i].push(j); indeg[j]++; } else { next[j].push(i); indeg[i]++; }
+    }
+    const out = [], done = faces.map(() => false);
+    for (let c = 0; c < n; c++){
+      let best = -1;
+      for (let i = 0; i < n; i++) if (!done[i] && indeg[i] === 0 && (best < 0 || faces[i].mid < faces[best].mid)) best = i;
+      if (best < 0) for (let i = 0; i < n; i++) if (!done[i] && (best < 0 || faces[i].mid < faces[best].mid)) best = i;
+      done[best] = true; out.push(faces[best]); next[best].forEach(j => indeg[j]--);
+    }
+    return out;
   }
-  return { N, STAGES, DETAIL, S, build, draw };
+
+  /* A figure: wall, backfill, earth pressure, mechanism (half, then full). spec.pieces lists the cut prisms as
+     { poly, kind: 'concrete' | 'soil', move, gate: 'ground' | 'wall' | 'fill' }; spec.move maps a key to a
+     motion (p, a) → p in the section. spec.press puts the earth-pressure triangle on a line of the section and
+     on a moving key; spec.loads and spec.diagram add arrows (the head
+     may ride on its own key, onTo) and an outline with it; spec.cracks lists the lines,
+     in the section and with the key of the piece they ride on, or a key on each point so a crack can open as
+     a V, drawn at the end. */
+  function fig(spec){
+    const N = 5, { S, G, val } = seq(N);
+    const STAGES = [['wall', 1], ['backfill', 2], ['earth pressure', 3], ['mechanism', 4]];
+    const press = { top: [-7, 16], bot: [-7, 1.5], on: 'none', ...(spec.press || {}) };
+    function build(svg){
+      const C = Cam(AZ, .5, 1), g = mk('g', {}, svg), pts = [];
+      [[-18, -6], [10, -6], [10, 3], [-18, 16], [0, 16]].forEach(([x, z]) => [-YL, YL].forEach(y => pts.push([x, y, z])));
+      fit(C, pts, 0, 0);
+      const P1 = proj(C), q = pts.map(p => P1(...p)), w = Math.max(...q.map(p => p[0])) - Math.min(...q.map(p => p[0])), h = Math.max(...q.map(p => p[1])) - Math.min(...q.map(p => p[1]));
+      C.S = Math.min(350/w, 270/h); fit(C, pts, 200, 162);
+      const P = proj(C);
+      const M = { C, P, a: 0, amp: tween(1, 900), gates: { ground: G(from(1)), wall: G(from(1), 200), fill: G(from(2)) }, press: G(from(3)), mech: G(from(4)), full: G(from(5)) };
+      const motion = key => (spec.move && spec.move[key]) || null;
+      M.T = key => { const f = motion(key); return (x, y, z, dz = 0) => { const p = f && M.a ? f([x, z], M.a) : [x, z]; return P(p[0], y, p[1] + dz); }; };
+      /* the pieces, their faces in paint order, then their cut ends: soil first, then concrete, the ones that
+         move after the ones that stay */
+      M.pieces = WHOLE.map(pc => ({ ...pc, phase: 0 })).concat(spec.pieces.map(pc => ({ ...pc, phase: 1 }))).map(pc => {
+        const Q = ccw(pc.poly), moving = !!motion(pc.move);
+        const b = { x0: Math.min(...Q.map(p => p[0])), x1: Math.max(...Q.map(p => p[0])), z0: Math.min(...Q.map(p => p[1])), z1: Math.max(...Q.map(p => p[1])) };
+        const dots = [];
+        if (pc.kind === 'soil') for (let z = Math.ceil((b.z0 - .45)/.8)*.8 + .45, r = Math.round((z - .45)/.8); z < b.z1; z += .8, r++) for (let x = Math.floor(b.x0/.8)*.8 + (r % 2 ? .05 : .45); x < b.x1; x += .8) if (inPoly([x, z], Q)) dots.push([x, z]);
+        return { ...pc, Q, moving, dots };
+      });
+      /* a face is a run of edges that face the viewer and meet smoothly, so a slip circle is one curved face */
+      const faces = [];
+      M.pieces.forEach(pc => {
+        const Q = pc.Q, n = Q.length, E = i => [Q[(i + 1) % n][0] - Q[i % n][0], Q[(i + 1) % n][1] - Q[i % n][1]];
+        const fac = i => { const [dx, dz] = E(i); return VX*dz - VZ*dx > 1e-6; };
+        const smooth = i => { const u = E((i - 1 + n) % n), v = E(i); return Math.abs(Math.atan2(u[0]*v[1] - u[1]*v[0], u[0]*v[0] + u[1]*v[1])) < .12; };
+        for (let i = 0; i < n; i++){
+          if (!fac(i) || (fac((i - 1 + n) % n) && smooth(i))) continue;
+          const pts = [Q[i]];
+          for (let j = i; ; ){ pts.push(Q[(j + 1) % n]); const nx = (j + 1) % n; if (nx !== i && fac(nx) && smooth(nx)) j = nx; else break; }
+          faces.push({ pc, pts });
+        }
+      });
+      M.faces = paintOrder(faces);
+      M.faces.forEach(f => { f.el = mk('path', { class: 'sil' }, g); f.mesh = mk('path', { class: 'nf' }, g); });
+      const order = pc => (pc.kind === 'concrete' ? 2 : 0) + (pc.moving ? 1 : 0);
+      M.pieces.slice().sort((u, v) => order(u) - order(v)).forEach(pc => { pc.end = mk('path', { class: 'sil' }, g); pc.tex = mk('path', { class: 'nf lo' }, g); });
+      spec.onEnd && spec.onEnd(g, M);
+      /* the earth pressure, the other loads, and the cracks and failure surfaces */
+      M.pTri = mk('path', { class: 'nf' }, g);
+      M.pArr = [13, 10, 7, 4].map(z => ({ z, ar: arrow(g) }));
+      M.diag = mk('path', { class: 'nf' }, g);
+      M.loads = (spec.loads || []).map(l => ({ ...l, ar: arrow(g) }));
+      M.cracks = (spec.cracks || []).map(c => ({ ...c, el: mk('path', { class: 'nf hi' }, g) }));
+      spec.top && spec.top(g, M);
+      return M;
+    }
+    function draw(M){
+      const k = S.k, { P } = M;
+      tset(M.amp, k === 4 ? .5 : k >= 5 ? 1 : 0, S.now, 0); M.a = tval(M.amp, S.now);
+      const cut = M.a > 1e-3 ? 1 : 0;
+      const lift = pc => { const v = pc.phase === cut ? val(M.gates[pc.gate || 'ground']) : 0; return { v, dz: (pc.gate === 'wall' ? 9 : pc.gate === 'fill' ? 6 : -6)*(1 - v) }; };
+      M.faces.forEach(f => {
+        const { v, dz } = lift(f.pc), T = M.T(f.pc.move);
+        if (v < .001){ setD(f.el, ''); setD(f.mesh, ''); return; }
+        const A = (pt, y) => T(pt[0], y, pt[1], dz);
+        setD(f.el, poly(f.pts.map(p => A(p, -YL)).concat(f.pts.slice().reverse().map(p => A(p, YL)))));
+        let m = '';
+        if (f.pc.kind === 'concrete') [-3, -1, 1, 3].forEach(y => { m += open(f.pts.map(p => A(p, y))); });
+        else for (let i = 0, s0 = 0, r = 0, s = .55; i < f.pts.length - 1; i++){
+          const p = f.pts[i], q = f.pts[i + 1], L = Math.hypot(q[0] - p[0], q[1] - p[1]);
+          for (; s < s0 + L; s += 1.1, r++){ const t = (s - s0)/L, pt = [lerp(p[0], q[0], t), lerp(p[1], q[1], t)];
+            for (let y = -YL + (r % 2 ? .5 : 1.05); y < YL; y += 1.1) m += open([A(pt, y), A(pt, y + .3)]); }
+          s0 += L;
+        }
+        setD(f.mesh, m); cls(f.mesh, f.pc.kind === 'concrete' ? 'nf' : 'nf lo');
+      });
+      M.pieces.forEach(pc => {
+        const { v, dz } = lift(pc), T = M.T(pc.move);
+        if (v < .001){ setD(pc.end, ''); setD(pc.tex, ''); return; }
+        setD(pc.end, poly(pc.Q.map(p => T(p[0], YL, p[1], dz))));
+        setD(pc.tex, pc.dots.map(([x, z]) => open([T(x, YL, z, dz), T(x + .25, YL, z, dz)])).join(''));
+        cls(pc.end, k === 1 && pc.gate === 'wall' ? 'sil hi' : k === 2 && pc.gate === 'fill' ? 'sil hi' : 'sil');
+      });
+      /* earth pressure: a triangle against its line, arrows growing with depth */
+      const vp = val(M.press), Tp = M.T(press.on), Pe = (x, z) => Tp(x, YL + .02, z), base = 4.8, [xt, zt] = press.top, [xb, zb] = press.bot;
+      setD(M.pTri, vp > .001 ? poly([Pe(xt, zt), Pe(xb, zb), Pe(xb - base*vp, zb)]) : '');
+      cls(M.pTri, k === 3 ? 'nf hi' : 'nf');
+      M.pArr.forEach(p => { const t = (zt - p.z)/(zt - zb), x = lerp(xt, xb, t); drawArrow(p.ar, Pe(x - base*t, p.z), Pe(x - .05, p.z), vp, k === 3); });
+      if (spec.diagram){ const Td = M.T(spec.diagram.on); setD(M.diag, vp > .98 ? poly(spec.diagram.pts.map(p => Td(p[0], YL + .02, p[1]))) : ''); cls(M.diag, k === 3 ? 'nf hi' : 'nf'); }
+      M.loads.forEach(l => drawArrow(l.ar, M.T(l.on)(l.from[0], YL + .02, l.from[1]), M.T(l.onTo || l.on)(l.to[0], YL + .02, l.to[1]), vp, k === 3));
+      const on = val(M.full) > .5;
+      M.cracks.forEach(c => setD(c.el, on ? open(c.pts.map(p => M.T(p[2] || c.on || 'none')(p[0], YL + .02, p[1]))) : ''));
+      spec.drawExtra && spec.drawExtra(M, k, val);
+    }
+    return { N, STAGES, DETAIL: spec.DETAIL, S, build, draw };
+  }
+  return { SEC, XW, YL, backX, rot, tr, arcPts, disk, clipConvex, minusConvex, fig };
 })();
-return { FLB, WLY, WLC, WSB, WCB, PZ };
+</script>
+<script>
+/* The limit states of a cantilever retaining wall: its stability as a block, against overturning, sliding,
+   bearing and a deep slip circle (IBC 1807.2.3), and the strength of its concrete, the stem in flexure and
+   shear and the heel and toe in flexure (ACI 318). Displacements are exaggerated so the mechanism reads. */
+const RWLS = (() => {
+const { SEC, XW, backX, rot, tr, arcPts, disk, clipConvex, minusConvex } = RWX;
+const { setD, cls, range } = WF, { mk, poly } = HL;
+const D1 = 'cantilever wall 16 ft · footing 10 ft', D2 = 'backfill γ 120 pcf · φ 30°', D3 = 'active thrust Pa = ½ Ka γ H² · Ka ⅓';
+const soil = (p, move, gate = 'fill') => ({ poly: p, kind: 'soil', move, gate });
+const conc = (p, move) => ({ poly: p, kind: 'concrete', move, gate: 'wall' });
+const GROUND = soil(SEC.ground, undefined, 'ground');
+const ACTIVE = { pts: [[-7, 1.5], [XW, 16]] };
+/* the pieces inside a slip circle move with it; the ones outside stay */
+const split = (list, K, key) => list.flatMap(pc => {
+  const i = clipConvex(pc.poly, K), o = minusConvex(pc.poly, K);
+  return [o && { ...pc, poly: o, move: undefined }, i && { ...pc, poly: i, move: key }].filter(Boolean);
+});
+/* a pivot: a small ring in the plane of the cut ends */
+const pivot = (x, z) => ({ top(g, M){ M.piv = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){ setD(M.piv, val(M.full) > .5 ? poly(range(16).slice(0, -1).map(t => M.P(x + .3*Math.cos(2*Math.PI*t), RWX.YL + .02, z + .3*Math.sin(2*Math.PI*t)))) : ''); } });
+
+/* Overturning: the thrust tips the wall forward about its toe; the heel lifts and the active wedge slides
+   down its plane behind the wall. */
+const RWO = RWX.fig({
+  DETAIL: ['ready', D1, D2, D3, 'the wall tips about its toe', 'FS = ΣMR / ΣMO ≥ 1.5'],
+  pieces: [GROUND, soil(SEC.back), soil(SEC.wedge, 'wedge'), soil(SEC.heelSoil, 'wall'), soil(SEC.frontRest), soil(SEC.overToe, 'wall'), conc(SEC.wall, 'wall')],
+  move: { wall: rot(3, 0, -.08), wedge: tr(.45, -.78) },
+  press: { on: 'wall' },
+  cracks: [ACTIVE],
+  ...pivot(3, 0),
+});
+
+/* Sliding: the wall slides forward on its base; the active wedge drops behind it and a passive wedge in front
+   of the toe is shoved up its plane, 45° − φ/2 off the level. */
+const XP = 3 + 3/Math.tan(Math.PI/4 - Math.PI/12);
+const RWS = RWX.fig({
+  DETAIL: ['ready', D1, D2, D3, 'base friction and passive resistance give out', 'FS = (μ ΣV + Pp) / Pa ≥ 1.5'],
+  pieces: [GROUND, soil(SEC.back), soil(SEC.wedge, 'wedge'), soil(SEC.heelSoil, 'wall'), soil([[3, 0], [10, 0], [10, 3], [XP, 3]]), soil([[3, 0], [XP, 3], [3, 3]], 'passive'), soil(SEC.overToe, 'wall'), conc(SEC.wall, 'wall')],
+  move: { wall: tr(.9, 0), wedge: tr(.85, -1.47), passive: tr(.9, .52) },
+  press: { on: 'wall' },
+  cracks: [{ pts: [[-7, 0], [3, 0]] }, { pts: [[3, 0], [XP, 3]] }, ACTIVE],
+});
+
+/* Bearing capacity: the eccentric load crowds the pressure under the toe until the soil there shears out
+   along a curved surface and heaves the ground in front; the toe sinks and the wall tilts forward. */
+const BO = [3.5, 2.5], BR = Math.hypot(3.5 + 1.5, 2.5), BK = disk(...BO, BR), BX = BO[0] + Math.sqrt(BR*BR - .25);
+const RWB = RWX.fig({
+  DETAIL: ['ready', D1, D2, D3, 'the soil under the toe shears out', 'q toe = (ΣV / B)(1 + 6e / B) ≤ q allow'],
+  pieces: [...split([GROUND, soil(SEC.frontRest)], BK, 'mass'), soil(SEC.back), soil(SEC.wedge, 'wedge'), soil(SEC.heelSoil, 'wall'), soil(SEC.overToe, 'wall'), conc(SEC.wall, 'wall')],
+  move: { wall: rot(-7, 0, -.06), wedge: tr(.5, -.87), mass: rot(...BO, .12) },
+  press: { on: 'wall' },
+  cracks: [{ pts: arcPts(...BO, BR, Math.atan2(-2.5, -5) + 2*Math.PI, Math.atan2(.5, BX - BO[0]) + 2*Math.PI) }],
+});
+
+/* Global stability: a deep circle passes under the whole wall; the wall, the backfill and the ground inside
+   it turn together about its centre, the backfill dropping and the ground in front heaving. */
+const GO = [-2.87, 11.74], GR = 14.75, GK = disk(...GO, GR), gx = z => Math.sqrt(GR*GR - (z - GO[1])**2);
+const RWG = RWX.fig({
+  DETAIL: ['ready', D1, D2, D3, 'a slip circle passes under the wall', 'FS = resisting / driving moment ≥ 1.5'],
+  pieces: [...split([GROUND, soil(SEC.fill), soil(SEC.front)], GK, 'slide'), conc(SEC.wall, 'slide')],
+  move: { slide: rot(...GO, .06) },
+  press: { on: 'slide' },
+  cracks: [{ pts: arcPts(...GO, GR, Math.atan2(16 - GO[1], -gx(16)), Math.atan2(3 - GO[1], gx(3)) + 2*Math.PI, 72) }],
+});
+
+/* Stem flexure: the stem cantilevers off the footing; the pressure bends it forward and it cracks on the soil
+   face at its base, where the moment is largest. The backfill follows it. */
+const follow = (sx, z0, z1) => (p, a) => [p[0] + a*sx*Math.max(0, Math.min(1, (p[1] - z0)/(z1 - z0))), p[1]];
+const STEM_P = { top: [-1, 16], bot: [-1.25, 1.5], on: 'stem' };
+const RSF = RWX.fig({
+  DETAIL: ['ready', D1, D2, 'Ka γ h on the stem · h 14.5 ft', 'the stem bends off the footing', 'Mu = 1.6 Ka γ h³ / 6 ≤ φMn'],
+  pieces: [GROUND, soil(SEC.back), soil(SEC.wedge, 'fill'), soil(SEC.heelSoil, 'fill'), soil(SEC.front), conc(SEC.foot), conc(SEC.stem, 'stem')],
+  move: { stem: rot(0, 1.5, -.1), fill: follow(1.45, 1.5, 16) },
+  press: STEM_P,
+  cracks: [{ pts: [[-1.25, 1.5, 'stem'], [-.35, 1.5], [-1.25, 1.5]] }],
+});
+
+/* Stem shear: near the base the shear opens a diagonal crack from the soil face down toward the front, and the
+   stem above slides on it. */
+const ZC = 3.3, XC = backX(ZC), ZF = 2;
+const RSS = RWX.fig({
+  DETAIL: ['ready', D1, D2, 'Ka γ h on the stem · h 14.5 ft', 'a diagonal crack near the base', 'Vu = 1.6 Ka γ h² / 2 ≤ φVc'],
+  pieces: [GROUND, soil(SEC.back), soil(SEC.wedge, 'fill'), soil([[-7, 1.5], [-1.25, 1.5], [XC, ZC], [-1, 16], [-7, 16]], 'fill'), soil(SEC.front),
+    conc([[-7, 0], [3, 0], [3, 1.5], [0, 1.5], [0, ZF], [XC, ZC], [-1.25, 1.5], [-7, 1.5]]), conc([[XC, ZC], [0, ZF], [0, 16], [-1, 16]], 'stem')],
+  move: { stem: tr(.41, -.44), fill: follow(.41, 1.5, ZC) },
+  press: STEM_P,
+  cracks: [{ pts: [[XC, ZC], [0, ZF]] }],
+});
+
+/* Heel flexure: the soil on the heel outweighs the pressure under it; the heel bends down off the stem and
+   cracks on top at the stem face. */
+const sink = (k, x0) => (p, a) => [p[0], p[1] + a*k*Math.min(0, p[0] - x0)];
+const RHF = RWX.fig({
+  DETAIL: ['ready', D1, D2, 'Pa, and the soil on the heel', 'the heel bends down off the stem', 'Mu at the stem face ≤ φMn · steel on top'],
+  pieces: [GROUND, soil(SEC.back), soil(SEC.wedge), soil(SEC.heelSoil, 'sink'), soil(SEC.front),
+    conc([[-1.25, 0], [3, 0], [3, 1.5], [0, 1.5], [0, 16], [-1, 16], [-1.25, 1.5]]), conc([[-7, 0], [-1.25, 0], [-1.25, 1.5], [-7, 1.5]], 'heel')],
+  move: { heel: rot(-1.25, 0, .09), sink: sink(.09, -1.25) },
+  loads: [-5.8, -4.2, -2.6].map(x => ({ from: [x, 8], to: [x, 1.6], on: 'sink' })),
+  cracks: [{ pts: [[-1.25, 1.5, 'heel'], [-1.25, .45], [-1.25, 1.5]] }],
+});
+
+/* Toe flexure: the bearing pressure, highest under the toe, bends the toe up off the stem; it cracks underneath
+   at the stem face. */
+const q = x => 1 + .34*(x + 7);
+const RTF = RWX.fig({
+  DETAIL: ['ready', D1, D2, 'Pa, and the bearing pressure under the toe', 'the toe bends up off the stem', 'Mu at the stem face ≤ φMn · steel on bottom'],
+  pieces: [GROUND, soil(SEC.fill), soil(SEC.frontRest), soil(SEC.overToe, 'lift'),
+    conc([[-7, 0], [0, 0], [0, 16], [-1, 16], [-1.25, 1.5], [-7, 1.5]]), conc([[0, 0], [3, 0], [3, 1.5], [0, 1.5]], 'toe')],
+  move: { toe: rot(0, 1.5, .1), lift: (p, a) => [p[0], p[1] + a*.1*Math.max(0, p[0])] },
+  diagram: { pts: [[-7, 0], [3, 0], [3, -q(3)], [-7, -q(-7)]] },
+  loads: [-5.6, -3, .6, 2.4].map(x => ({ from: [x, -q(x)], to: [x, -.05], on: 'none', onTo: x > 0 ? 'toe' : 'none' })),
+  cracks: [{ pts: [[0, 0, 'toe'], [0, 1.05], [0, 0]] }],
+});
+
+return { RWO, RWS, RWB, RWG, RSF, RSS, RHF, RTF };
 })();
 </script>
 <script>
