@@ -2,7 +2,7 @@
 
 Animated, isometric line studies of structural models. Each page is one looping black-and-white animation; move across the drawing to scrub it, or pick a stage from the rail underneath.
 
-**All four on one page:** [`index.html`](index.html), served by GitHub Pages at https://mohammedbala.github.io/structural-isometrics/ once Pages is turned on (Settings → Pages → Deploy from a branch → this branch, `/ (root)`).
+**All four on one page:** [`index.html`](index.html), served by GitHub Pages at https://mohammedbala.github.io/structural-isometrics/ once Pages is turned on (Settings → Pages → Deploy from a branch → `main`, `/ (root)`).
 
 The folders below hold each animation on its own page.
 
