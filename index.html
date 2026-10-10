@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Structural Isometrics</title>
-<meta name="description" content="Four concrete models drawn as black-and-white isometric line animations: a beam, a turbine foundation, a pump foundation and a building substructure.">
+<meta name="description" content="Five structural models drawn as black-and-white isometric line animations: a concrete beam, a turbine foundation, a pump foundation, a building substructure and a bolted moment end plate.">
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,6 +50,7 @@ h1{margin:0;font:300 clamp(30px,4vw,48px)/1.02 var(--f-sans);letter-spacing:-.02
 .seqs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,540px),1fr));gap:56px 28px}
 .seq{display:grid;gap:14px;align-content:start;min-width:0;scroll-margin-top:24px}
 @supports (grid-template-rows:subgrid){.seq{grid-row:span 3;grid-template-rows:subgrid;row-gap:14px}.seq-head{align-self:end}}
+@media (min-width:1200px){.seq:last-child:nth-child(odd){grid-column:1 / -1;justify-self:center;width:calc(50% - 14px)}}
 .seq > *{min-width:0}
 .seq-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
 .seq-head .num{font:11px/1 var(--f-mono);color:var(--muted)}
@@ -81,12 +82,13 @@ footer a{color:inherit}
       <h1>Structural isometrics</h1>
       <button class="switch" id="theme" type="button" aria-label="Switch between the light and the dark theme"></button>
     </div>
-    <p>Four concrete models drawn in lines, each built stage by stage in a loop. Move across a drawing to scrub it, or pick a stage under it. Deflections, cracks and mode shapes are sketches, not analysis results.</p>
+    <p>Five structural models drawn in lines, four in concrete and one bolted steel connection, each built stage by stage in a loop. Move across a drawing to scrub it, or pick a stage under it. Deflections, cracks and mode shapes are sketches, not analysis results.</p>
     <ol class="toc">
       <li><a href="#beam"><span>01</span>Concrete beam</a></li>
       <li><a href="#turbine"><span>02</span>Turbine foundation</a></li>
       <li><a href="#pump"><span>03</span>Pump foundation</a></li>
       <li><a href="#substructure"><span>04</span>Building substructure</a></li>
+      <li><a href="#endplate"><span>05</span>Moment end plate</a></li>
     </ol>
   </header>
 
@@ -125,6 +127,14 @@ footer a{color:inherit}
         <div class="stage" data-hairline="building-substructure" role="img" aria-label="An industrial building substructure is drawn in lines against the grade datum: slab outlines at four floor levels, then walls, then slabs on grade with the main slab one foot above grade and a depressed pit, then materials and a mesh."></div>
       </div>
       <ol class="rail" aria-label="Stages of the building substructure"></ol>
+    </section>
+    <section class="seq" id="endplate" data-sequence="endplate" data-dwell="1100" data-hold="3800" aria-labelledby="endplate-h">
+      <div class="seq-head"><span class="num">05</span><h2 id="endplate-h">Moment end plate</h2><p>An AISC 358 four-bolt extended end plate (4E), from work lines to plate separation under moment.</p></div>
+      <div class="plate">
+        <span class="tag tag-name"></span><span class="tag tag-read"></span>
+        <div class="stage" data-hairline="moment-end-plate" role="img" aria-label="A bolted moment end-plate connection is drawn in lines: work lines, a W14 column, a W24 beam, an extended end plate, flange and web welds, bolt holes, eight bolts and nuts, column continuity plates, turn-of-nut match marks, a mesh, and a load that rotates the beam so the plate separates from the column at the tension flange."></div>
+      </div>
+      <ol class="rail" aria-label="Stages of the moment end plate"></ol>
     </section>
   </main>
 
@@ -1537,13 +1547,179 @@ const BS = (() => {
 })();
 </script>
 <script>
+/* An AISC 358 four-bolt extended unstiffened end-plate moment connection (4E): a W24x76 beam welded to a
+   1 1/4 in end plate, bolted with eight 1 1/8 in A490 bolts to the flange of a W14x132 column with continuity
+   plates. World units are inches; x runs along the beam, y across it, z up; the column's bolted flange face
+   is x = 0. Ten stages, 15 phases. Under the moment, the plate, bolt heads, beam and welds rotate about the
+   compression flange through Pm, so the plate pulls off the column flange at the tension side. */
+const EP = (() => {
+  const { Cam, fit, proj, facing, rings, circ, prism, hull, poly, open, lerp, tween, tset, tval, mk, solid, place } = HL;
+  const N = 15;
+  const CD = 14.7, CBF = 14.7, CTF = 1.03, CTW = .645, CZ0 = -20, CZ1 = 22;
+  const BD = 23.9, BBF = 9, BTF = .68, BTW = .44, BL = 41;
+  const TP = 1.25, PW = 10, ZT = BD/2, ZTI = BD/2 - BTF, PH = ZT + 4.5;
+  const GG = 5.5, PF = 2, RB = .95, THMAX = .09;
+  const ZROWS = [ZT + PF, ZTI - PF, -(ZTI - PF), -(ZT + PF)];
+  const STAGES = [['work lines',1],['column',2],['beam',3],['end plate',4],['welds',5],['bolts',6],['stiffeners',9],['pretension',10],['mesh',11],['moment',13]];
+  const DETAIL = ['ready','WP','W14×132','W24×76','PL 1¼ × 10 · 4E','CJP flanges · fillet web','holes 1¼','8 × A490 1⅛','nuts','continuity plates',
+    'turn-of-nut ⅓','plate · beam','column','load','Mf 50%','Mf · plate separation'];
+  const setD = (el, d) => { if (el._d !== d){ el._d = d; el.setAttribute('d', d); } };
+  const cls = (el, c) => { if (el._c !== c){ el._c = c; el.setAttribute('class', c); } };
+  const show = (el, on) => { const v = on ? '' : 'none'; if (el._v !== v){ el._v = v; el.style.display = v; } };
+  const mix = (a, b, t) => a.map((v, i) => lerp(v, b[i], t));
+  function partial(pts, v){
+    if (v <= 0 || pts.length < 2) return [];
+    if (v >= 1) return pts;
+    const d = []; let tot = 0;
+    for (let i = 1; i < pts.length; i++){ const l = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); d.push(l); tot += l; }
+    let rem = v*tot; const out = [pts[0]];
+    for (let i = 0; i < d.length; i++){
+      if (rem >= d[i]){ out.push(pts[i+1]); rem -= d[i]; continue; }
+      out.push(mix(pts[i], pts[i+1], d[i] ? rem/d[i] : 0)); break;
+    }
+    return out;
+  }
+  const line = (pts, v = 1) => { const q = partial(pts, v); return q.length > 1 ? open(q) : ''; };
+  const ringsOf = (b, r, k) => { const w = Math.min(b[2] - b[0], b[3] - b[1]); return rings(b[0], b[1], b[2], b[3], Math.min(r, w/2), Math.min(k, w*.38)); };
+  const putc = (el, s) => {
+    if (el._s !== s.sil){ el._s = s.sil; el.sil.setAttribute('d', s.sil); }
+    if (el._k !== s.crease){ el._k = s.crease; el.cr.setAttribute('d', s.crease); }
+  };
+  /* a prism along x: n-sided rings in the y-z plane at x0 and x1, turned by ph; the near cap is the crease */
+  const xprism = (Pf, x0, x1, y, z, R, n, ph, cap = true) => {
+    const ring = x => Array.from({ length: n }, (_, i) => { const a = ph + i/n*2*Math.PI; return Pf(x, y + R*Math.cos(a), z + R*Math.sin(a)); });
+    const a = ring(x0), b = ring(x1);
+    return { sil: poly(hull(a.concat(b))), crease: cap ? poly(b) : '' };
+  };
+
+  const S = { k: N, now: 0, th: THMAX };
+  const G = (gate, dl = 0) => ({ gate, dl, t: tween(gate(N) ? 1 : 0) });
+  const val = e => { tset(e.t, e.gate(S.k) ? 1 : 0, S.now, e.dl); return tval(e.t, S.now); };
+  const from = (a, b = Infinity) => k => k >= a && k < b;
+  /* rotation about the outer face of the compression flange, at the column face */
+  function rot(x, y, z){
+    if (!S.th) return [x, y, z];
+    const c = Math.cos(S.th), s = Math.sin(S.th), dz = z + ZT;
+    return [x*c + dz*s, y, -ZT - x*s + dz*c];
+  }
+
+  function build(svg){
+    const C = Cam(45, 0.5, 4.15);
+    fit(C, [[-CD, -CBF/2, CZ0], [-CD, CBF/2, CZ1], [0, CBF/2, CZ0], [BL, BBF/2, -ZT - 4], [BL, -BBF/2, ZT + 6], [36, 0, ZT + 6]], 200, 164);
+    const P = proj(C), front = facing(C), g = mk('g', {}, svg), Pm = (x, y, z) => P(...rot(x, y, z));
+    const M = { P, Pm, front, C, items: [], xps: [] };
+    const item = (b, z0, z1, o) => {
+      const it = { b, z0, z1, mode: o.mode || 'drop', s: G(o.gate, o.dl || 0), ph: o.ph, mov: !!o.mov, r: o.r ?? .3, kk: o.k ?? .2 };
+      [it.ring, it.inner] = ringsOf(b, it.r, it.kk); it.el = solid(g);
+      if (o.mesh){ it.mesh = mk('path', { class: 'nf' }, it.el.g); it.mw = o.mesh; it.ms = G(from(o.meshAt), o.meshDl || 0); }
+      M.items.push(it); return it;
+    };
+    const xp = o => { const it = { ...o, s: G(o.gate, o.dl || 0), el: solid(g) }; if (o.mark) it.mk = mk('path', { class: 'nf' }, it.el.g); M.xps.push(it); return it; };
+    const bolts = [];
+    ZROWS.forEach(z => [-GG/2, GG/2].forEach(y => bolts.push({ y, z })));
+
+    M.work = [
+      { w: [[-CD/2, 0, CZ0 - 2], [-CD/2, 0, CZ1 + 2]], s: G(from(1, 4)) },
+      { w: [[-CD/2, 0, 0], [BL + 3, 0, 0]], s: G(from(1, 4), 200) },
+    ];
+    M.work.forEach(l => { l.el = mk('path', { class: 'nf dash' }, g); });
+    M.wp = mk('circle', { r: 1.5, class: 'dot' }, g); place(M.wp, P(-CD/2, 0, 0)); M.wpS = G(from(1, 4));
+
+    const zl = Array.from({ length: 10 }, (_, i) => CZ0 + 2 + i*4.2);
+    item([-CD, -CBF/2, -CD + CTF, CBF/2], CZ0, CZ1, { gate: from(2), mode: 'rise', ph: 2 });
+    const stiff = (y0, y1) => [ZT - BTF/2, -(ZT - BTF/2)].forEach((z, i) => item([-CD + CTF, y0, -CTF, y1], z - .38, z + .38, { gate: from(9), ph: 9, dl: i*160 }));
+    const nuts = side => bolts.filter(b => Math.sign(b.y) === side).forEach((b, i) => {
+      xp({ x0: -CTF - 2.6, x1: -CTF - 1.6, y: b.y, z: b.z, R: .56, n: 12, slide: -6, gate: from(8), dl: i*70, ph: 8, cap: false });
+      xp({ x0: -CTF - 1.6, x1: -CTF, y: b.y, z: b.z, R: RB, n: 6, slide: -6, gate: from(8), dl: i*70, ph: 8, cap: false });
+    });
+    stiff(-CBF/2 + .3, -CTW/2); nuts(-1);
+    item([-CD + CTF, -CTW/2, -CTF, CTW/2], CZ0, CZ1, { gate: from(2), mode: 'rise', ph: 2, dl: 120, r: .15, k: .1 });
+    stiff(CTW/2, CBF/2 - .3); nuts(1);
+    item([-CTF, -CBF/2, 0, CBF/2], CZ0, CZ1, { gate: from(2), mode: 'rise', ph: 2, dl: 240,
+      mesh: zl.map(z => [[0, -CBF/2 + .4, z], [0, CBF/2, z], [-CTF + .2, CBF/2, z]]), meshAt: 12 });
+
+    M.shanks = bolts.filter(b => b.z > 0).map(b => ({ ...b, el: mk('path', { class: 'nf hi' }, g) }));
+    const plateMesh = [...[-GG/2 - 1.2, 0, GG/2 + 1.2].map(y => [[TP, y, -PH + .4], [TP, y, PH - .4]]), ...[-14.5, -9.5, -4.5, 0, 4.5, 9.5, 14.5].map(z => [[TP, -PW/2 + .4, z], [TP, PW/2, z], [.2, PW/2, z]])];
+    M.plate = item([0, -PW/2, TP, PW/2], -PH, PH, { gate: from(4), ph: 4, mov: true, r: .5, mesh: plateMesh, meshAt: 11 });
+    M.holes = bolts.map(b => ({ ...b, el: mk('path', { class: 'nf' }, M.plate.el.g), s: G(from(6), (b.z < 0 ? 200 : 0) + (b.y > 0 ? 80 : 0)) }));
+    M.ticks = bolts.map(b => ({ ...b, el: mk('path', { class: 'nf' }, M.plate.el.g), s: G(from(10)) }));
+    M.heads = bolts.slice().sort((a, b) => a.y - b.y).map((b, i) =>
+      xp({ x0: TP, x1: TP + .72, y: b.y, z: b.z, R: RB, n: 6, slide: 8, gate: from(7), dl: i*70, ph: 7, mov: true, mark: true, turn: true }));
+
+    const xs = Array.from({ length: 7 }, (_, i) => 6 + i*5);
+    item([TP, -BBF/2, BL, BBF/2], -ZT, -ZTI, { gate: from(3), mode: 'growx', ph: 3, mov: true,
+      mesh: xs.map(x => [[x, -BBF/2 + .3, -ZTI], [x, BBF/2, -ZTI], [x, BBF/2, -ZT + .1]]), meshAt: 11, meshDl: 120 });
+    M.welds = [];
+    const weld = (q, ph) => { const w = { q, el: mk('path', { class: 'sil' }, g), s: G(from(5), ph) }; M.welds.push(w); };
+    weld([[TP, -BBF/2, -ZTI + .5], [TP + .5, -BBF/2, -ZTI], [TP + .5, BBF/2, -ZTI], [TP, BBF/2, -ZTI + .5]], 420);
+    item([TP, -BTW/2, BL, BTW/2], -ZTI, ZTI, { gate: from(3), mode: 'growx', ph: 3, mov: true, dl: 120, r: .15, k: .1,
+      mesh: [...xs.map(x => [[x, BTW/2, -ZTI + .2], [x, BTW/2, ZTI - .2]]), ...[-ZTI/2, 0, ZTI/2].map(z => [[TP + .6, BTW/2, z], [BL, BTW/2, z]])], meshAt: 11, meshDl: 60 });
+    weld([[TP, BTW/2 + .45, -ZTI], [TP + .45, BTW/2, -ZTI], [TP + .45, BTW/2, ZTI], [TP, BTW/2 + .45, ZTI]], 210);
+    item([TP, -BBF/2, BL, BBF/2], ZTI, ZT, { gate: from(3), mode: 'growx', ph: 3, mov: true, dl: 240,
+      mesh: [...xs.map(x => [[x, -BBF/2 + .3, ZT], [x, BBF/2, ZT], [x, BBF/2, ZTI + .1]]), [[TP + .6, 0, ZT], [BL, 0, ZT]]], meshAt: 11 });
+    weld([[TP, -BBF/2, ZT + .5], [TP + .5, -BBF/2, ZT], [TP + .5, BBF/2, ZT], [TP, BBF/2, ZT + .5]], 0);
+
+    M.weights = [0, 1, 2].map(n => ({ n, el: solid(g), s: G(from(13), n*130),
+      ring: circ(3.2, 20).map(q => ({ ...q, u: q.u + 35, v: q.v })), inner: circ(2.6, 20).map(q => ({ ...q, u: q.u + 35, v: q.v })) }));
+    M.th = tween(1, 900);
+    return M;
+  }
+
+  function draw(M){
+    const { P, Pm, front } = M, k = S.k;
+    tset(M.th, k >= 14 ? (k - 13)/2 : 0, S.now, 0); S.th = THMAX*tval(M.th, S.now);
+    M.work.forEach(l => setD(l.el, line(l.w.map(p => P(...p)), val(l.s))));
+    show(M.wp, val(M.wpS) > .5);
+    M.items.forEach(it => {
+      const v = val(it.s), on = v > .001, Pf = it.mov ? Pm : P; show(it.el.g, on);
+      if (on){
+        let b = it.b, z0 = it.z0, z1 = it.z1, ring = it.ring, inner = it.inner;
+        if (it.mode === 'rise') z1 = z0 + Math.max(.3, (z1 - z0)*v);
+        else if (it.mode === 'growx'){ b = [b[0], b[1], b[0] + Math.max(.6, (b[2] - b[0])*v), b[3]]; [ring, inner] = ringsOf(b, it.r, it.kk); }
+        else { const dz = 20*(1 - v); z0 += dz; z1 += dz; }
+        putc(it.el, prism(Pf, front, ring, inner, z0, z1));
+        if (it.mesh){ const vm = val(it.ms); setD(it.mesh, vm > .001 && v > .99 ? it.mw.map(w => line(w.map(p => Pf(...p)), vm)).join('') : ''); }
+      }
+      cls(it.el.sil, k === it.ph ? 'sil hi' : 'sil');
+    });
+    const turn = val(G0(M)), ring = (Pf, x, y, z, r, n = 14) => poly(Array.from({ length: n }, (_, i) => { const a = i/n*2*Math.PI; return Pf(x, y + r*Math.cos(a), z + r*Math.sin(a)); }));
+    M.holes.forEach(h => setD(h.el, val(h.s) > .5 && val(M.plate.s) > .99 ? ring(Pm, TP, h.y, h.z, .62) : ''));
+    M.ticks.forEach(t => { const v = val(t.s); setD(t.el, v > .5 ? line([Pm(TP, t.y + 1.15, t.z + 1.15), Pm(TP, t.y + 1.65, t.z + 1.65)]) : ''); cls(t.el, k === 10 ? 'nf hi' : 'nf'); });
+    M.xps.forEach(h => {
+      const v = val(h.s), on = v > .001; show(h.el.g, on);
+      if (on){
+        const dx = h.slide*(1 - v), Pf = h.mov ? Pm : P, ph = Math.PI/6 + (h.turn ? turn*2*Math.PI/3 : 0);
+        putc(h.el, xprism(Pf, h.x0 + dx, h.x1 + dx, h.y, h.z, h.R, h.n, ph, h.cap !== false));
+        if (h.mk){ const a = Math.PI/4 + turn*2*Math.PI/3, x = h.x1 + dx;
+          setD(h.mk, line([Pf(x, h.y - .8*Math.cos(a), h.z - .8*Math.sin(a)), Pf(x, h.y + .8*Math.cos(a), h.z + .8*Math.sin(a))])); cls(h.mk, k === 10 ? 'nf hi' : 'nf'); }
+      }
+      cls(h.el.sil, k === h.ph ? 'sil hi' : 'sil');
+    });
+    M.shanks.forEach(b => setD(b.el, S.th > .002 ? line([P(0, b.y, b.z), Pm(0, b.y, b.z)]) : ''));
+    M.welds.forEach(w => {
+      const v = val(w.s), q = w.q, e = (a, b) => mix(a, b, v);
+      setD(w.el, v > .001 ? poly([q[0], q[1], e(q[1], q[2]), e(q[0], q[3])].map(p => Pm(...p))) : '');
+      cls(w.el, k === 5 ? 'hi' : 'sil');
+    });
+    M.weights.forEach(wt => {
+      const v = val(wt.s), on = v > .001; show(wt.el.g, on);
+      if (on){ const z = ZT + wt.n*1.7 + 16*(1 - v); putc(wt.el, prism(Pm, front, wt.ring, wt.inner, z, z + 1.5)); }
+      cls(wt.el.sil, k === 13 ? 'sil hi' : 'sil');
+    });
+  }
+  /* the turn-of-nut rotation: one tween shared by every head, on from phase 10 */
+  const G0 = M => M.turnS || (M.turnS = G(from(10)));
+  return { N, STAGES, DETAIL, S, build, draw };
+})();
+</script>
+<script>
 /* One playback for every sequence on the page. Each section keeps its own clock: the loop opens on the
    finished model, un-builds and builds again; moving across the drawing scrubs it by the pointer's x;
    the rail jumps to a stage. All figures share the kernel's single frame loop, which sleeps offscreen. */
 (() => {
   const { register, pointer, reducedMotion, mk, inject, clamp } = HL;
   inject(document);
-  const FIGS = { beam: BEAM, turbine: TG, pump: PP, substructure: BS };
+  const FIGS = { beam: BEAM, turbine: TG, pump: PP, substructure: BS, endplate: EP };
 
   function mount(fig, root, DW, HOLD){
     const { N, STAGES, DETAIL, S } = fig;
