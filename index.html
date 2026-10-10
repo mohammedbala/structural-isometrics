@@ -106,7 +106,7 @@ footer a{color:inherit}
       <h1>Structural isometrics</h1>
       <button class="switch" id="theme" type="button" aria-label="Switch between the light and the dark theme"></button>
     </div>
-    <p>Five structural models drawn in lines, four in concrete and one bolted steel connection, then the six local limit states of wide-flange members under concentrated forces. Each builds stage by stage in a loop. Pick colours below and download any figure as SVG, PNG or GIF. Move across a drawing to scrub it, or pick a stage under it. Deflections, cracks and mode shapes are sketches, not analysis results.</p>
+    <p>Five structural models drawn in lines, four in concrete and one bolted steel connection, then the local limit states of wide-flange members under concentrated forces and of rectangular HSS (tube steel) connections. Each builds stage by stage in a loop. Pick colours below and download any figure as SVG, PNG or GIF. Move across a drawing to scrub it, or pick a stage under it. Deflections, cracks and mode shapes are sketches, not analysis results.</p>
     <ol class="toc">
       <li><a href="#beam"><span>01</span>Concrete beam</a></li>
       <li><a href="#turbine"><span>02</span>Turbine foundation</a></li>
@@ -119,6 +119,14 @@ footer a{color:inherit}
       <li><a href="#wsb"><span>09</span>Web sidesway buckling</a></li>
       <li><a href="#wcb"><span>10</span>Web compression buckling</a></li>
       <li><a href="#pz"><span>11</span>Web panel-zone shear</a></li>
+      <li><a href="#cwp"><span>12</span>Chord wall plastification</a></li>
+      <li><a href="#pun"><span>13</span>Punching shear</a></li>
+      <li><a href="#sly"><span>14</span>Sidewall local yielding</a></li>
+      <li><a href="#slc"><span>15</span>Sidewall local crippling</a></li>
+      <li><a href="#slb"><span>16</span>Sidewall local buckling</a></li>
+      <li><a href="#bew"><span>17</span>Branch local yielding</a></li>
+      <li><a href="#csg"><span>18</span>Chord sidewall shear</a></li>
+      <li><a href="#cdf"><span>19</span>Chord distortional failure</a></li>
     </ol>
     <div class="colors">
       <span>Colours</span>
@@ -226,6 +234,76 @@ footer a{color:inherit}
           <div class="stage" data-hairline="pz" role="img" aria-label="A wide-flange column is drawn in lines with beams framing into both flanges and continuity plates; an unbalanced moment shears the panel zone into a parallelogram and the beams turn with it."></div>
         </div>
         <ol class="rail" aria-label="Stages of web panel-zone shear"></ol>
+      </section>
+    </div>
+  </section>
+
+  <section class="group" aria-labelledby="k-h">
+    <div class="group-head"><span class="num">K</span><h2 id="k-h">Rectangular HSS connections</h2><p>AISC 360 Chapter K: the limit states of rectangular HSS (tube steel) connections under branch forces. Each figure builds the chord, its branch and its load, then lets the mechanism develop. Displacements are exaggerated.</p></div>
+    <div class="seqs">
+      <section class="seq" id="cwp" data-sequence="cwp" data-dwell="1300" data-hold="3400" aria-labelledby="cwp-h">
+        <div class="seq-head"><span class="num">12</span><h2 id="cwp-h">Chord wall plastification</h2><p>T-connection, β ≤ 0.85 · The branch pushes the connecting face in, and the face folds along yield lines from the footprint out to the sidewalls.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="cwp" role="img" aria-label="A square tube chord is drawn in lines with a narrower square tube branch standing on it and weights on top; the top face of the chord dishes in under the branch and yield lines form a frame around it."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of chord wall plastification"></ol>
+      </section>
+      <section class="seq" id="pun" data-sequence="pun" data-dwell="1300" data-hold="3400" aria-labelledby="pun-h">
+        <div class="seq-head"><span class="num">13</span><h2 id="pun-h">Punching shear</h2><p>Shear yielding, 0.85 < β ≤ 1 − 1/γ · The face shears around the footprint of a wide branch, and the branch pushes the plug into the chord.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="pun" role="img" aria-label="A square tube chord with a branch nearly as wide as it, loaded with weights; the branch sinks into the top face as the face shears around its footprint."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of punching shear"></ol>
+      </section>
+      <section class="seq" id="sly" data-sequence="sly" data-dwell="1300" data-hold="3400" aria-labelledby="sly-h">
+        <div class="seq-head"><span class="num">14</span><h2 id="sly-h">Sidewall local yielding</h2><p>β = 1 · A branch as wide as the chord bears straight onto the sidewalls, and they yield over 5k + lb just below the corners.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="sly" role="img" aria-label="A square tube chord with a branch as wide as it, loaded with weights; dashed lines show the load spreading through the corners, and a band of the sidewall yields below them."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of sidewall local yielding"></ol>
+      </section>
+      <section class="seq" id="slc" data-sequence="slc" data-dwell="1300" data-hold="3400" aria-labelledby="slc-h">
+        <div class="seq-head"><span class="num">15</span><h2 id="slc-h">Sidewall local crippling</h2><p>β = 1, T-connection in compression · The sidewalls wrinkle just under the loaded face, and the branch settles into them.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="slc" role="img" aria-label="A square tube chord with a branch as wide as it, loaded with weights; the sidewalls wrinkle outward just under the top face and the branch settles."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of sidewall local crippling"></ol>
+      </section>
+      <section class="seq" id="slb" data-sequence="slb" data-dwell="1300" data-hold="3400" aria-labelledby="slb-h">
+        <div class="seq-head"><span class="num">16</span><h2 id="slb-h">Sidewall local buckling</h2><p>β = 1, cross-connection · Branches push on both faces at one section, and the sidewalls buckle out across the depth: the cross-connection case of sidewall crippling.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="slb" role="img" aria-label="A square tube chord with branches as wide as it above and below, the lower one on a base and the upper one loaded with weights; the sidewalls bow outward across their depth."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of sidewall local buckling"></ol>
+      </section>
+      <section class="seq" id="bew" data-sequence="bew" data-dwell="1300" data-hold="3400" aria-labelledby="bew-h">
+        <div class="seq-head"><span class="num">17</span><h2 id="bew-h">Branch local yielding</h2><p>Uneven load distribution, β > 0.85 · The stiff sidewalls draw the load into the branch walls above them and an effective width of the cross walls, which yield at the weld.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="bew" role="img" aria-label="A square tube chord with a slightly narrower branch loaded with weights; the middle of the top face gives under the branch, and the branch walls over the sidewalls and beside its corners bulge and yield at the weld."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of branch local yielding"></ol>
+      </section>
+      <section class="seq" id="csg" data-sequence="csg" data-dwell="1300" data-hold="3400" aria-labelledby="csg-h">
+        <div class="seq-head"><span class="num">18</span><h2 id="csg-h">Chord sidewall shear</h2><p>Gapped K-connection · One branch pushes and one pulls, and their vertical components shear the chord sidewalls across the gap.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="csg" role="img" aria-label="A square tube chord with two branches leaning away from each other at 45 degrees and a gap between their toes; arrows push one branch and pull the other, and the chord shears across the gap."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of chord sidewall shear"></ol>
+      </section>
+      <section class="seq" id="cdf" data-sequence="cdf" data-dwell="1300" data-hold="3400" aria-labelledby="cdf-h">
+        <div class="seq-head"><span class="num">19</span><h2 id="cdf-h">Chord distortional failure</h2><p>T-connection, out-of-plane moment · The branch moment racks the chord section into a parallelogram under it.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="cdf" role="img" aria-label="A square tube chord with a branch pushed sideways at its top; the chord section under the branch racks into a parallelogram as its sidewalls lean."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of chord distortional failure"></ol>
       </section>
     </div>
   </section>
@@ -2990,6 +3068,419 @@ return { FLB, WLY, WLC, WSB, WCB, PZ };
 })();
 </script>
 <script>
+/* Rectangular HSS (tube steel) for the AISC 360 Chapter K figures. A tube is a rounded rectangle swept
+   along an axis and drawn as strips: outside, the faces and the parts of corner arcs that face the viewer;
+   inside, the ones that face away, seen through an open end. The chord's top face is cut around each
+   branch footprint, so the face in front of a branch can hide its foot when the face dishes or the branch
+   punches in. Every point goes through Pf, the figure's displacement field. Inches. */
+const HSS = (() => {
+  const { setD, cls, line, from, range, seq, camera, panel, drawPanel, box, drawBox, weights, drawWeights, clamp, lerp, poly, open } = WF;
+  const { mk, tween, tset, tval } = HL;
+  const SV = [Math.SQRT1_2*Math.sqrt(.75), Math.SQRT1_2*Math.sqrt(.75), .5];   // toward the viewer of Cam(45, .5)
+  const dot = (p, q) => p[0]*q[0] + p[1]*q[1] + p[2]*q[2];
+  const plat = (x, h, w) => { const d = Math.abs(x) - h; return d <= 0 ? 1 : Math.exp(-((d/w)**2)); };
+  const smooth = t => { t = clamp(t, 0, 1); return t*t*(3 - 2*t); };
+  const CH = { X0: -22, X1: 22, B: 10, H: 10, t: .5, r: .75 };
+  const ZT = CH.H/2, YF = CH.B/2 - CH.r;
+
+  /* the perimeter of a rounded rectangle, half-widths a along e1 and b along e2, corner radius r: eight
+     segments counter-clockwise from the +e1 face, each mapping w in 0..1 to [e1, e2, n1, n2] */
+  function perimeter(a, b, r){
+    const fa = a - r, fb = b - r;
+    const face = (p, q, n) => w => [lerp(p[0], q[0], w), lerp(p[1], q[1], w), n[0], n[1]];
+    const arc = (c, a0) => w => { const t = (a0 + 90*w)*Math.PI/180, ca = Math.cos(t), sa = Math.sin(t); return [c[0] + r*ca, c[1] + r*sa, ca, sa]; };
+    return [
+      { name: '+1', f: face([a, -fb], [a, fb], [1, 0]) }, { name: '++', f: arc([fa, fb], 0), corner: true },
+      { name: '+2', f: face([fa, b], [-fa, b], [0, 1]) }, { name: '-+', f: arc([-fa, fb], 90), corner: true },
+      { name: '-1', f: face([-a, fb], [-a, -fb], [-1, 0]) }, { name: '--', f: arc([-fa, -fb], 180), corner: true },
+      { name: '-2', f: face([-fa, -b], [fa, -b], [0, -1]) }, { name: '+-', f: arc([fa, -fb], 270), corner: true },
+    ];
+  }
+  /* a tube from s = 0 (or from a plane, for a branch cut to the chord face) to s = L along A */
+  function tube(o){
+    const T = { nu: 16, nw: 8, rings: [], lines: [], ...o }, { O, A, E1, E2 } = T;
+    T.at = (s, e1, e2) => [0, 1, 2].map(i => O[i] + s*A[i] + e1*E1[i] + e2*E2[i]);
+    T.s0 = T.plane ? (e1, e2) => { const p = T.at(0, e1, e2), { P, n } = T.plane; return dot([P[0] - p[0], P[1] - p[1], P[2] - p[2]], n)/dot(A, n); } : () => 0;
+    T.out = perimeter(T.a, T.b, T.r); T.inn = perimeter(T.a - T.t, T.b - T.t, Math.max(.06, T.r - T.t));
+    T.endOn = dot(A, SV) > 0;
+    return T;
+  }
+  /* the strips that face the viewer, outside or inside, each corner clipped to the part that faces this way */
+  function pieces(T, inner){
+    const out = [];
+    (inner ? T.inn : T.out).forEach(seg => {
+      const n = 48, on = [];
+      for (let i = 0; i <= n; i++){ const [, , n1, n2] = seg.f(i/n); on.push((inner ? -1 : 1)*dot([0, 1, 2].map(j => n1*T.E1[j] + n2*T.E2[j]), SV) > 1e-4); }
+      const i0 = on.indexOf(true); if (i0 < 0) return;
+      let i1 = i0; while (i1 < n && on[i1 + 1]) i1++;
+      if (i1 === i0) return;
+      const [e1, e2] = seg.f((i0 + i1)/2/n);
+      out.push({ seg, wa: i0/n, wb: i1/n, inner, depth: dot(T.at(T.L/2, e1, e2), SV) });
+    });
+    return out.sort((p, q) => p.depth - q.depth);
+  }
+  function strip(g, T, pc){
+    const st = { T, ...pc, el: mk('path', { class: 'sil' }, g) };
+    if (!pc.inner && (T.rings.length || (!pc.seg.corner && T.lines.length))) st.mesh = mk('path', { class: 'nf' }, g);
+    return st;
+  }
+  function drawStrip(st, Pf, grow){
+    const { T } = st;
+    if (grow <= .001){ setD(st.el, ''); if (st.mesh) setD(st.mesh, ''); return; }
+    const U = range(T.nu), W = range(st.seg.corner ? 4 : T.nw);
+    const E = w => st.seg.f(lerp(st.wa, st.wb, w));
+    const span = (e1, e2) => { const s0 = T.s0(e1, e2); return [s0, s0 + grow*(T.L - s0)]; };
+    const P = (u, w) => { const [e1, e2] = E(w), [s0, s1] = span(e1, e2); return Pf(...T.at(lerp(s0, s1, u), e1, e2)); };
+    setD(st.el, poly([...U.map(u => P(u, 0)), ...W.slice(1).map(w => P(1, w)), ...U.slice(0, -1).reverse().map(u => P(u, 1)), ...W.slice(1, -1).reverse().map(w => P(0, w))]));
+    if (!st.mesh) return;
+    let d = '';
+    T.rings.forEach(s => {
+      const q = []; W.forEach(w => { const [e1, e2] = E(w), [s0, s1] = span(e1, e2); if (s > s0 + .01 && s < s1 - .01) q.push(Pf(...T.at(s, e1, e2))); });
+      d += open(q);
+    });
+    if (!st.seg.corner) T.lines.forEach(w => { d += open(U.map(u => P(u, w))); });
+    setD(st.mesh, d);
+  }
+  /* the cut end at the growing front: the outer ring with the inner one as a hole */
+  function capD(T, grow, Pf){
+    const ring = segs => { const pts = []; segs.forEach(seg => { const n = seg.corner ? 5 : 1;
+      for (let i = 0; i <= n; i++){ const [e1, e2] = seg.f(i/n), s0 = T.s0(e1, e2); pts.push(Pf(...T.at(s0 + grow*(T.L - s0), e1, e2))); } }); return pts; };
+    return poly(ring(T.out)) + poly(ring(T.inn));
+  }
+  function tubeParts(g, T){
+    const P = { T, inner: pieces(T, true).map(pc => strip(g, T, pc)) };
+    P.outer = pieces(T, false).map(pc => strip(g, T, pc));
+    P.cap = T.endOn ? mk('path', { class: 'sil', 'fill-rule': 'evenodd' }, g) : null;
+    P.draw = (Pf, grow) => { P.inner.concat(P.outer).forEach(st => drawStrip(st, Pf, grow)); if (P.cap) setD(P.cap, grow > .001 ? capD(T, grow, Pf) : ''); };
+    P.hi = on => { P.outer.forEach(st => cls(st.el, on ? 'sil hi' : 'sil')); if (P.cap) cls(P.cap, on ? 'sil hi' : 'sil'); };
+    P.piece = name => P.outer.find(st => st.seg.name === name);
+    return P;
+  }
+
+  /* The chord: 44 in of HSS 10 × 10 × ½ along x, its top face cut around the footprints. The DOM order is
+     the painting order: hooks put a figure's own parts under the chord, on the top face before or after a
+     branch, after the whole top face, on the near wall, or over everything. */
+  function chord(g, o = {}){
+    const { X0, X1, B, H, t, r } = CH, L = X1 - X0;
+    const xs = range(15).slice(1, -1).map(u => X0 + u*L), ys = o.ys || [-YF/2, 0, YF/2];
+    const T = tube({ O: [X0, 0, 0], A: [1, 0, 0], E1: [0, 1, 0], E2: [0, 0, 1], a: B/2, b: H/2, r, t, L, nu: 64, nw: 14, rings: xs.map(x => x - X0), lines: [.25, .5, .75] });
+    const C = { T, regions: [], xs };
+    o.under && o.under(g);
+    C.inner = pieces(T, true).map(pc => strip(g, T, pc));
+    const outer = pieces(T, false), top = outer.find(pc => pc.seg.name === '+2');
+    C.outer = outer.filter(pc => pc !== top && pc.depth < top.depth).map(pc => strip(g, T, pc));
+    const rect = (x0, x1, y0, y1) => {
+      if (x1 - x0 < .01 || y1 - y0 < .01) return;
+      const p = panel(g, (u, v) => [lerp(x0, x1, u), lerp(y0, y1, v), ZT], { nu: Math.max(3, Math.ceil((x1 - x0)/.6)), nv: Math.max(2, Math.ceil((y1 - y0)/.6)),
+        us: xs.filter(x => x > x0 + .01 && x < x1 - .01).map(x => (x - x0)/(x1 - x0)), vs: ys.filter(y => y > y0 + .01 && y < y1 - .01).map(y => (y - y0)/(y1 - y0)) });
+      p.el.setAttribute('class', 'fo'); p.x0 = x0; p.x1 = x1; C.regions.push(p);
+    };
+    let xa = X0;
+    (o.foot || []).forEach((f, i) => {
+      rect(xa, f.x0, -YF, YF);
+      if (i === 0) C.edge = mk('path', { class: 'nf sil' }, g);
+      const y0 = Math.max(f.y0, -YF), y1 = Math.min(f.y1, YF);
+      rect(f.x0, f.x1, -YF, y0);
+      rect(f.x0 + .002, f.x1 - .002, y0 + .002, y1 - .002);
+      f.far && f.far(g, i); f.build && f.build(g, i);
+      rect(f.x0, f.x1, y1, YF);
+      f.near && f.near(g, i);
+      xa = f.x1;
+    });
+    rect(xa, X1, -YF, YF);
+    if (!C.edge) C.edge = mk('path', { class: 'nf sil' }, g);
+    o.after && o.after(g);
+    C.outer.push(...outer.filter(pc => pc !== top && pc.depth >= top.depth).map(pc => strip(g, T, pc)));
+    o.onNear && o.onNear(g);
+    C.cap = mk('path', { class: 'sil', 'fill-rule': 'evenodd' }, g);
+    o.top && o.top(g);
+    C.piece = name => C.outer.find(st => st.seg.name === name);
+    C.draw = (Pf, grow) => {
+      C.inner.concat(C.outer).forEach(st => drawStrip(st, Pf, grow));
+      const xg = X0 + grow*L;
+      C.regions.forEach(p => drawPanel(p, Pf, clamp((xg - p.x0)/(p.x1 - p.x0), 0, 1)));
+      setD(C.edge, grow > .001 ? open([Pf(X0, -YF, ZT), Pf(X0, YF, ZT)]) : '');
+      setD(C.cap, grow > .001 ? capD(T, grow, Pf) : '');
+    };
+    C.meshHi = (names, on) => names.forEach(n => {
+      if (n === 'top') C.regions.forEach(p => p.mesh && cls(p.mesh, on ? 'nf hi' : 'nf'));
+      else { const st = C.piece(n); if (st && st.mesh) cls(st.mesh, on ? 'nf hi' : 'nf'); }
+    });
+    return C;
+  }
+
+  /* A branch: a square or rectangular HSS standing on the chord's top face, vertical or leaning toward -x or
+     +x at theta, cut to the face; or one under the chord (below), standing on a base. hb is its depth in the
+     plane of the chord's axis, bb its width across the chord. */
+  function branch(b){
+    const th = (b.theta ?? 90)*Math.PI/180, sn = Math.sin(th), cs = Math.cos(th), lean = b.lean || 0;
+    const a = b.hb/2, w = b.bb/2, R = b.r ?? CH.r, t = b.t ?? .375;
+    let T;
+    if (b.below) T = tube({ O: [b.xc, 0, -ZT - b.L], A: [0, 0, 1], E1: [1, 0, 0], E2: [0, 1, 0], a, b: w, r: R, t, L: b.L - .02, rings: b.rings || [], lines: b.lines || [] });
+    else T = tube({ O: [b.xc, 0, ZT + .02], A: [lean*cs, 0, sn], E1: lean ? [-lean*sn, 0, cs] : [1, 0, 0], E2: [0, 1, 0], a, b: w, r: R, t, L: b.L,
+      plane: { P: [0, 0, ZT + .02], n: [0, 0, 1] }, rings: b.rings || [b.L/3, 2*b.L/3], lines: b.lines || [] });
+    const B = { spec: b, T, top: !b.below, foot: { x0: b.xc - a/sn, x1: b.xc + a/sn, y0: -w, y1: w } };
+    const end = s => T.at(s, 0, 0);
+    B.build = (g, M, G) => {
+      const zTop = b.below ? -ZT - b.L : ZT + .02 + b.L;
+      if (b.base) B.base = box(g, [b.xc - a - 1.5, -w - 1.5, b.xc + a + 1.5, w + 1.5], zTop - 2, zTop, { r: .6, k: .3 });
+      B.parts = tubeParts(g, T);
+      if (b.plate) B.plate = box(g, [b.xc - a - .6, -w - .6, b.xc + a + .6, w + .6], zTop, zTop + 1);
+      if (b.weights) B.weights = weights(g, G, from(3), b.xc, 0, Math.min(3.2, Math.min(a, w) + .4), zTop + 1);
+      if (b.push || b.pull) B.arrow = arrow(g);
+    };
+    B.draw = (M, k, val) => {
+      const v = val(M.path), { Pf, front } = M;
+      B.parts.draw(Pf, v); B.parts.hi(k === 2);
+      if (B.base){ drawBox(B.base, M.P, front, v > .001, -8*(1 - v)); cls(B.base.el.sil, k === 2 ? 'sil hi' : 'sil'); }
+      if (B.plate){ drawBox(B.plate, Pf, front, v > .001, 10*(1 - v)); cls(B.plate.el.sil, k === 2 ? 'sil hi' : 'sil'); }
+      if (B.weights) drawWeights(B.weights, val, Pf, front, k === 3);
+      if (B.arrow){
+        const vl = val(M.load), near = Pf(...end(T.L + .8)), far = Pf(...end(T.L + 9));
+        drawArrow(B.arrow, b.push ? far : near, b.push ? near : far, vl, k === 3);
+      }
+    };
+    return B;
+  }
+
+  /* arrows are drawn on the screen: a shaft that grows with v and a head once it is there */
+  const arrow = g => ({ s: mk('path', { class: 'nf' }, g), h: mk('path', { class: 'nf' }, g) });
+  function drawArrow(ar, p0, p1, v, hi){
+    setD(ar.s, v > .001 ? line([p0, p1], v) : '');
+    if (v > .98){
+      const dx = p1[0] - p0[0], dy = p1[1] - p0[1], l = Math.hypot(dx, dy) || 1, ux = dx/l, uy = dy/l, L = 5.5, W = 2.8;
+      setD(ar.h, open([[p1[0] - ux*L + uy*W, p1[1] - uy*L - ux*W], p1, [p1[0] - ux*L - uy*W, p1[1] - uy*L + ux*W]]));
+    } else setD(ar.h, '');
+    cls(ar.s, hi ? 'nf hi' : 'nf'); cls(ar.h, hi ? 'nf hi' : 'nf');
+  }
+  /* straight lines on a surface, sampled so they follow its displacement */
+  const lines = (Pf, segs, n = 14) => segs.map(([p, q]) => open(range(n).map(u => Pf(lerp(p[0], q[0], u), lerp(p[1], q[1], u), lerp(p[2], q[2], u))))).join('');
+
+  /* the near wall's mesh between x0 and x1, to pick out the part of it that gives way */
+  function wallMesh(Pf, xs, x0, x1){
+    const y = CH.B/2 + .01, n = 18;
+    let d = xs.filter(x => x > x0 && x < x1).map(x => open(range(n).map(u => Pf(x, y, lerp(-YF, YF, u))))).join('');
+    [-YF/2, 0, YF/2].forEach(z => { d += open(range(3*n).map(u => Pf(lerp(x0, x1, u), y, z))); });
+    return d;
+  }
+  /* A figure: chord, branch, load, mechanism (half, then full). The spec gives the branches, the field D,
+     its own parts through the hooks (far and near are per footprint), and drawExtra for them. */
+  const FIT = [[-22, -5, -6], [22, 5, -6], [22, -5, 19.5], [-22, 5, 19.5], [0, 0, 20.5]];
+  function fig(spec){
+    const N = 5, { S, G, val } = seq(N);
+    const STAGES = [['chord', 1], ['branch', 2], ['load', 3], ['mechanism', 4]];
+    function build(svg){
+      const { C, P, front, g } = camera(svg, spec.scale || 6.4, spec.fit || FIT, spec.cy);
+      const M = { C, P, front, a: 1, amp: tween(1, 900), sec: G(from(1)), path: G(from(2)), load: G(from(3)), mech: G(from(4)), full: G(from(5)) };
+      M.Pf = (x, y, z) => { if (!M.a) return P(x, y, z); const d = spec.D(x, y, z, M.a, M); return P(x + d[0], y + d[1], z + d[2]); };
+      const hook = name => (g2, i) => spec[name] && spec[name](g2, M, G, i);
+      M.br = (spec.branches || []).map(branch);
+      M.chord = chord(g, {
+        under: g2 => { M.br.filter(b => !b.top).forEach(b => b.build(g2, M, G)); hook('under')(g2); },
+        foot: M.br.filter(b => b.top).map(b => ({ ...b.foot, far: hook('far'), build: g2 => { b.build(g2, M, G); hook('onBranch')(g2); }, near: hook('near') })),
+        after: hook('after'), top: hook('top'), ys: spec.ys,
+        onNear: g2 => { if (spec.wallHi) M.wallHi = mk('path', { class: 'nf hi' }, g2); hook('onNear')(g2); },
+      });
+      return M;
+    }
+    function draw(M){
+      const k = S.k;
+      tset(M.amp, k === 4 ? .5 : k >= 5 ? 1 : 0, S.now, 0); M.a = tval(M.amp, S.now);
+      M.chord.draw(M.Pf, val(M.sec));
+      cls(M.chord.cap, k === 1 ? 'sil hi' : 'sil');
+      if (spec.hiMesh) M.chord.meshHi(spec.hiMesh, k === 5);
+      if (M.wallHi) setD(M.wallHi, k === 5 ? wallMesh(M.Pf, M.chord.xs, ...spec.wallHi) : '');
+      M.br.forEach(b => b.draw(M, k, val));
+      spec.drawExtra && spec.drawExtra(M, k, val);
+    }
+    return { N, STAGES, DETAIL: spec.DETAIL, S, build, draw };
+  }
+  return { CH, ZT, YF, plat, smooth, fig, lines, arrow, drawArrow, perimeter };
+})();
+</script>
+<script>
+/* The rectangular HSS (tube steel) connection limit states of AISC 360 Chapter K, one figure each. The chord
+   is HSS 10 × 10 × ½ (ZT its top, YF the edge of its flat top face); displacements are exaggerated so the
+   mechanism reads. */
+const KH = (() => {
+const { ZT, YF, plat, smooth, lines } = HSS, { clamp, bell, setD, cls, line, open } = WF, { mk } = HL;
+const sgn = v => (v > 0 ? 1 : v < 0 ? -1 : 0);
+const at = (on, d) => (on ? d : '');
+
+/* a band on a wall, outlined, with hatching across it */
+function band(g){ return { o: mk('path', { class: 'nf' }, g), h: mk('path', { class: 'nf' }, g) }; }
+function drawBand(B, Pf, on, hi, corner, du, dv, n){
+  const P = (u, v) => Pf(corner[0] + u*du[0] + v*dv[0], corner[1] + u*du[1] + v*dv[1], corner[2] + u*du[2] + v*dv[2]);
+  const edge = (u0, v0, u1, v1) => WF.range(10).map(s => P(u0 + s*(u1 - u0), v0 + s*(v1 - v0)));
+  setD(B.o, on ? WF.poly([...edge(0, 0, 1, 0), ...edge(1, 0, 1, 1).slice(1), ...edge(1, 1, 0, 1).slice(1), ...edge(0, 1, 0, 0).slice(1, -1)]) : '');
+  let h = ''; if (on) for (let i = 1; i < n; i++) h += open(edge(i/n, 0, i/n, 1));
+  setD(B.h, h);
+  cls(B.o, hi ? 'nf hi' : 'nf'); cls(B.h, hi ? 'nf hi' : 'nf lo');
+}
+
+/* Chord wall plastification: a narrow branch pushes the connecting face in; the face folds along yield
+   lines, a frame from the footprint out to the sidewalls. */
+const LX = 6.2, HC = 2.5;
+const CWP = HSS.fig({
+  DETAIL: ['ready', 'HSS 10 × 10 × ½ chord', 'HSS 5 × 5 branch · β = 0.5', 'compression Pu', 'the connecting face dishes', 'Fy t² [2η/(1−β) + 4/√(1−β)] Qf'],
+  branches: [{ xc: 0, bb: 2*HC, hb: 2*HC, L: 9, plate: true, weights: true }],
+  ys: [-3.4, -1.7, 0, 1.7, 3.4],
+  D(x, y, z, a){
+    if (z > ZT + .01) return [0, 0, -a*1.15];
+    if (z < ZT - .51) return [0, 0, 0];
+    const gy = (YF - Math.abs(y))/(YF - HC), gx = (LX - Math.abs(x))/(LX - HC);
+    return [0, 0, -a*1.15*clamp(Math.min(gx, gy), 0, 1)];
+  },
+  far(g, M){ M.ylFar = mk('path', { class: 'nf hi' }, g); },
+  after(g, M){ M.ylNear = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){
+    const on = val(M.full) > .5, z = ZT, Y = YF, P = (x, y) => [x, y, z];
+    setD(M.ylFar, at(on, lines(M.Pf, [[P(-LX, -Y), P(HC, -Y)], [P(-LX, Y), P(-HC, Y)], [P(-LX, -Y), P(-LX, Y)], [P(-HC, -HC), P(-LX, -Y)], [P(-HC, HC), P(-LX, Y)]])));
+    setD(M.ylNear, at(on, lines(M.Pf, [[P(HC, -Y), P(LX, -Y)], [P(-HC, Y), P(LX, Y)], [P(LX, -Y), P(LX, Y)], [P(HC, -HC), P(LX, -Y)], [P(HC, HC), P(LX, Y)]])));
+  },
+});
+
+/* Shear yielding (punching): a branch nearly as wide as the chord shears the face around its footprint and
+   pushes the plug in. */
+const HP = 4.3;
+const PUN = HSS.fig({
+  DETAIL: ['ready', 'HSS 10 × 10 × ½ chord', 'branch · β = 0.86', 'compression Pu', 'the face shears around the branch', '0.6 Fy t B (2η + 2βeop)'],
+  branches: [{ xc: 0, bb: 2*HP, hb: 2*HP, L: 9, plate: true, weights: true }],
+  D(x, y, z, a){
+    const d = 2;
+    if (z > ZT + .01) return [0, 0, -a*d];
+    if (z < ZT - .51) return [0, 0, 0];
+    const ax = Math.abs(x), ay = Math.abs(y);
+    if (ax < HP - .001 && ay < YF - .001) return [0, 0, -a*d];
+    return [0, 0, -a*d*.2*bell(Math.max(ax - HP, 0), 1.8)*clamp(1 - (ay/YF)**4, 0, 1)];
+  },
+  onNear(g, M){ M.cut = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){
+    const on = val(M.full) > .5, x = HP + .001;
+    setD(M.cut, at(on, lines(M.Pf, [[[x, -YF, ZT], [x, HP, ZT]], [[-HP, HP, ZT], [x, HP, ZT]]], 18)));
+  },
+});
+
+/* Sidewall local yielding: a branch as wide as the chord bears straight onto the sidewalls, the load
+   spreads through the corners at 2.5 : 1, and the walls yield over 5k + lb just below them. */
+const KR = .75, HB = 5 + 2.5*KR, KZ = YF - 2.4;
+const SLY = HSS.fig({
+  DETAIL: ['ready', 'HSS 10 × 10 × ½ chord', 'branch as wide as the chord · β = 1', 'compression Pu', 'the sidewalls yield below the corners', '2 Fy t (5k + lb)'],
+  branches: [{ xc: 0, bb: 10, hb: 10, L: 9, plate: true, weights: true }],
+  D(x, y, z, a){
+    if (z > ZT + .01) return [0, 0, -a*.6];
+    if (z <= KZ) return [0, 0, 0];
+    const b = plat(x, 5, 2.4), t = clamp((z - KZ)/(YF - KZ), 0, 1);
+    return [0, sgn(y)*a*.5*b*Math.sin(Math.PI*t), -a*.6*b*t];
+  },
+  onNear(g, M){ M.disp = [0, 1].map(() => mk('path', { class: 'nf dash' }, g)); M.yb = band(g); },
+  drawExtra(M, k, val){
+    const y = 5.02, vd = val(M.path);
+    M.disp.forEach((el, i) => { const s = i ? 1 : -1;
+      setD(el, line([[s*5, y, YF], [s*HB, y, YF - KR], [s*(HB + 2.5*(YF - KR - KZ)), y, KZ]].map(p => M.Pf(...p)), vd)); });
+    drawBand(M.yb, M.Pf, val(M.mech) > .5, k === 5, [-HB, y, KZ], [2*HB, 0, 0], [0, 0, YF - KZ], 16);
+  },
+});
+
+/* Sidewall local crippling: a T-connection with the branch in compression; the sidewalls wrinkle just under
+   the loaded face and the branch settles. */
+const SLC = HSS.fig({
+  DETAIL: ['ready', 'HSS 10 × 10 × ½ chord', 'branch as wide as the chord · β = 1', 'compression Pu', 'the sidewalls wrinkle under the face', '1.6 t² [1 + 3lb/(H − 3t)] √(E Fy) Qf'],
+  branches: [{ xc: 0, bb: 10, hb: 10, L: 9, plate: true, weights: true }],
+  wallHi: [-10, 10],
+  D(x, y, z, a){
+    if (z > ZT + .01) return [0, 0, -a*.9];
+    const Zc = 1.2; if (z <= Zc) return [0, 0, 0];
+    const b = plat(x, 4.5, 2.6), t = clamp((z - Zc)/(ZT - .5 - Zc), 0, 1);
+    return [0, sgn(y)*a*1.3*b*Math.sin(Math.PI*t), -a*.9*b*t];
+  },
+});
+
+/* Sidewall local buckling: a cross-connection, branches pushing on both faces; the sidewalls bow out across
+   the depth like columns. */
+const SLB = HSS.fig({
+  DETAIL: ['ready', 'HSS 10 × 10 × ½ chord', 'branches on both faces · β = 1', 'paired compression Pu', 'the sidewalls bow across the depth', '48 t³/(H − 3t) · √(E Fy) Qf'],
+  branches: [{ xc: 0, bb: 10, hb: 10, L: 8, plate: true, weights: true }, { xc: 0, bb: 10, hb: 10, L: 7, below: true, base: true }],
+  wallHi: [-11, 11], scale: 5.5,
+  fit: [[-22, -5, -15], [22, 5, -15], [22, -5, 18.5], [-22, 5, 18.5], [0, 0, 19.5]],
+  D(x, y, z, a){
+    if (z > ZT + .01) return [0, 0, -a*.5];
+    if (z < -ZT - .01) return [0, 0, 0];
+    const b = plat(x, 4.5, 3), dy = Math.abs(z) < 4.7 ? sgn(y)*a*1.8*b*Math.cos(Math.PI*z/9.4) : 0;
+    return [0, dy, -a*.5*b*(z + ZT)/(2*ZT)];
+  },
+});
+
+/* Local yielding of the branch from uneven load distribution: the sidewalls are stiff and the middle of the
+   face is not, so the branch walls over the sidewalls, and an effective width of the cross walls beside the
+   corners, carry the load and yield at the weld. */
+const HE = 4.5, BE = 2.2;
+const BEW = HSS.fig({
+  DETAIL: ['ready', 'HSS 10 × 10 × ½ chord', 'HSS 9 × 9 branch · β = 0.9', 'compression Pu', 'the branch yields at the weld', 'Fyb tb (2Hb + 2beoi − 4tb)'],
+  branches: [{ xc: 0, bb: 2*HE, hb: 2*HE, L: 9, plate: true, weights: true, rings: [.8, 1.6, 2.4, 5.2, 7.4], lines: [.5] }],
+  D(x, y, z, a){
+    if (z < ZT - .51) return [0, 0, 0];
+    const fw = Math.abs(y) < YF ? .9*Math.cos(Math.PI*y/(2*YF))**2*plat(x, HE, 1.6) : 0;
+    if (z <= ZT + .01) return [0, 0, -a*fw];
+    const q = clamp((z - ZT)/2.4, 0, 1), dz = -a*(.55*q + fw*(1 - q));
+    if (q >= 1) return [0, 0, dz];
+    const R = HSS.CH.r, cx = clamp(x, R - HE, HE - R), cy = clamp(y, R - HE, HE - R);
+    let dx = x - cx, dy = y - cy; const l = Math.hypot(dx, dy) || 1; dx /= l; dy /= l;
+    const wc = clamp((Math.abs(y) - (HE - BE))/BE, 0, 1), s = a*.6*Math.sin(Math.PI*q)*Math.max(Math.abs(dy), Math.abs(dx)*wc);
+    return [dx*s, dy*s, dz];
+  },
+  onBranch(g, M){ M.bL = band(g); M.bA = band(g); M.bB = band(g); M.mid = mk('path', { class: 'nf dash' }, g); },
+  drawExtra(M, k, val){
+    const on = val(M.mech) > .5, hi = k === 5, z0 = ZT + .05, hz = 1.6, f = HE - HSS.CH.r, x = HE + .02;
+    drawBand(M.bL, M.Pf, on, hi, [-f, HE + .02, z0], [2*f, 0, 0], [0, 0, hz], 14);
+    drawBand(M.bA, M.Pf, on, hi, [x, HE - BE, z0], [0, BE - HSS.CH.r, 0], [0, 0, hz], 4);
+    drawBand(M.bB, M.Pf, on, hi, [x, -f, z0], [0, BE - HSS.CH.r, 0], [0, 0, hz], 4);
+    setD(M.mid, at(on, lines(M.Pf, [[[x, BE - HE, z0 + hz/2], [x, HE - BE, z0 + hz/2]]])));
+    cls(M.mid, hi ? 'nf dash hi' : 'nf dash');
+  },
+});
+
+/* Shear of the chord sidewalls in the gap: a gapped K-connection, one branch pushing and one pulling; the
+   vertical components shear the chord between the toes. */
+const GAP = 3, XK = GAP/2 + 3.5/Math.SQRT1_2;
+const CSG = HSS.fig({
+  DETAIL: ['ready', 'HSS 10 × 10 × ½ chord', 'gapped K · HSS 7 × 7 branches at 45°', 'compression and tension Pu', 'the chord shears across the gap', 'Vn = 0.6 Fy (2ht) Cv2'],
+  branches: [{ xc: -XK, bb: 7, hb: 7, L: 13, theta: 45, lean: -1, push: true }, { xc: XK, bb: 7, hb: 7, L: 13, theta: 45, lean: 1, pull: true }],
+  scale: 6.1, fit: [[-22, -5, -6], [22, 5, -6], [-22, 0, 21], [22, 0, 21]],
+  D(x, y, z, a){ return [0, 0, -a*1.3*(1 - smooth((x + GAP/2)/GAP))]; },
+  onNear(g, M){ M.gb = band(g); },
+  drawExtra(M, k, val){ drawBand(M.gb, M.Pf, val(M.mech) > .5, k === 5, [-GAP/2, 5.02, -YF], [GAP, 0, 0], [0, 0, 2*YF], 5); },
+});
+
+/* Chord distortional failure: a T-connection with an out-of-plane moment on the branch; the chord section
+   racks into a parallelogram under it. */
+const CDF = HSS.fig({
+  DETAIL: ['ready', 'HSS 10 × 10 × ½ chord', 'HSS 6 × 6 branch', 'out-of-plane Mu', 'the chord section racks', 'chord distortional failure'],
+  branches: [{ xc: 0, bb: 6, hb: 6, L: 10, plate: true }],
+  D(x, y, z, a){
+    if (z > ZT + .01) return [0, -a*(1.5 + .09*(z - ZT)), 0];
+    return [0, -a*1.5*plat(x, 3, 5.5)*(z + ZT)/(2*ZT), 0];
+  },
+  top(g, M){ M.push = HSS.arrow(g); M.sect = mk('path', { class: 'nf hi' }, g); },
+  drawExtra(M, k, val){
+    const zt = ZT + 10.6;
+    HSS.drawArrow(M.push, M.Pf(0, 13, zt), M.Pf(0, 3.9, zt), val(M.load), k === 3);
+    let pts = [];
+    if (val(M.full) > .5){
+      const R = HSS.CH.r, c = 5 - R;
+      for (let i = 0; i <= 6; i++) pts.push([0, 3 + i*(YF - 3)/6, ZT]);
+      for (let i = 1; i <= 6; i++){ const t = i/6*Math.PI/2; pts.push([0, c + R*Math.sin(t), c + R*Math.cos(t)]); }
+      for (let i = 1; i <= 12; i++) pts.push([0, 5, c - i*2*c/12]);
+      for (let i = 1; i <= 3; i++){ const t = i/6*Math.PI/2; pts.push([0, c + R*Math.cos(t), -c - R*Math.sin(t)]); }
+    }
+    setD(M.sect, open(pts.map(p => M.Pf(...p))));
+  },
+});
+
+return { CWP, PUN, SLY, SLC, SLB, BEW, CSG, CDF };
+})();
+</script>
+<script>
 /* One playback for every sequence on the page, plus colours and downloads. Each section keeps its own
    clock: the loop opens on the finished model, un-builds and builds again; moving across the drawing scrubs
    it; the rail jumps to a stage. The colour picker recolours every drawing, and each section can save its
@@ -2998,7 +3489,7 @@ return { FLB, WLY, WLC, WSB, WCB, PZ };
   const { register, pointer, reducedMotion, mk, inject, clamp } = HL;
   inject(document);
   const FIGS = { beam: () => BEAM, turbine: () => TG, pump: () => PP, substructure: () => BS, endplate: () => EP,
-    flb: () => J10.FLB, wly: () => J10.WLY, wlc: () => J10.WLC, wsb: () => J10.WSB, wcb: () => J10.WCB, pz: () => J10.PZ };
+    flb: () => J10.FLB, wly: () => J10.WLY, wlc: () => J10.WLC, wsb: () => J10.WSB, wcb: () => J10.WCB, pz: () => J10.PZ, cwp: () => KH.CWP, pun: () => KH.PUN, sly: () => KH.SLY, slc: () => KH.SLC, slb: () => KH.SLB, bew: () => KH.BEW, csg: () => KH.CSG, cdf: () => KH.CDF };
   const docEl = document.documentElement, KEYS = ['plate', 'hi', 'edge', 'mid', 'lo'];
   const store = { get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} } };
 
@@ -3101,8 +3592,16 @@ return { FLB, WLY, WLC, WSB, WCB, PZ };
     const dl = document.createElement('div'); dl.className = 'dl';
     const lbl = document.createElement('span'); lbl.textContent = 'Download'; dl.append(lbl);
     const make = (fmt, fn) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = fmt; b.setAttribute('aria-label', `Download ${root.querySelector('h2').textContent} as ${fmt}`); b.addEventListener('click', () => fn(b)); dl.append(b); return b; };
-    const bSvg = make('SVG', () => save(new Blob([svgDoc(svg, palOf(stage), 800, 640, 1.2, transparent)], { type: 'image/svg+xml' }), base() + '.svg'));
+    /* a still of the empty start would be blank: draw the finished model instead, and carry on from it */
+    const still = () => {
+      if (busy || S.k !== 0) return;
+      let v = Math.max(clock(), S.now) + 1;
+      for (let t = 0; t < 2600; t += 80){ S.now = v; S.k = N; ui(N); fig.draw(M); v += 80; }
+      off = v - performance.now(); t0 = v - N*DW; man = null; R.wake();
+    };
+    const bSvg = make('SVG', () => still() || save(new Blob([svgDoc(svg, palOf(stage), 800, 640, 1.2, transparent)], { type: 'image/svg+xml' }), base() + '.svg'));
     const bPng = make('PNG', async () => {
+      still();
       const W = 1600, H = 1280, c = document.createElement('canvas'); c.width = W; c.height = H;
       await draw(c.getContext('2d'), svgDoc(svg, palOf(stage), W, H, 2.4, transparent), W, H);
       c.toBlob(b => save(b, base() + '.png'), 'image/png');
