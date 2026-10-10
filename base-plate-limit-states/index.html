@@ -1,4 +1,4 @@
-<title>Wide Flange Limit States</title>
+<title>Base Plate Limit States</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&display=swap">
@@ -73,60 +73,84 @@ footer a{color:inherit}
 </style>
 <div class="wrap">
   <header class="top">
-    <div class="title"><h1>Wide flange limit states</h1></div>
-    <p>Flanges and webs with concentrated forces, AISC 360 Section J10. Each figure loops on its own; move across a drawing to scrub it, or pick a stage under it.</p>
+    <div class="title"><h1>Base plate limit states</h1></div>
+    <p>A column base plate on a concrete pier, AISC Design Guide 1 and ACI 318 Chapter 17. Each figure loops on its own; move across a drawing to scrub it, or pick a stage under it.</p>
   </header>
 
-  <section class="group" style="border-top:0;padding-top:0" aria-labelledby="j10-h">
-    <div class="group-head"><span class="num">J10</span><h2 id="j10-h">Flanges and webs with concentrated forces</h2><p>AISC 360 Section J10: the six local limit states of a wide-flange member under a concentrated force. Each figure builds the member, its load path and its load, then lets the mechanism develop. Displacements are exaggerated.</p></div>
+  <section class="group" style="border-top:0;padding-top:0" aria-labelledby="bp-h">
+    <div class="group-head"><span class="num">DG1</span><h2 id="bp-h">Column base plate</h2><p>AISC Design Guide 1: a W12×65 column on a 22 in square, 1½ in plate, grouted on a 32 in square concrete pier and held by four cast-in 1 in rods. The concrete in bearing (AISC 360 J8), the plate in bending at its bearing and tension interfaces, the column welds, a large moment, and the rods and the pier in tension and shear (ACI 318 Chapter 17). Each figure casts the pier with its rods, sets the plate and column, loads it, then lets the mechanism develop. Displacements are exaggerated.</p></div>
     <div class="seqs">
-      <section class="seq" id="flb" data-sequence="flb" data-dwell="1300" data-hold="3400" aria-labelledby="flb-h">
-        <div class="seq-head"><span class="num">06</span><h2 id="flb-h">Flange local bending</h2><p>J10.1 · A plate welded across the flange pulls on it; the flange bends about the web and yield lines form.</p></div>
+      <section class="seq" id="bpc" data-sequence="bpc" data-dwell="1300" data-hold="3400" aria-labelledby="bpc-h">
+        <div class="seq-head"><span class="num">59</span><h2 id="bpc-h">Concrete bearing</h2><p>Under the column’s load the grout and the concrete under the plate crush, and the pier splits outward from under it. AISC 360 J8 caps the bearing stress at 0.85 f′c √(A2/A1).</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="flb" role="img" aria-label="A wide-flange beam is drawn in lines, a plate welded across its top flange is pulled upward, and the flange bends about the web with its tips lifting, forming yield lines."></div>
+          <div class="stage" data-hairline="bpc" role="img" aria-label="A W12 column on a square base plate, grouted on a concrete pier and held by four anchor rods with plate washers and nuts, is drawn in lines, the rods inside the concrete drawn hidden; an arrow pushes the column down; the plate sinks into the crushed grout and cracks run out across the top of the pier and down its sides."></div>
         </div>
-        <ol class="rail" aria-label="Stages of flange local bending"></ol>
+        <ol class="rail" aria-label="Stages of concrete bearing"></ol>
       </section>
-      <section class="seq" id="wly" data-sequence="wly" data-dwell="1300" data-hold="3400" aria-labelledby="wly-h">
-        <div class="seq-head"><span class="num">07</span><h2 id="wly-h">Web local yielding</h2><p>J10.2 · The reaction at a bearing support spreads through the flange at 2.5 : 1 and yields the web at the fillet toe over N + 5k.</p></div>
+      <section class="seq" id="bpy" data-sequence="bpy" data-dwell="1300" data-hold="3400" aria-labelledby="bpy-h">
+        <div class="seq-head"><span class="num">60</span><h2 id="bpy-h">Plate yielding in compression</h2><p>The bearing pressure bends the plate’s cantilevers, m beyond 0.95d and n beyond 0.8bf, up off the grout about yield lines round the column.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="wly" role="img" aria-label="A wide-flange beam is drawn in lines on a bearing support, loaded at both ends; dashed lines show the reaction spreading at 2.5 to 1, and a band of the web yields at the toe of the fillet."></div>
+          <div class="stage" data-hairline="bpy" role="img" aria-label="A W12 column on a square base plate, grouted on a concrete pier and held by four anchor rods with plate washers and nuts, is drawn in lines, the rods inside the concrete drawn hidden; an arrow pushes the column down; the plate’s edges curl up off the grout about lines round the column."></div>
         </div>
-        <ol class="rail" aria-label="Stages of web local yielding"></ol>
+        <ol class="rail" aria-label="Stages of plate yielding in compression"></ol>
       </section>
-      <section class="seq" id="wlc" data-sequence="wlc" data-dwell="1300" data-hold="3400" aria-labelledby="wlc-h">
-        <div class="seq-head"><span class="num">08</span><h2 id="wlc-h">Web local crippling</h2><p>J10.3 · Over a bearing support the web wrinkles just above the flange, and the beam settles into it.</p></div>
+      <section class="seq" id="bpt" data-sequence="bpt" data-dwell="1300" data-hold="3400" aria-labelledby="bpt-h">
+        <div class="seq-head"><span class="num">61</span><h2 id="bpt-h">Plate yielding in tension</h2><p>The column pulls up and the rods hold the plate down; the plate bends between them about lines at the flanges and at the rods.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="wlc" role="img" aria-label="A wide-flange beam is drawn in lines on a bearing support, loaded at both ends; the web wrinkles just above the bottom flange over the support."></div>
+          <div class="stage" data-hairline="bpt" role="img" aria-label="A W12 column on a square base plate, grouted on a concrete pier and held by four anchor rods with plate washers and nuts, is drawn in lines, the rods inside the concrete drawn hidden; an arrow pulls the column up; the middle of the plate rises with it while the rods hold its edges down."></div>
         </div>
-        <ol class="rail" aria-label="Stages of web local crippling"></ol>
+        <ol class="rail" aria-label="Stages of plate yielding in tension"></ol>
       </section>
-      <section class="seq" id="wsb" data-sequence="wsb" data-dwell="1300" data-hold="3400" aria-labelledby="wsb-h">
-        <div class="seq-head"><span class="num">09</span><h2 id="wsb-h">Web sidesway buckling</h2><p>J10.4 · With the flanges free to move sideways, the loaded flange swings out and the web bends under it.</p></div>
+      <section class="seq" id="bar" data-sequence="bar" data-dwell="1300" data-hold="3400" aria-labelledby="bar-h">
+        <div class="seq-head"><span class="num">62</span><h2 id="bar-h">Anchor rod rupture</h2><p>Under uplift the rods neck just above the grout and break, and the plate and column lift away.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="wsb" role="img" aria-label="A wide-flange beam is drawn in lines with a bearing plate on its top flange, loaded from above; the loaded compression flange moves sideways relative to the bottom flange and the web bends."></div>
+          <div class="stage" data-hairline="bar" role="img" aria-label="A W12 column on a square base plate, grouted on a concrete pier and held by four anchor rods with plate washers and nuts, is drawn in lines, the rods inside the concrete drawn hidden; an arrow pulls the column up; the rods neck and break above the grout and the plate lifts off."></div>
         </div>
-        <ol class="rail" aria-label="Stages of web sidesway buckling"></ol>
+        <ol class="rail" aria-label="Stages of anchor rod rupture"></ol>
       </section>
-      <section class="seq" id="wcb" data-sequence="wcb" data-dwell="1300" data-hold="3400" aria-labelledby="wcb-h">
-        <div class="seq-head"><span class="num">10</span><h2 id="wcb-h">Web compression buckling</h2><p>J10.5 · Equal loads on both flanges at one section bow the web out across its depth.</p></div>
+      <section class="seq" id="bcb" data-sequence="bcb" data-dwell="1300" data-hold="3400" aria-labelledby="bcb-h">
+        <div class="seq-head"><span class="num">63</span><h2 id="bcb-h">Pier breakout in tension</h2><p>The rods sit 7½ in from the pier’s sides, inside 1.5 hef, so ACI’s prism takes the whole top of the pier: it cracks round the sides and lifts out with the column.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="wcb" role="img" aria-label="A wide-flange beam is drawn in lines, loaded from above and bearing on a support below at the same section; the web bows out across its depth like a column."></div>
+          <div class="stage" data-hairline="bcb" role="img" aria-label="A W12 column on a square base plate, grouted on a concrete pier and held by four anchor rods with plate washers and nuts, is drawn in lines, the rods inside the concrete drawn hidden; an arrow pulls the column up; the top of the pier cracks off round its sides and lifts out, a hidden frustum running down to the rods’ heads."></div>
         </div>
-        <ol class="rail" aria-label="Stages of web compression buckling"></ol>
+        <ol class="rail" aria-label="Stages of pier breakout in tension"></ol>
       </section>
-      <section class="seq" id="pz" data-sequence="pz" data-dwell="1300" data-hold="3400" aria-labelledby="pz-h">
-        <div class="seq-head"><span class="num">11</span><h2 id="pz-h">Web panel-zone shear</h2><p>J10.6 · An unbalanced beam moment shears the column web between the continuity plates.</p></div>
+      <section class="seq" id="bwr" data-sequence="bwr" data-dwell="1300" data-hold="3400" aria-labelledby="bwr-h">
+        <div class="seq-head"><span class="num">64</span><h2 id="bwr-h">Column weld rupture</h2><p>The fillet welds round the column’s foot tear through their throats and the column lifts off the plate.</p></div>
         <div class="plate">
           <span class="tag tag-name"></span><span class="tag tag-read"></span>
-          <div class="stage" data-hairline="pz" role="img" aria-label="A wide-flange column is drawn in lines with beams framing into both flanges and continuity plates; an unbalanced moment shears the panel zone into a parallelogram and the beams turn with it."></div>
+          <div class="stage" data-hairline="bwr" role="img" aria-label="A W12 column on a square base plate, grouted on a concrete pier and held by four anchor rods with plate washers and nuts, is drawn in lines, the rods inside the concrete drawn hidden; an arrow pulls the column up; the fillet welds at its foot split and the column lifts off the plate."></div>
         </div>
-        <ol class="rail" aria-label="Stages of web panel-zone shear"></ol>
+        <ol class="rail" aria-label="Stages of column weld rupture"></ol>
+      </section>
+      <section class="seq" id="bmo" data-sequence="bmo" data-dwell="1300" data-hold="3400" aria-labelledby="bmo-h">
+        <div class="seq-head"><span class="num">65</span><h2 id="bmo-h">Moment and uplift</h2><p>A large moment rocks the column and plate about the toe; the heel lifts and its rods stretch, and the grout under the toe takes the bearing.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="bmo" role="img" aria-label="A W12 column on a square base plate, grouted on a concrete pier and held by four anchor rods with plate washers and nuts, is drawn in lines, the rods inside the concrete drawn hidden; an arrow pushes the top of the column sideways; the plate rocks onto its toe, its heel lifting on stretched rods, and the grout under the toe is hatched."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of moment and uplift"></ol>
+      </section>
+      <section class="seq" id="bvs" data-sequence="bvs" data-dwell="1300" data-hold="3400" aria-labelledby="bvs-h">
+        <div class="seq-head"><span class="num">66</span><h2 id="bvs-h">Anchor rod shear</h2><p>The plate slides on the grout and the rods, bent through the grout, shear off at the concrete. ACI takes 0.8 of their strength on a grout pad.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="bvs" role="img" aria-label="A W12 column on a square base plate, grouted on a concrete pier and held by four anchor rods with plate washers and nuts, is drawn in lines, the rods inside the concrete drawn hidden; an arrow pushes the plate sideways; it slides on the grout and hidden lines show the rods bending through the grout."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of anchor rod shear"></ol>
+      </section>
+      <section class="seq" id="bvb" data-sequence="bvb" data-dwell="1300" data-hold="3400" aria-labelledby="bvb-h">
+        <div class="seq-head"><span class="num">67</span><h2 id="bvb-h">Pier breakout in shear</h2><p>Pushed toward the near side, the front rods, 7½ in from it, break out a wedge of the pier, across its whole width and 1.5 ca1 down its face.</p></div>
+        <div class="plate">
+          <span class="tag tag-name"></span><span class="tag tag-read"></span>
+          <div class="stage" data-hairline="bvb" role="img" aria-label="A W12 column on a square base plate, grouted on a concrete pier and held by four anchor rods with plate washers and nuts, is drawn in lines, the rods inside the concrete drawn hidden; an arrow pushes the plate toward the near side of the pier; a wedge of the pier in front of the near rods breaks away and slides out with them."></div>
+        </div>
+        <ol class="rail" aria-label="Stages of pier breakout in shear"></ol>
       </section>
     </div>
   </section>
@@ -843,203 +867,379 @@ const WF = (() => {
 })();
 </script>
 <script>
-/* The six AISC 360 J10 limit states for flanges and webs with concentrated forces. ZT is the top of the
-   member, ZTI the underside of its top flange; displacements are exaggerated so the mechanism reads. */
-const J10 = (() => {
-const { clamp: wclamp, bell, from: wfrom } = WF;
-const ZT = WF.SECTION.d/2, ZTI = ZT - WF.SECTION.tf, TW = WF.SECTION.tw;
+/* A column base plate, AISC Design Guide 1: a W12×65 column welded all round to a 22 in square, 1½ in plate,
+   grouted 1½ in on a 32 in square concrete pier and held down by four cast-in 1 in headed rods, hef 12, with
+   plate washers and nuts. The pier is an x–z section extruded along y, so a breakout can come away as a piece;
+   everything standing on it is drawn through a figure's displacement field D(x, y, z, a, part, rod). The parts
+   of the rods inside the concrete are drawn hidden. Inches; z = 0 is the top of the pier, the +x and +y faces
+   are toward the viewer. */
+const BPX = (() => {
+  const { setD, cls, show, putc, from, range, seq, panel, drawPanel, ringsOf, arrow, drawArrow, lerp } = WF;
+  const { Cam, fit, proj, facing, prism, circ, poly, open, mk, tween, tset, tval, solid, hull } = HL;
+  const PC = 16, ZB = -14, GS = 2;                          // pier half-width, the bottom of the drawing, mesh pitch
+  const GT = 1.5, GH = 12.5;                                // grout: thickness, half-width
+  const PH = 11, ZP0 = GT, ZP1 = GT + 1.5;                  // plate: half-width, underside, top
+  const D = 12.1, BF = 12, TF = .605, TW = .39, ZC1 = 18;   // W12×65, cut off at ZC1
+  const RX = 8.5, RR = .5, HEF = 12, RN = .94, RH = .94, TH = .63, WS = 1.5, ZW = ZP1 + .5, ZN = ZW + 1, ZR = ZN + .75;
+  const W = .6;                                             // weld leg, drawn large
+  /* the far rod first; the column hides it, and stands in front of the rest */
+  const RODS = [[-RX, -RX], [RX, -RX], [-RX, RX], [RX, RX]].map(([x, y], i) => ({ i, x, y }));
 
-/* J10.1 Flange local bending: a plate welded across the flange pulls; the flange bends about the web, its
-   tips lifting more than the line over the web, and yield lines form. */
-const FLB = WF.beamFig({
-  DETAIL: ['ready', 'W14 × 61', 'plate across the flange', 'tension Pu', 'flange bends about the web', 'yield lines · Rn = 6.25 Fyf tf²'],
-  bearing: false, arrow: false, hi: 'flange',
-  fit: [[-22, -5, -ZT - 1], [22, 5, -ZT - 1], [22, -5, ZT + 14], [-22, 5, ZT + 14], [0, 0, ZT + 15]],
-  D(x, y, z, a){
-    const b = bell(x, 5.5), curl = a*1.7*Math.pow(Math.min(1, Math.abs(y)/5), 1.4)*b, lift = a*1.0*b;
-    if (z < ZTI - .01) return [0, 0, 0];
-    if (z <= ZT + .01) return [0, 0, curl];
-    const t = wclamp((z - ZT)/.6, 0, 1);
-    return [0, 0, curl + (lift - curl)*t];
-  },
-  onTop(g, M, G){
-    M.tplate = WF.box(g, [-.45, -4.6, .45, 4.6], ZT, ZT + 6, { r: .2, k: .12 });
-    M.grip = WF.box(g, [-2.2, -5.4, 2.2, 5.4], ZT + 6, ZT + 8.2, { r: .6, k: .3 });
-    M.pull = WF.arrow(g);
-    M.ylines = HL.mk('path', { class: 'nf hi' }, g);
-    M.tS = G(wfrom(2)); M.gS = G(wfrom(3)); M.yS = G(wfrom(5));
-  },
-  drawExtra(M, k, val){
-    const { Pf, front } = M, vt = val(M.tS), vg = val(M.gS), vy = val(M.yS);
-    WF.drawBox(M.tplate, Pf, front, vt > .001, 10*(1 - vt)); WF.cls(M.tplate.el.sil, k === 2 ? 'sil hi' : 'sil');
-    WF.drawBox(M.grip, Pf, front, vg > .001, 8*(1 - vg)); WF.cls(M.grip.el.sil, k === 3 ? 'sil hi' : 'sil');
-    WF.drawArrow(M.pull, Pf(0, 0, ZT + 8.4), Pf(0, 0, ZT + 15), vg, k === 3);
-    const L = (pts, n = 10) => { const out = []; for (let i = 0; i < pts.length - 1; i++) for (let j = 0; j < n; j++) out.push(WF.mix(pts[i], pts[i+1], j/n)); out.push(pts[pts.length - 1]); return WF.open(out.map(p => Pf(...p))); };
-    WF.setD(M.ylines, vy > .5 ? [
-      L([[-7, .7, ZT], [7, .7, ZT]]), L([[-7, -.7, ZT], [7, -.7, ZT]]),
-      L([[-7, .7, ZT], [-2.6, 5, ZT]]), L([[7, .7, ZT], [2.6, 5, ZT]]), L([[-7, -.7, ZT], [-2.6, -5, ZT]]), L([[7, -.7, ZT], [2.6, -5, ZT]]),
-    ].join('') : '');
-  },
-});
-
-/* A bearing support under the bottom flange at mid-length, with loads at both ends: the reaction is the
-   concentrated force. Shared by J10.2 and J10.3, so the web just above the bottom flange is in view. */
-const SUPPORT_FIT = [[-22, -6, -ZT - 8], [22, 6, -ZT - 8], [22, -5, ZT + 6], [-22, 5, ZT + 6], [-16, 0, ZT + 6]];
-const support = {
-  bearing: false, arrow: false, fit: SUPPORT_FIT,
-  under(g, M, G){
-    M.base = WF.box(g, [-4.5, -6, 4.5, 6], -ZT - 7, -ZT - 1, { r: .8, k: .4 });
-    M.bplate = WF.box(g, [-3, -4.6, 3, 4.6], -ZT - 1, -ZT);
-    M.uS = G(wfrom(2));
-  },
-  onTop(g, M, G){ M.ends = [-16, 16].map(x => ({ x, ar: WF.arrow(g) })); M.endS = G(wfrom(3)); },
-  drawSupport(M, k, val){
-    const v = val(M.uS);
-    WF.drawBox(M.base, M.P, M.front, v > .001, -8*(1 - v)); WF.drawBox(M.bplate, M.P, M.front, v > .001, -8*(1 - v));
-    WF.cls(M.base.el.sil, k === 2 ? 'sil hi' : 'sil'); WF.cls(M.bplate.el.sil, k === 2 ? 'sil hi' : 'sil');
-    const ve = val(M.endS); M.ends.forEach(e => WF.drawArrow(e.ar, M.Pf(e.x, 0, ZT + 7), M.Pf(e.x, 0, ZT + .3), ve, k === 3));
-  },
-};
-
-/* J10.2 Web local yielding: the reaction spreads through the flange at 2.5 : 1 and yields the web over
-   N + 5k at the toe of the fillet; the beam above settles and the web bulges a little there. */
-const K = 1.25, KZ = -ZT + K, SPREAD = 3 + 2.5*K;
-const WLY = WF.beamFig({
-  ...support,
-  DETAIL: ['ready', 'W14 × 61', 'bearing N on a support · 2.5 : 1', 'reaction Pu', 'web yields at the fillet toe', 'Rn = Fyw tw (5k + N)'],
-  D(x, y, z, a){
-    if (z <= KZ) return [0, 0, 0];
-    const b = bell(x, 5), t = wclamp((z - KZ)/2.6, 0, 1);
-    return [0, a*.6*b*Math.sin(Math.PI*t), -a*.55*b*t];
-  },
-  onWeb(g, M, G){
-    M.disp = [-1, 1].map(sx => ({ w: [[sx*3, TW/2 + .02, -ZT], [sx*SPREAD, TW/2 + .02, KZ], [sx*(SPREAD + 2.5*2.2), TW/2 + .02, KZ + 2.2]], el: HL.mk('path', { class: 'nf dash' }, g) }));
-    M.band = HL.mk('path', { class: 'nf' }, g); M.hatch = HL.mk('path', { class: 'nf' }, g);
-    M.dS = G(wfrom(2)); M.bS = G(wfrom(4));
-  },
-  drawExtra(M, k, val){
-    support.drawSupport(M, k, val);
-    const { Pf } = M, vd = val(M.dS), vb = val(M.bS), y = TW/2 + .03, z1 = KZ + 1.3;
-    M.disp.forEach(d => WF.setD(d.el, WF.line(d.w.map(p => Pf(...p)), vd)));
-    WF.setD(M.band, vb > .5 ? WF.poly([[-SPREAD, y, KZ], [SPREAD, y, KZ], [SPREAD, y, z1], [-SPREAD, y, z1]].map(p => Pf(...p))) : '');
-    let h = ''; if (vb > .5) for (let x = -SPREAD + .9; x < SPREAD; x += .9) h += WF.open([Pf(x, y, KZ), Pf(x, y, z1)]);
-    WF.setD(M.hatch, h);
-    WF.cls(M.band, k === 5 ? 'nf hi' : 'nf'); WF.cls(M.hatch, k === 5 ? 'nf hi' : 'nf lo');
-  },
-});
-
-/* J10.3 Web local crippling: over the bearing, the web wrinkles just above the flange and the beam
-   settles into it. */
-const WLC = WF.beamFig({
-  ...support,
-  DETAIL: ['ready', 'W14 × 61', 'bearing N on a support', 'reaction Pu', 'web wrinkles above the flange', 'web crippling'],
-  hi: 'web',
-  D(x, y, z, a){
-    if (z <= -ZTI) return [0, 0, 0];
-    const b = bell(x, 4.2), t = (z + ZTI)/3.8, drop = -a*.9*b;
-    if (t > 1) return [0, 0, drop];
-    return [0, a*1.5*b*Math.sin(Math.PI*t), drop*t];
-  },
-  drawExtra(M, k, val){ support.drawSupport(M, k, val); },
-});
-
-/* J10.4 Web sidesway buckling: with the flanges free to move sideways relative to each other, the loaded
-   compression flange swings out and the web bends under it. */
-const WSB = WF.beamFig({
-  DETAIL: ['ready', 'W14 × 61', 'bearing N · flanges unbraced', 'compression Pu', 'compression flange sways', 'web sidesway buckling'],
-  hi: 'web',
-  D(x, y, z, a){
-    const b = bell(x, 8), t = wclamp((z + ZT)/(2*ZT), 0, 1.25);
-    return [0, a*2.4*b*t*t, -a*.25*b*t];
-  },
-});
-
-/* J10.5 Web compression buckling: equal loads on both flanges at one section, and the web bows out across
-   its depth like a column. */
-const WCB = WF.beamFig({
-  DETAIL: ['ready', 'W14 × 61', 'bearing on both flanges', 'paired compression Pu', 'web bows across its depth', 'Rn = 24 tw³ √(E Fyw) / h'],
-  hi: 'web',
-  fit: [[-22, -6, -ZT - 8], [22, 6, -ZT - 8], [22, -5, ZT + 9], [-22, 5, ZT + 9], [0, 0, ZT + 10]],
-  D(x, y, z, a){
-    if (Math.abs(z) > ZTI) return [0, 0, 0];
-    return [0, a*1.9*bell(x, 6)*Math.cos(Math.PI*z/(2*ZTI)), 0];
-  },
-  under(g, M, G){
-    M.base = WF.box(g, [-4.5, -6, 4.5, 6], -ZT - 7, -ZT - 1, { r: .8, k: .4 });
-    M.bplate = WF.box(g, [-3, -4.6, 3, 4.6], -ZT - 1, -ZT);
-    M.uS = G(wfrom(2));
-  },
-  drawExtra(M, k, val){
-    const v = val(M.uS);
-    WF.drawBox(M.base, M.P, M.front, v > .001, -8*(1 - v)); WF.drawBox(M.bplate, M.P, M.front, v > .001, -8*(1 - v));
-    WF.cls(M.base.el.sil, k === 2 ? 'sil hi' : 'sil'); WF.cls(M.bplate.el.sil, k === 2 ? 'sil hi' : 'sil');
-  },
-});
-
-/* J10.6 Web panel-zone shear: beams on both sides of a column carry an unbalanced moment into it; the web
-   between the continuity plates shears into a parallelogram, the column flanges kink at its corners, and
-   the beams turn with it. */
-const PZ = (() => {
-  const N = 5, { S, G, val } = WF.seq(N);
-  const XF = 7, TFC = 1.03, TWC = .65, YB = 7.35, Z0 = -22, Z1 = 22, ZB = 9, TFB = .6, YBF = 3.75, LB = 15;
-  const STAGES = [['column', 1], ['load path', 2], ['load', 3], ['mechanism', 4]];
-  const DETAIL = ['ready', 'W14 × 132 column', 'W18 beams · continuity plates', 'unbalanced moment', 'panel zone shears', 'Rv = 0.60 Fy dc tw'];
-  function D(x, y, z, a){
-    const gam = .2*a, dx = gam*wclamp(z, -ZB, ZB);
-    const dz = x > XF ? -gam*(x - XF) : x < -XF ? -gam*(x + XF) : 0;
-    return [dx, 0, dz];
+  /* 2-d helpers for the pier's section: orientation, a point in a polygon, the parts of a segment inside one */
+  const area = Q => Q.reduce((s, p, i) => { const q = Q[(i + 1) % Q.length]; return s + p[0]*q[1] - q[0]*p[1]; }, 0)/2;
+  const ccw = Q => (area(Q) < 0 ? Q.slice().reverse() : Q);
+  const inPoly = (q, Q) => { let c = false; for (let i = 0, j = Q.length - 1; i < Q.length; j = i++){ const a = Q[i], b = Q[j];
+    if ((a[1] > q[1]) !== (b[1] > q[1]) && q[0] < (b[0] - a[0])*(q[1] - a[1])/(b[1] - a[1]) + a[0]) c = !c; } return c; };
+  function inside(A, B, Q){
+    const ts = [0, 1], dx = B[0] - A[0], dy = B[1] - A[1];
+    for (let i = 0, j = Q.length - 1; i < Q.length; j = i++){
+      const ex = Q[i][0] - Q[j][0], ey = Q[i][1] - Q[j][1], den = dx*ey - dy*ex; if (Math.abs(den) < 1e-12) continue;
+      const wx = Q[j][0] - A[0], wy = Q[j][1] - A[1], t = (wx*ey - wy*ex)/den, s = (wx*dy - wy*dx)/den;
+      if (t > 0 && t < 1 && s >= 0 && s <= 1) ts.push(t);
+    }
+    ts.sort((p, q) => p - q);
+    const out = [];
+    for (let i = 0; i < ts.length - 1; i++){
+      if (ts[i + 1] - ts[i] < 1e-6) continue;
+      const m = (ts[i] + ts[i + 1])/2;
+      if (inPoly([A[0] + m*dx, A[1] + m*dy], Q)) out.push([ts[i], ts[i + 1]]);
+    }
+    return out;
   }
-  function build(svg){
-    const { C, P, front, g } = WF.camera(svg, 4.8, [[-22, -YB, Z0], [22, YB, Z0], [22, -YB, Z1 + 1], [-22, YB, Z1 + 1], [19, 0, ZB + 6]]);
-    const M = { C, P, front, a: 1, amp: HL.tween(1, 900), sec: G(wfrom(1)), path: G(wfrom(2)), load: G(wfrom(3)), zone: G(wfrom(5)) };
-    M.Pf = (x, y, z) => { if (!M.a) return P(x, y, z); const d = D(x, y, z, M.a); return P(x + d[0], y + d[1], z + d[2]); };
-    const Z = u => Z0 + u*(Z1 - Z0), us = WF.range(14).slice(1, -1);
-    const beam = side => ['bot', 'web', 'top'].map(part => {
-      const z = part === 'bot' ? [-ZB, -ZB + TFB] : part === 'top' ? [ZB - TFB, ZB] : [-ZB + TFB, ZB - TFB];
-      const yy = part === 'web' ? [-.18, .18] : [-YBF, YBF];
-      return { side, z, yy, el: HL.solid(g) };
-    });
-    M.left = beam(-1);
-    M.backInner = WF.panel(g, (u, v) => [-XF + TFC, -YB + v*2*YB, Z(u)], { nu: 40, nv: 4 });
-    M.backEdge = WF.panel(g, (u, v) => [-XF + v*TFC, YB, Z(u)], { nu: 40, nv: 1 });
-    M.web = WF.panel(g, (u, v) => [-XF + TFC + v*(2*XF - 2*TFC), TWC/2, Z(u)], { nu: 44, nv: 8, us, vs: [.25, .5, .75] });
-    M.zoneEl = HL.mk('path', { class: 'nf hi' }, g);
-    M.stiff = [ZB - TFB/2, -(ZB - TFB/2)].map(z => WF.box(g, [-XF + TFC, TWC/2, XF - TFC, YB - .25], z - .38, z + .38, { r: .2, k: .1 }));
-    M.frontOuter = WF.panel(g, (u, v) => [XF, -YB + v*2*YB, Z(u)], { nu: 44, nv: 6, us, vs: [.25, .5, .75] });
-    M.frontEdge = WF.panel(g, (u, v) => [XF - TFC + v*TFC, YB, Z(u)], { nu: 44, nv: 1 });
-    M.right = beam(1);
-    M.arrow = WF.arrow(g);
-    M.cap = HL.mk('path', { class: 'sil' }, g);
-    return M;
+  const ticks = (a, b) => { const out = []; for (let t = Math.ceil((Math.min(a, b) + .01)/GS)*GS; t < Math.max(a, b) - .01; t += GS) out.push(t); return out; };
+  /* the side faces of extruded sections in paint order: one hides another where a line toward the viewer, in
+     the section, meets it first */
+  const VX = Math.SQRT1_2, VZ = .5/Math.sqrt(.75);
+  function paintOrder(faces){
+    const Wd = p => -VZ*p[0] + VX*p[1], Dp = p => VX*p[0] + VZ*p[1];
+    faces.forEach(f => { f.w0 = Wd(f.p); f.w1 = Wd(f.q); f.mid = (Dp(f.p) + Dp(f.q))/2; });
+    const at = (f, w) => lerp(Dp(f.p), Dp(f.q), (w - f.w0)/(f.w1 - f.w0));
+    const n = faces.length, next = faces.map(() => []), indeg = faces.map(() => 0);
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++){
+      const a = faces[i], b = faces[j];
+      if (a.pc.phase !== b.pc.phase && a.pc.phase >= 0 && b.pc.phase >= 0) continue;
+      const lo = Math.max(a.w0, b.w0), hi = Math.min(a.w1, b.w1);
+      if (hi - lo < 1e-4) continue;
+      const da = at(a, (lo + hi)/2), db = at(b, (lo + hi)/2);
+      if (Math.abs(da - db) < 1e-6) continue;
+      if (da < db){ next[i].push(j); indeg[j]++; } else { next[j].push(i); indeg[i]++; }
+    }
+    const out = [], done = faces.map(() => false);
+    for (let c = 0; c < n; c++){
+      let best = -1;
+      for (let i = 0; i < n; i++) if (!done[i] && indeg[i] === 0 && (best < 0 || faces[i].mid < faces[best].mid)) best = i;
+      if (best < 0) for (let i = 0; i < n; i++) if (!done[i] && (best < 0 || faces[i].mid < faces[best].mid)) best = i;
+      done[best] = true; out.push(faces[best]); next[best].forEach(j => indeg[j]--);
+    }
+    return out;
   }
-  const I = [[-XF, -YB], [-XF + TFC, -YB], [-XF + TFC, -TWC/2], [XF - TFC, -TWC/2], [XF - TFC, -YB], [XF, -YB], [XF, YB], [XF - TFC, YB], [XF - TFC, TWC/2], [-XF + TFC, TWC/2], [-XF + TFC, YB], [-XF, YB]];
-  function draw(M){
-    const k = S.k, { Pf, front } = M;
-    HL.tset(M.amp, k === 4 ? .5 : k >= 5 ? 1 : 0, S.now, 0); M.a = HL.tval(M.amp, S.now);
-    const grow = val(M.sec), vb = val(M.path);
-    const drawBeam = parts => parts.forEach(p => {
-      const on = vb > .001; WF.show(p.el.g, on); if (!on) return;
-      const x0 = p.side > 0 ? XF : -XF - LB*vb, x1 = p.side > 0 ? XF + LB*vb : -XF;
-      const [ring, inner] = WF.ringsOf([x0, p.yy[0], x1, p.yy[1]], .25, .15);
-      WF.putc(p.el, HL.prism(Pf, front, ring, inner, p.z[0], p.z[1]));
-      WF.cls(p.el.sil, k === 2 ? 'sil hi' : 'sil');
-    });
-    drawBeam(M.left);
-    [M.backInner, M.backEdge, M.web].forEach(p => WF.drawPanel(p, Pf, grow));
-    const vz = val(M.zone), y = TWC/2 + .02, xa = -XF + TFC, xb = XF - TFC;
-    WF.setD(M.zoneEl, vz > .5 ? WF.poly([[xa, y, -ZB], [xb, y, -ZB], [xb, y, ZB], [xa, y, ZB]].map(p => Pf(...p))) + WF.open([Pf(xa, y, -ZB), Pf(xb, y, ZB)]) + WF.open([Pf(xb, y, -ZB), Pf(xa, y, ZB)]) : '');
-    M.stiff.forEach(s => { WF.drawBox(s, Pf, front, vb > .001, 6*(1 - vb)); WF.cls(s.el.sil, k === 2 ? 'sil hi' : 'sil'); });
-    [M.frontOuter, M.frontEdge].forEach(p => WF.drawPanel(p, Pf, grow));
-    WF.cls(M.web.mesh, k === 5 ? 'nf hi' : 'nf');
-    drawBeam(M.right);
-    WF.drawArrow(M.arrow, Pf(XF + 12, 0, ZB + 8), Pf(XF + 12, 0, ZB + .3), val(M.load), k === 3);
-    const zc = Z0 + grow*(Z1 - Z0);
-    WF.setD(M.cap, grow > .001 ? WF.poly(I.map(([x, yy]) => Pf(x, yy, zc))) : '');
-    WF.cls(M.cap, k === 1 ? 'sil hi' : 'sil');
+
+  /* rings for vertical prisms, a rod's outline as the hull of its two end circles, and a fillet weld */
+  const circAt = (x, y, R, n = 16) => circ(R, n).map(q => ({ ...q, u: q.u + x, v: q.v + y }));
+  const hexAt = (x, y, R) => range(6).slice(0, -1).map(u => { const t = Math.PI/6 + u*2*Math.PI; return { u: x + R*Math.cos(t), v: y + R*Math.sin(t), nu: Math.cos(t), nv: Math.sin(t) }; });
+  const ringPts = (T, x, y, r, z) => circ(r, 16).map(q => T(x + q.u, y + q.v, z));
+  const cyl = (T0, z0, r0, T1, z1, r1, x, y) => { const top = ringPts(T1, x, y, r1, z1); return { sil: poly(hull(ringPts(T0, x, y, r0, z0).concat(top))), crease: poly(top) }; };
+  /* the welds that show: along the far flange's inside and the web on the +y side, then the near flange's
+     outside; a: start, b: end, n: out over the plate */
+  const WELDS = [
+    { a: [-D/2 + TF, TW/2], b: [-D/2 + TF, BF/2], n: [1, 0], back: true },
+    { a: [-D/2 + TF, TW/2], b: [D/2 - TF, TW/2], n: [0, 1], back: true },
+    { a: [D/2 - TF, TW/2], b: [D/2 - TF, BF/2], n: [-1, 0], back: true },
+    { a: [D/2, -BF/2], b: [D/2, BF/2], n: [1, 0] },
+  ];
+
+  /* A figure: pier and rods, plate and column, load, mechanism (half, then full). spec.D(x, y, z, a, part, rod)
+     moves the parts 'grout', 'plate', 'col', 'rod' (a rod above the plate, rigidly) and 'embed' (a rod in the
+     concrete); spec.pieces = [{ poly, move }] cut the pier once the mechanism starts, spec.move[key] moving a
+     piece in its section; spec.load names the arrow; spec.marks = [{ at, pts, on, when, cls, cls4 }] are lines
+     (cracks, yield lines, hidden surfaces) put in at depth 'at', riding on 'on', shown from the mechanism or
+     only at its full extent; hooks add a figure's own parts at their depth. */
+  const LOADS = {
+    down: ['col', [0, 0, ZC1 + 8], [0, 0, ZC1 + .6]], up: ['col', [0, 0, ZC1 + .6], [0, 0, ZC1 + 8]],
+    push: ['col', [-17, 0, ZC1 - 2], [-D/2 - .3, 0, ZC1 - 2]], shear: ['plate', [-24, 0, (ZP0 + ZP1)/2], [-PH - .3, 0, (ZP0 + ZP1)/2]],
+  };
+  function fig(spec){
+    const N = 5, { S, G, val } = seq(N);
+    const STAGES = [['pier', 1], ['column', 2], ['load', 3], ['mechanism', 4]];
+    const Dsp = spec.D || (() => null);
+    function build(svg){
+      const C = Cam(45, .5, 1), g = mk('g', {}, svg), pts = [];
+      [-PC, PC].forEach(x => [-PC, PC].forEach(y => [ZB, 0].forEach(z => pts.push([x, y, z]))));
+      pts.push([-D/2, -BF/2, ZC1], [D/2, BF/2, ZC1], [0, 0, ZC1 + 8]);
+      fit(C, pts, 0, 0);
+      const P1 = proj(C), q = pts.map(p => P1(...p)), w = Math.max(...q.map(p => p[0])) - Math.min(...q.map(p => p[0])), h = Math.max(...q.map(p => p[1])) - Math.min(...q.map(p => p[1]));
+      C.S = Math.min(340/w, 262/h); fit(C, pts, 200, 162);
+      const P = proj(C), front = facing(C);
+      const M = { C, P, front, a: 0, amp: tween(1, 900), blk: G(from(1)), rod: G(from(1), 300), grout: G(from(2)), plt: G(from(2), 150), col: G(from(2), 300), nut: G(from(2), 450),
+        load: G(from(3)), mech: G(from(4)), full: G(from(5)) };
+      /* transforms: a part through the field, a rod's top or its embedded length as one piece, a pier piece */
+      M.Pd = (part, dz = 0) => (x, y, z) => { const d = M.a ? Dsp(x, y, z, M.a, part) : null; return d ? P(x + d[0], y + d[1], z + d[2] + dz) : P(x, y, z + dz); };
+      M.Pr = (rod, part = 'rod', dz = 0) => { const d = (M.a && Dsp(rod.x, rod.y, part === 'rod' ? ZP1 : 0, M.a, part, rod)) || [0, 0, 0]; return (x, y, z) => P(x + d[0], y + d[1], z + d[2] + dz); };
+      M.Pm = (key, dz = 0) => { const f = spec.move && spec.move[key]; return (x, y, z) => { const p = f && M.a ? f([x, z], M.a) : [x, z]; return P(p[0], y, p[1] + dz); }; };
+      M.X = key => (spec.move && spec.move[key] ? M.Pm(key) : key === 'none' ? P : M.Pd(key));
+      const hook = name => g2 => spec[name] && spec[name](g2, M);
+
+      /* the pier: whole, then cut; side faces in paint order, then the cut ends at y = PC */
+      M.pieces = [{ poly: [[-PC, ZB], [PC, ZB], [PC, 0], [-PC, 0]], phase: spec.pieces ? 0 : -1 }].concat((spec.pieces || []).map(pc => ({ ...pc, phase: 1 }))).map(pc => ({ ...pc, Q: ccw(pc.poly) }));
+      const faces = [];
+      M.pieces.forEach(pc => pc.Q.forEach((p, i) => { const q2 = pc.Q[(i + 1) % pc.Q.length]; if (VX*(q2[1] - p[1]) - VZ*(q2[0] - p[0]) > 1e-6) faces.push({ pc, p, q: q2 }); }));
+      M.faces = paintOrder(faces);
+      M.faces.forEach(f => { f.el = mk('path', { class: 'sil' }, g); f.mesh = mk('path', { class: 'nf' }, g); f.top = Math.abs(f.p[1]) < 1e-6 && Math.abs(f.q[1]) < 1e-6; });
+      M.pieces.forEach(pc => { pc.end = mk('path', { class: 'sil' }, g); pc.mesh = mk('path', { class: 'nf' }, g); });
+      M.marks = [];
+      const marks = at => (spec.marks || []).filter(m => (m.at || 'pier') === at).forEach(m => M.marks.push({ ...m, el: mk('path', { class: 'nf hi' }, g) }));
+      marks('pier'); hook('onPier')(g);
+      /* hidden: the rods and their heads in the concrete */
+      M.hidden = mk('path', { class: 'nf sil dash' }, g);
+      marks('hidden'); hook('onHidden')(g);
+      /* the grout, the rods from it up to the plate, the plate */
+      marks('ground'); hook('onGround')(g);
+      const [gr, gi] = ringsOf([-GH, -GH, GH, GH], .3, .2); M.gbox = { ring: gr, inner: gi, el: solid(g) };
+      marks('grout'); hook('onGrout')(g);
+      M.rodLo = RODS.map(() => solid(g));
+      const us = range(11).slice(1, -1);
+      M.plate = [panel(g, (u, v) => [PH, lerp(-PH, PH, u), lerp(ZP0, ZP1, v)], { nu: 44, nv: 1 }), panel(g, (u, v) => [lerp(-PH, PH, u), PH, lerp(ZP0, ZP1, v)], { nu: 44, nv: 1 }),
+        panel(g, (u, v) => [lerp(-PH, PH, u), lerp(-PH, PH, v), ZP1], { nu: 44, nv: 44, us, vs: us })];
+      marks('plate'); hook('onPlate')(g);
+      /* a rod's top: the rod, its plate washer, its nut */
+      const top = r => { r.up = solid(g); r.wash = solid(g); r.nutEl = solid(g); };
+      M.rods = RODS.map(r => ({ ...r }));
+      top(M.rods[0]);
+      /* the column, back to front, the welds at its foot in among its faces */
+      const Zc = u => lerp(ZP1, ZC1, u), cu = range(7).slice(1, -1);
+      const weld = wd => ({ ...wd, el: solid(g), el2: solid(g) });
+      M.colP = [panel(g, (u, v) => [-D/2 + TF, lerp(-BF/2, BF/2, v), Zc(u)], { nu: 24, nv: 6 }), panel(g, (u, v) => [-D/2 + v*TF, BF/2, Zc(u)], { nu: 24, nv: 1 }),
+        panel(g, (u, v) => [lerp(-D/2 + TF, D/2 - TF, v), TW/2, Zc(u)], { nu: 24, nv: 12, us: cu, vs: [.25, .5, .75] })];
+      M.welds = WELDS.filter(wd => wd.back).map(weld);
+      marks('web'); hook('onWeb')(g);
+      M.colP.push(panel(g, (u, v) => [D/2 - TF + v*TF, BF/2, Zc(u)], { nu: 24, nv: 1 }), panel(g, (u, v) => [D/2, lerp(-BF/2, BF/2, v), Zc(u)], { nu: 24, nv: 12, us: cu, vs: [.15, .3, .7, .85] }));
+      M.cap = mk('path', { class: 'sil' }, g);
+      M.welds.push(...WELDS.filter(wd => !wd.back).map(weld));
+      marks('column'); hook('onColumn')(g);
+      M.rods.slice(1).forEach(top);
+      marks('top'); hook('top')(g);
+      M.arrow = arrow(g);
+      return M;
+    }
+    function draw(M){
+      const k = S.k, { P, front } = M;
+      tset(M.amp, k === 4 ? .5 : k >= 5 ? 1 : 0, S.now, 0); M.a = tval(M.amp, S.now);
+      const vb = val(M.blk), vr = val(M.rod), vg = val(M.grout), vp = val(M.plt), vc = val(M.col), vn = val(M.nut), cut = M.a > 1e-3 ? 1 : 0;
+      /* the pier */
+      const dzb = -20*(1 - vb);
+      M.faces.forEach(f => {
+        if (vb < .001 || (f.pc.phase >= 0 && f.pc.phase !== cut)){ setD(f.el, ''); setD(f.mesh, ''); return; }
+        const T = M.Pm(f.pc.move, dzb), A = (pt, y) => T(pt[0], y, pt[1]);
+        setD(f.el, poly([A(f.p, -PC), A(f.q, -PC), A(f.q, PC), A(f.p, PC)]));
+        const dx = f.q[0] - f.p[0], dz = f.q[1] - f.p[1], byX = Math.abs(dx) >= Math.abs(dz);
+        let m = ticks(-PC, PC).map(y => open([A(f.p, y), A(f.q, y)])).join('');
+        (byX ? ticks(f.p[0], f.q[0]).map(x => (x - f.p[0])/dx) : ticks(f.p[1], f.q[1]).map(z => (z - f.p[1])/dz)).forEach(t => {
+          const pt = [lerp(f.p[0], f.q[0], t), lerp(f.p[1], f.q[1], t)]; m += open([A(pt, -PC), A(pt, PC)]); });
+        setD(f.mesh, m); cls(f.el, k === 1 && f.top ? 'sil hi' : 'sil');
+      });
+      M.pieces.forEach(pc => {
+        if (vb < .001 || (pc.phase >= 0 && pc.phase !== cut)){ setD(pc.end, ''); setD(pc.mesh, ''); return; }
+        const T = M.Pm(pc.move, dzb), A = pt => T(pt[0], PC, pt[1]);
+        setD(pc.end, poly(pc.Q.map(A)));
+        const xs = pc.Q.map(p => p[0]), zs = pc.Q.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), z0 = Math.min(...zs), z1 = Math.max(...zs);
+        let m = '';
+        ticks(x0, x1).forEach(x => inside([x, z0], [x, z1], pc.Q).forEach(([s, t]) => { m += open([A([x, lerp(z0, z1, s)]), A([x, lerp(z0, z1, t)])]); }));
+        ticks(z0, z1).forEach(z => inside([x0, z], [x1, z], pc.Q).forEach(([s, t]) => { m += open([A([lerp(x0, x1, s), z]), A([lerp(x0, x1, t), z])]); }));
+        setD(pc.mesh, m);
+      });
+      /* the rods: hidden in the concrete, then up to the plate */
+      const dzr = 10*(1 - vr), ron = vr > .001;
+      let hd = '';
+      if (vr > .99) M.rods.forEach(r => {
+        const Te = M.Pr(r, 'embed'), s = Math.SQRT1_2*RR;
+        hd += open([Te(r.x + s, r.y - s, -HEF), Te(r.x + s, r.y - s, 0)]) + open([Te(r.x - s, r.y + s, -HEF), Te(r.x - s, r.y + s, 0)]) + prism(Te, front, hexAt(r.x, r.y, RH), null, -HEF - TH, -HEF).sil;
+      });
+      setD(M.hidden, hd);
+      /* grout */
+      const zt = spec.groutTop ? spec.groutTop(M.a) : GT;
+      show(M.gbox.el.g, vg > .001);
+      if (vg > .001){ putc(M.gbox.el, prism(M.Pd('grout', 12*(1 - vg)), front, M.gbox.ring, M.gbox.inner, 0, zt)); cls(M.gbox.el.sil, k === 2 ? 'sil hi' : 'sil'); }
+      /* the rods from the grout up; inside it they never show */
+      const z0 = vg > .99 ? zt : 0, gap = r => { const d = (M.a && Dsp(r.x, r.y, ZP0, M.a, 'plate')) || [0, 0, 0]; return d[2]; };
+      M.rods.forEach((r, i) => {
+        const el = M.rodLo[i]; show(el.g, ron); if (!ron) return;
+        const Te = M.Pr(r, 'embed', dzr), Tr = M.Pr(r, 'rod', dzr), g0 = gap(r);
+        if (spec.rodBreak && M.a > 1e-3){
+          /* broken: the stub's necked tip stands off the grout, the upper piece's hangs from the plate */
+          const Pz = (x, y, z) => P(x, y, z), lo = ZP0 + .45*g0, hi = ZP0 + .55*g0;
+          const s1 = cyl(Te, z0, RR, Pz, ZP0 + .25*g0, RR, r.x, r.y), n1 = cyl(Pz, ZP0 + .25*g0, RR, Pz, lo, .4*RR, r.x, r.y);
+          const n2 = cyl(Pz, hi, .4*RR, Pz, ZP0 + .7*g0, RR, r.x, r.y), s2 = cyl(Pz, ZP0 + .7*g0, RR, Pz, ZP0 + g0, RR, r.x, r.y);
+          putc(el, { sil: s1.sil + n1.sil + n2.sil + s2.sil, crease: '' });
+          cls(el.sil, k === 5 ? 'sil hi' : 'sil');
+        } else { putc(el, cyl(Te, z0, RR, Tr, vp > .99 ? ZP0 : ZR, RR, r.x, r.y)); cls(el.sil, k === 1 || (spec.rodHi && spec.rodHi(r, k)) ? 'sil hi' : 'sil'); }
+      });
+      /* the plate */
+      const Pp = M.Pd('plate', 12*(1 - vp));
+      M.plate.forEach(p => { drawPanel(p, Pp, vp > .001 ? 1 : 0); cls(p.el, k === 2 ? 'sil hi' : 'sil'); });
+      /* the rods' tops; the column and its welds */
+      M.rods.forEach(r => {
+        const Tr = M.Pr(r, 'rod', dzr), Tn = M.Pr(r, 'rod', 12*(1 - vn)), seated = vp > .99, non = vn > .001;
+        show(r.up.g, ron && seated); if (ron && seated) putc(r.up, cyl(Tr, ZP1, RR, Tr, ZR, RR, r.x, r.y));
+        cls(r.up.sil, k === 1 || (spec.rodHi && spec.rodHi(r, k)) ? 'sil hi' : 'sil');
+        show(r.wash.g, non); show(r.nutEl.g, non);
+        if (non){ const [wr, wi] = ringsOf([r.x - WS, r.y - WS, r.x + WS, r.y + WS], .2, .1);
+          putc(r.wash, prism(Tn, front, wr, wi, ZP1, ZW)); putc(r.nutEl, prism(Tn, front, hexAt(r.x, r.y, RN), hexAt(r.x, r.y, RN*.82), ZW, ZN)); }
+        [r.wash, r.nutEl].forEach(e => cls(e.sil, k === 2 || (spec.rodHi && spec.rodHi(r, k)) ? 'sil hi' : 'sil'));
+      });
+      const Pc = M.Pd('col');
+      M.colP.forEach(p => drawPanel(p, Pc, vc));
+      const zc = lerp(ZP1, ZC1, vc), I = [[-D/2, -BF/2], [-D/2 + TF, -BF/2], [-D/2 + TF, -TW/2], [D/2 - TF, -TW/2], [D/2 - TF, -BF/2], [D/2, -BF/2], [D/2, BF/2], [D/2 - TF, BF/2], [D/2 - TF, TW/2], [-D/2 + TF, TW/2], [-D/2 + TF, BF/2], [-D/2, BF/2]];
+      setD(M.cap, vc > .001 ? poly(I.map(([x, y]) => Pc(x, y, zc))) : ''); cls(M.cap, k === 2 ? 'sil hi' : 'sil');
+      /* a weld's section: root, toe on the plate, toe on the column, each point riding on its part; broken,
+         it tears through the throat and its column half goes with the column */
+      const Tw = { c: Pc, p: Pp }, broke = spec.weldBreak && M.a > 1e-3;
+      M.welds.forEach(wd => {
+        const on = vc > .99; show(wd.el.g, on); show(wd.el2.g, on && broke); if (!on) return;
+        const [nx, ny] = wd.n, tri = sec => poly(hull([wd.a, wd.b].flatMap(([x, y]) => sec.map(([s, h, t]) => Tw[t](x + nx*s, y + ny*s, ZP1 + h)))));
+        if (broke){ putc(wd.el, { sil: tri([[0, 0, 'p'], [W, 0, 'p'], [W/2, W/2, 'p']]), crease: '' }); putc(wd.el2, { sil: tri([[0, 0, 'c'], [W/2, W/2, 'c'], [0, W, 'c']]), crease: '' }); }
+        else putc(wd.el, { sil: tri([[0, 0, 'c'], [W, 0, 'p'], [0, W, 'c']]), crease: '' });
+        [wd.el, wd.el2].forEach(e => cls(e.sil, k === 2 || (spec.weldHi && k === 5) ? 'sil hi' : 'sil'));
+      });
+      /* the load */
+      const L = LOADS[spec.load];
+      if (L){ const T = M.Pd(L[0]); drawArrow(M.arrow, T(...L[1]), T(...L[2]), val(M.load), k === 3); }
+      const vm = val(M.mech) > .5, vf = val(M.full) > .5;
+      M.marks.forEach(m => {
+        const on = m.when === 'mech' ? vm : vf, T = M.X(m.on || 'none'), pts = typeof m.pts === 'function' ? m.pts(M.a) : m.pts;
+        setD(m.el, on ? (m.closed ? poly : open)(pts.map(p => T(...p))) : ''); cls(m.el, k >= 5 ? m.cls || 'nf hi' : m.cls4 || m.cls || 'nf hi');
+      });
+      spec.drawExtra && spec.drawExtra(M, k, val);
+    }
+    return { N, STAGES, DETAIL: spec.DETAIL, S, build, draw };
   }
-  return { N, STAGES, DETAIL, S, build, draw };
+  return { PC, ZB, GT, GH, PH, ZP0, ZP1, D, BF, TF, TW, ZC1, RX, RR, HEF, ZR, W, RODS, fig };
 })();
-return { FLB, WLY, WLC, WSB, WCB, PZ };
+</script>
+<script>
+/* The limit states of a column base plate, AISC Design Guide 1: the concrete in bearing (AISC 360 J8), the
+   plate yielding at its bearing and tension interfaces, the rods, the column welds, a large moment, and the
+   rods and the pier in tension and shear (ACI 318 Chapter 17). Displacements are exaggerated so the
+   mechanism reads. */
+const BPLS = (() => {
+const { PC, ZB, GT, GH, PH, ZP0, ZP1, D, BF, RX, HEF, W, RODS, fig } = BPX;
+const { range, lerp } = WF;
+const D1 = 'pier 32 in square · four 1 in rods, hef 12', D2 = 'W12×65 · plate 22 × 22 × 1½ · grout 1½';
+const smooth = t => t*t*(3 - 2*t);
+/* a crack from p to q, kinked alternately along e */
+const zig = (p, q, e, n = 6, amp = .3) => range(n).map((t, i) => p.map((v, j) => lerp(v, q[j], t) + (i > 0 && i < n ? (i % 2 ? amp : -amp)*e[j] : 0)));
+const line = (p, q, n = 12) => range(n).map(t => p.map((v, j) => lerp(v, q[j], t)));
+const HID = { when: 'mech', cls4: 'nf sil dash', cls: 'nf dash hi' };
+
+/* Concrete bearing: the grout and the concrete under it crush, and the pier splits outward from under the
+   plate. */
+const SINK = .7;
+const BPC = fig({
+  DETAIL: ['ready', D1, D2, 'axial compression Pu', 'the concrete under the plate crushes and splits the pier', 'Pp = 0.85 f′c A1 √(A2/A1) ≤ 1.7 f′c A1'],
+  load: 'down',
+  D: (x, y, z, a, part) => (part === 'embed' || part === 'grout' ? null : [0, 0, -SINK*a]),
+  groutTop: a => GT - SINK*a,
+  marks: [
+    ...[[GH, 0, 0, PC, 0, 1, 0], [0, GH, 0, 0, PC, 1, 0], [-GH, 0, 0, -PC, 0, 0, 1], [0, -GH, 0, 0, -PC, 0, 1]].map(([x0, y0, z0, x1, y1]) =>
+      ({ pts: zig([x0, y0, z0], [x1, y1, 0], x0 ? [0, 1, 0] : [1, 0, 0], 4, .3) })),
+    { pts: zig([PC, 0, 0], [PC, 0, -10], [0, 1, 0], 7, .3) }, { pts: zig([0, PC, 0], [0, PC, -10], [1, 0, 0], 7, .3) },
+    ...[[1, 1], [1, -1], [-1, 1], [-1, -1]].map(([sx, sy]) => ({ pts: zig([sx*GH, sy*GH, 0], [sx*PC, sy*PC, 0], [.7*sy, -.7*sx, 0], 4, .25) })),
+  ],
+});
+
+/* Plate yielding at the bearing interface: the bearing pressure bends the plate's cantilevers, m beyond 0.95d
+   and n beyond 0.8bf, up off the grout about yield lines round the column. */
+const M95 = .95*D/2, N80 = .8*BF/2, CURL = .2;
+const curl = (x, y) => CURL*Math.max(0, Math.abs(x) - M95, Math.abs(y) - N80);
+const BPY = fig({
+  DETAIL: ['ready', D1, D2, 'axial compression Pu', 'the plate bends up beyond 0.95d and 0.8bf', 'tp ≥ ℓ √(2Pu / (φ Fy B N))'],
+  load: 'down',
+  D: (x, y, z, a, part) => (part === 'plate' || part === 'rod' ? [0, 0, a*curl(x, y)] : null),
+  marks: [
+    { at: 'plate', on: 'plate', closed: true, pts: [[-M95, -N80, ZP1], [M95, -N80, ZP1], [M95, N80, ZP1], [-M95, N80, ZP1]] },
+    ...[[1, 1], [1, -1], [-1, 1], [-1, -1]].map(([sx, sy]) => ({ at: 'plate', on: 'plate', pts: line([sx*M95, sy*N80, ZP1], [sx*PH, sy*(N80 + PH - M95), ZP1]) })),
+  ],
+});
+
+/* Plate yielding at the tension interface: the column pulls up, the rods hold the plate down, and the plate
+   bends between them about lines at the flanges and at the rods. */
+const LIFT = 1.4, bend = x => Math.max(0, Math.min(1, (RX - Math.abs(x))/(RX - D/2)));
+const BPT = fig({
+  DETAIL: ['ready', D1, D2, 'uplift Tu', 'the plate bends between the flanges and the rods', 'tp ≥ √(4 Tu,rod x / (φ Fy beff))'],
+  load: 'up',
+  D: (x, y, z, a, part) => (part === 'col' ? [0, 0, LIFT*a] : part === 'plate' || part === 'rod' ? [0, 0, LIFT*a*bend(x)] : null),
+  marks: [-1, 1].flatMap(s => [D/2 + W, RX].map(x => ({ at: 'plate', on: 'plate', pts: [[s*x, -PH, ZP1], [s*x, PH, ZP1]] }))),
+});
+
+/* Anchor rod tension: the rods neck just above the grout and break; the plate and column lift away. */
+const UP = 3;
+const BAR = fig({
+  DETAIL: ['ready', D1, D2, 'uplift Tu', 'the rods neck and break above the grout', 'Nsa = Ase,N futa, each rod'],
+  load: 'up', rodBreak: true,
+  D: (x, y, z, a, part) => (part === 'col' || part === 'plate' || part === 'rod' ? [0, 0, UP*a] : null),
+});
+
+/* Pier breakout in tension: the rods sit 7½ in from the pier's sides, inside 1.5 hef, so ACI's prism takes the
+   whole top of the pier: it cracks round the sides where the 1 : 1.5 slopes from the heads meet them and lifts
+   out with the column. */
+const ZCK = -HEF + (PC - RX)/1.5, LB = 2.4;
+const BCB = fig({
+  DETAIL: ['ready', D1, D2, 'uplift Tu', 'c 7½ < 1.5 hef: ANc is the whole pier top', 'Ncbg = (ANc / ANco) ψec ψed ψc Nb'],
+  load: 'up',
+  pieces: [{ poly: [[-PC, ZB], [PC, ZB], [PC, ZCK], [-PC, ZCK]] }, { poly: [[-PC, ZCK], [PC, ZCK], [PC, 0], [-PC, 0]], move: 'chunk' }],
+  move: { chunk: (p, a) => [p[0], p[1] + LB*a] },
+  D: (x, y, z, a) => [0, 0, LB*a],
+  marks: [
+    { pts: [[PC, -PC, ZCK], [PC, PC, ZCK], [-PC, PC, ZCK]] },
+    { at: 'hidden', on: 'chunk', ...HID, closed: true, pts: [[-RX, -RX, -HEF], [RX, -RX, -HEF], [RX, RX, -HEF], [-RX, RX, -HEF]] },
+    ...[[1, 1], [1, -1], [-1, 1], [-1, -1]].map(([sx, sy]) => ({ at: 'hidden', on: 'chunk', ...HID, pts: [[sx*RX, sy*RX, -HEF], [sx*PC, sy*PC, ZCK]] })),
+  ],
+});
+
+/* Column weld rupture: the fillet welds round the column's foot tear through their throats and the column
+   lifts off the plate. */
+const BWR = fig({
+  DETAIL: ['ready', D1, D2, 'uplift Tu', 'the fillet welds tear through their throats', 'φRn = 0.75 · 0.6 FEXX · 0.707 w · L'],
+  load: 'up', weldBreak: true, weldHi: true,
+  D: (x, y, z, a, part) => (part === 'col' ? [0, 0, 1.2*a] : null),
+});
+
+/* Moment with a large eccentricity: the column and plate rock about the toe; the heel lifts and its rods
+   stretch, and the grout under the toe takes the bearing. */
+const TIP = .045;
+const tip = (x, z, a) => { const t = -TIP*a, c = Math.cos(t), s = Math.sin(t), dx = x - PH, dz = z - ZP0; return [PH + dx*c - dz*s - x, 0, ZP0 + dx*s + dz*c - z]; };
+const BMO = fig({
+  DETAIL: ['ready', D1, D2, 'moment Mu', 'the heel lifts, its rods stretch, the toe bears', 'Tu = qmax Y − Pu ≤ φRn of the rods'],
+  load: 'push',
+  D: (x, y, z, a, part) => (part === 'col' || part === 'plate' || part === 'rod' ? tip(x, z, a) : null),
+  rodHi: (r, k) => k === 5 && r.x < 0,
+  /* the grout crushing under the toe, hatched on its faces */
+  marks: range(6).map(t => { const x = lerp(5.5, 11.8, t); return { at: 'grout', pts: [[x, GH, GT - .05], [x + .6, GH, .1]] }; })
+    .concat(range(14).map(t => { const y = lerp(-GH + .4, GH - 1, t); return { at: 'grout', pts: [[GH, y, GT - .05], [GH, y + .6, .1]] }; })),
+});
+
+/* Anchor rod shear: the plate slides on the grout and the rods, bent through it, shear off at the concrete. */
+const SL = 1.1;
+const BVS = fig({
+  DETAIL: ['ready', D1, D2, 'shear Vu', 'the rods bend through the grout and shear', 'Vsa = 0.6 Ase,V futa · 0.8 on a grout pad'],
+  load: 'shear',
+  D: (x, y, z, a, part) => (part === 'col' || part === 'plate' || part === 'rod' ? [SL*a, 0, 0] : null),
+  rodHi: (r, k) => k === 5,
+  marks: RODS.map(r => ({ at: 'top', ...HID, pts: a => range(10).map(t => [r.x + SL*a*smooth(t), r.y, ZP0*t]).concat([[r.x + SL*a, r.y, ZP1]]) })),
+});
+
+/* Pier breakout in shear: pushed toward the near side, the front rods, 7½ in from it, break out a wedge of the
+   pier: across its whole width and 1.5 ca1 down its face, ACI's half pyramid cut off by the pier's sides. */
+const SV = 1.5*(PC - RX), MV = [1.3, .25];
+const BVB = fig({
+  DETAIL: ['ready', D1, D2, 'shear Vu toward the near side', 'ca1 7½ · AVc is the pier face down 1.5 ca1', 'Vcbg = (AVc / AVco) ψec ψed ψc ψh Vb'],
+  load: 'shear',
+  pieces: [{ poly: [[-PC, ZB], [PC, ZB], [PC, -SV], [RX, 0], [-PC, 0]] }, { poly: [[RX, 0], [PC, -SV], [PC, 0]], move: 'chunk' }],
+  move: { chunk: (p, a) => [p[0] + MV[0]*a, p[1] + MV[1]*a] },
+  D: (x, y, z, a, part, rod) => (part === 'embed' && !(rod && rod.x > 0) ? null : [MV[0]*a, 0, MV[1]*a]),
+  marks: [{ pts: [[RX, PC, 0], [PC, PC, -SV], [PC, -PC, -SV]] }],
+});
+
+return { BPC, BPY, BPT, BAR, BCB, BWR, BMO, BVS, BVB };
 })();
 </script>
 <script>
